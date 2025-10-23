@@ -35,6 +35,23 @@
     }
   ];
 
+  // Get list of field names already used in the form
+  const usedFields = $derived(() => {
+    const fields = new Set<string>();
+    const collectFields = (elements: any[]): void => {
+      for (const el of elements) {
+        if (el['#tag'] === 'af-field' && el.name) {
+          fields.add(el.name);
+        }
+        if (el['#children']) {
+          collectFields(el['#children']);
+        }
+      }
+    };
+    collectFields(store.formElements);
+    return fields;
+  });
+
   // Show entity fields and layout elements
   const allItems = $derived(() => {
     const items = [...layoutItems];
@@ -42,17 +59,26 @@
     // Add entity fields if an entity is selected
     if (store.selectedEntity && store.entityFields) {
       const entityName = store.selectedEntity;
+      const used = usedFields();
+
       for (const [fieldName, field] of Object.entries(store.entityFields)) {
+        const fullFieldName = `${entityName}.${fieldName}`;
+
+        // Skip if field is already used in the form
+        if (used.has(fullFieldName)) {
+          continue;
+        }
+
         items.push({
           id: `field_${entityName}_${fieldName}`,
-          label: field.title || fieldName,
+          label: field.label || field.title || fieldName,
           category: `${entityName} Fields`,
           icon: 'fa-field',
           element: {
             '#tag': 'af-field',
-            name: `${entityName}.${fieldName}`,
+            name: fullFieldName,
             defn: {
-              label: field.title || fieldName,
+              label: field.label || field.title || fieldName,
               input_type: field.input_type || 'Text',
               required: field.required || false
             }

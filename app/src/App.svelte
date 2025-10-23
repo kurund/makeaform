@@ -40,6 +40,7 @@
       if (formData && formData.length > 0) {
         const form = formData[0];
         console.log('Loaded form:', form);
+        console.log('Form layout:', JSON.stringify(form.layout, null, 2));
 
         // Extract the form layout
         const layout = form.layout || [];
@@ -51,14 +52,53 @@
 
           // Separate af-entity from form elements
           const afEntity = children.find((el: any) => el['#tag'] === 'af-entity');
-          const formElements = children.filter((el: any) => el['#tag'] !== 'af-entity');
+          let formElements = children.filter((el: any) => el['#tag'] !== 'af-entity');
+          console.log('Form elements loaded:', JSON.stringify(formElements, null, 2));
+
+          // CiviCRM stores certain properties as strings, we need to parse them back
+          const parseAfformProperties = (elements: any[]): any[] => {
+            return elements.map((el: any) => {
+              const parsed = { ...el };
+
+              // Parse defn if it's a string
+              if (typeof parsed.defn === 'string') {
+                try {
+                  // Use eval to parse the object literal (CiviCRM uses JS object notation, not JSON)
+                  parsed.defn = eval('(' + parsed.defn + ')');
+                } catch (e) {
+                  console.error('Failed to parse defn:', parsed.defn, e);
+                }
+              }
+
+              // Recursively process children
+              if (parsed['#children'] && Array.isArray(parsed['#children'])) {
+                parsed['#children'] = parseAfformProperties(parsed['#children']);
+              }
+
+              return parsed;
+            });
+          };
+
+          formElements = parseAfformProperties(formElements);
+          console.log('Form elements after parsing:', JSON.stringify(formElements, null, 2));
 
           // Set entity config if present
           if (afEntity) {
+            // Parse actions if it's a string
+            let actions = afEntity.actions;
+            if (typeof actions === 'string') {
+              try {
+                actions = eval('(' + actions + ')');
+              } catch (e) {
+                console.error('Failed to parse actions:', actions, e);
+                actions = {};
+              }
+            }
+
             store.entityConfig = {
               type: afEntity.type,
               name: afEntity.name,
-              actions: afEntity.actions || {},
+              actions: actions || {},
               security: afEntity.security || 'RBAC'
             };
             store.selectedEntity = afEntity.type;

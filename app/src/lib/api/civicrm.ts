@@ -8,27 +8,29 @@ declare global {
 
 /**
  * Load admin data including entities, fields, and blocks
+ * This provides the list of searchable entities and their metadata
  */
 export async function loadAdminData(): Promise<AdminData> {
-  // Load basic entity list (the loadAdminData custom action isn't critical)
   try {
-    const entities = await window.CRM.api4('Entity', 'get', {
+    // Get list of searchable entities
+    const entityResults = await window.CRM.api4('Entity', 'get', {
       select: ['name', 'title', 'title_plural', 'description', 'type', 'icon', 'primary_key'],
       where: [['searchable', '=', 'primary']],
     });
 
-    const entityMap: Record<string, any> = {};
-    for (const entity of entities) {
-      entityMap[entity.name] = entity;
-    }
+    // Convert entity array to object keyed by name
+    const entities: Record<string, any> = {};
+    entityResults.forEach((entity: any) => {
+      entities[entity.name] = entity;
+    });
 
     return {
-      entities: entityMap,
+      entities: entities,
       fields: {},
       blocks: []
     };
   } catch (error) {
-    console.error('Failed to load entities:', error);
+    console.error('Failed to load admin data:', error);
     // Return empty data so the app can still function
     return { entities: {}, fields: {}, blocks: [] };
   }

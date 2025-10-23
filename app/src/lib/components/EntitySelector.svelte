@@ -18,40 +18,51 @@
     if (!entityName) {
       setSelectedEntity(null);
       setEntityFields({});
-      store.entityConfig = null;
       return;
     }
 
     setSelectedEntity(entityName);
 
-    // Set entity configuration for the form
-    const entityConfig = {
-      type: entityName,
-      name: entityName + '1',
-      actions: {
-        create: true,
-        update: false
-      },
-      security: 'RBAC'
-    };
-    store.entityConfig = entityConfig;
+    // Generate a unique entity name (e.g., Contact1, Contact2, etc.)
+    const existingCount = store.formElements.filter(
+      el => el['#tag'] === 'fieldset' && el['af-fieldset']?.startsWith(entityName)
+    ).length;
+    const entityInstanceName = `${entityName}${existingCount + 1}`;
 
-    // Auto-add the fieldset for this entity to the canvas if it's empty
-    if (store.formElements.length === 0) {
-      store.formElements.push({
-        '#tag': 'fieldset',
-        'af-fieldset': entityConfig.name,
-        class: 'af-container',
-        id: `fieldset_${Date.now()}`,
-        '#children': []
-      });
+    // Add entity configuration if it's the first entity
+    if (!store.entityConfig) {
+      store.entityConfig = {
+        type: entityName,
+        name: entityInstanceName,
+        actions: {
+          create: true,
+          update: false
+        },
+        security: 'RBAC'
+      };
     }
+
+    // Always add a new fieldset for this entity
+    store.formElements.push({
+      '#tag': 'fieldset',
+      'af-fieldset': entityInstanceName,
+      class: 'af-container',
+      id: `fieldset_${Date.now()}`,
+      '#children': []
+    });
 
     loading = true;
 
     try {
-      const fields = await getEntityFields(entityName);
-      setEntityFields(fields);
+      // Check if we already have fields from loadAdminData
+      const existingFields = store.adminData?.fields?.[entityName];
+      if (existingFields) {
+        setEntityFields(existingFields);
+      } else {
+        // Fallback to fetching fields if not in adminData
+        const fields = await getEntityFields(entityName);
+        setEntityFields(fields);
+      }
     } catch (error) {
       console.error('Failed to load entity fields:', error);
       alert(`Failed to load fields for ${entityName}`);
