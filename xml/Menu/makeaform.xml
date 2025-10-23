@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/admin/formcreator</path>
+    <page_callback>CRM_Makeaform_Page_Creator</page_callback>
+    <title>Form Creator</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>
