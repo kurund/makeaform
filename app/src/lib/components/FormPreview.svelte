@@ -1,6 +1,12 @@
 <script lang="ts">
-  import type { FormElement } from '../types';
-  import { store, selectElement, deleteElement, addElement, moveElement } from '../stores/formStore.svelte';
+  import type { FormElement } from "../types";
+  import {
+    store,
+    selectElement,
+    deleteElement,
+    addElement,
+    moveElement,
+  } from "../stores/formStore.svelte";
 
   let { element }: { element: FormElement } = $props();
 
@@ -15,7 +21,7 @@
 
   function handleDelete(e: MouseEvent) {
     e.stopPropagation();
-    if (confirm('Delete this element?')) {
+    if (confirm("Delete this element?")) {
       deleteElement(element.id);
     }
   }
@@ -23,28 +29,28 @@
   // Simpler approach: use HTML5 drag API but with proper event handling
   function handleDragStart(e: DragEvent) {
     if (e.dataTransfer && element.id) {
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', element.id);
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", element.id);
       isDragging = true;
 
       // Store the element ID globally so Canvas can access it
       (window as any).__draggingElementId = element.id;
 
-      console.log('Drag started for element:', element.id);
+      console.log("Drag started for element:", element.id);
     }
   }
 
   function handleDragEnd(e: DragEvent) {
     isDragging = false;
     (window as any).__draggingElementId = null;
-    console.log('Drag ended for element:', element.id);
+    console.log("Drag ended for element:", element.id);
   }
 
   function handleContainerDragOver(e: DragEvent) {
     e.preventDefault();
     e.stopPropagation();
     if (e.dataTransfer) {
-      e.dataTransfer.dropEffect = 'copy';
+      e.dataTransfer.dropEffect = "copy";
     }
     dragOverContainer = true;
   }
@@ -59,15 +65,15 @@
 
     if (e.dataTransfer) {
       // Check if it's a reordering operation (has element-id)
-      const elementId = e.dataTransfer.getData('application/x-element-id');
+      const elementId = e.dataTransfer.getData("application/x-element-id");
       if (elementId) {
         // This is a reordering operation - let it bubble to parent
-        console.log('Reordering operation detected, letting event bubble');
+        console.log("Reordering operation detected, letting event bubble");
         return;
       }
 
       // Check if it's a new element from palette
-      const jsonData = e.dataTransfer.getData('application/json');
+      const jsonData = e.dataTransfer.getData("application/json");
       if (jsonData) {
         e.preventDefault();
         e.stopPropagation();
@@ -75,7 +81,7 @@
           const newElement: FormElement = JSON.parse(jsonData);
           addElement(newElement, element.id);
         } catch (err) {
-          console.error('Failed to parse dropped element:', err);
+          console.error("Failed to parse dropped element:", err);
         }
       }
     }
@@ -84,8 +90,8 @@
   // Render different element types
   function renderField(el: FormElement) {
     const defn = el.defn || {};
-    const label = defn.label || el.name || 'Field';
-    const inputType = defn.input_type || 'Text';
+    const label = defn.label || el.name || "Field";
+    const inputType = defn.input_type || "Text";
     const required = defn.required || false;
 
     return { label, inputType, required };
@@ -93,9 +99,9 @@
 
   // Check if element can be a container
   const isContainer = $derived(
-    element['#tag'] === 'fieldset' ||
-    element['#tag'] === 'div' ||
-    element['#tag'] === 'container'
+    element["#tag"] === "fieldset" ||
+      element["#tag"] === "div" ||
+      element["#tag"] === "container",
   );
 </script>
 
@@ -107,7 +113,7 @@
   role="button"
   tabindex="0"
 >
-  {#if element['#tag'] === 'af-field'}
+  {#if element["#tag"] === "af-field"}
     {@const field = renderField(element)}
     <div class="form-group">
       <label>
@@ -117,50 +123,53 @@
         {/if}
       </label>
 
-      {#if field.inputType === 'TextArea'}
-        <textarea class="form-control" rows="3" placeholder={field.label}></textarea>
-      {:else if field.inputType === 'Select'}
+      {#if field.inputType === "TextArea"}
+        <textarea class="form-control" rows="3" placeholder={field.label}
+        ></textarea>
+      {:else if field.inputType === "Select"}
         <select class="form-control">
           <option>- select -</option>
         </select>
-      {:else if field.inputType === 'CheckBox'}
+      {:else if field.inputType === "CheckBox"}
         <div class="checkbox">
           <label>
-            <input type="checkbox" /> {field.label}
+            <input type="checkbox" />
+            {field.label}
           </label>
         </div>
-      {:else if field.inputType === 'Radio'}
+      {:else if field.inputType === "Radio"}
         <div class="radio">
           <label>
             <input type="radio" name={element.id} /> Option 1
           </label>
         </div>
-      {:else if field.inputType === 'Date'}
+      {:else if field.inputType === "Date"}
         <input type="text" class="form-control" placeholder="mm/dd/yyyy" />
-      {:else if field.inputType === 'EntityRef'}
+      {:else if field.inputType === "EntityRef"}
         <input type="text" class="form-control" placeholder="Start typing..." />
       {:else}
         <input type="text" class="form-control" placeholder={field.label} />
       {/if}
     </div>
-  {:else if element['#tag'] === 'fieldset'}
+  {:else if element["#tag"] === "fieldset"}
     <fieldset
       class="preview-fieldset"
       class:drag-over={dragOverContainer}
-      class:has-children={element['#children'] && element['#children'].length > 0}
+      class:has-children={element["#children"] &&
+        element["#children"].length > 0}
       ondragover={handleContainerDragOver}
       ondragleave={handleContainerDragLeave}
       ondrop={handleContainerDrop}
     >
-      {#if element['af-fieldset']}
-        <legend>Entity: {element['af-fieldset']}</legend>
+      {#if element["af-fieldset"]}
+        <legend>Entity: {element["af-fieldset"]}</legend>
       {/if}
       <div class="fieldset-content">
-        {#if element['#children'] && element['#children'].length > 0}
-          {#each element['#children'] as child}
-            {#if typeof child === 'object' && child['#tag'] === 'legend' && child['#children']}
-              <legend>{child['#children'][0]}</legend>
-            {:else if typeof child === 'object' && child['#tag']}
+        {#if element["#children"] && element["#children"].length > 0}
+          {#each element["#children"] as child}
+            {#if typeof child === "object" && child["#tag"] === "legend" && child["#children"]}
+              <legend>{child["#children"][0]}</legend>
+            {:else if typeof child === "object" && child["#tag"]}
               <svelte:self element={child} />
             {/if}
           {/each}
@@ -169,7 +178,7 @@
         {/if}
       </div>
     </fieldset>
-  {:else if element['#tag'] === 'div' || element['#tag'] === 'container'}
+  {:else if element["#tag"] === "div" || element["#tag"] === "container"}
     <div
       class="preview-container"
       class:drag-over={dragOverContainer}
@@ -178,9 +187,9 @@
       ondrop={handleContainerDrop}
     >
       <div class="container-label">Container</div>
-      {#if element['#children'] && element['#children'].length > 0}
-        {#each element['#children'] as child}
-          {#if typeof child === 'object' && child['#tag']}
+      {#if element["#children"] && element["#children"].length > 0}
+        {#each element["#children"] as child}
+          {#if typeof child === "object" && child["#tag"]}
             <svelte:self element={child} />
           {/if}
         {/each}
@@ -188,10 +197,10 @@
         <div class="container-empty">Drop fields here</div>
       {/if}
     </div>
-  {:else if element['#tag'] === 'button'}
+  {:else if element["#tag"] === "button"}
     <button type="button" class="btn {element.class || 'btn-default'}">
-      {#if element['#children'] && typeof element['#children'][0] === 'string'}
-        {element['#children'][0]}
+      {#if element["#children"] && typeof element["#children"][0] === "string"}
+        {element["#children"][0]}
       {:else}
         Button
       {/if}
@@ -237,14 +246,14 @@
   }
 
   .preview-element:hover {
-    background: #FAFAFA;
+    background: #fafafa;
     border-color: #e8e8eb;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   }
 
   .preview-element.selected {
-    background: #F3F1FF;
-    border-color: #6C5CE7;
+    background: #f3f1ff;
+    border-color: #6c5ce7;
     box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
   }
 
@@ -261,12 +270,12 @@
     display: block;
     font-weight: 600;
     margin-bottom: 8px;
-    color: #2C2C2C;
+    color: #2c2c2c;
     font-size: 15px;
   }
 
   .crm-marker {
-    color: #FF6B6B;
+    color: #ff6b6b;
   }
 
   .form-group input,
@@ -282,14 +291,14 @@
   .form-group input:focus,
   .form-group textarea:focus,
   .form-group select:focus {
-    border-color: #6C5CE7;
+    border-color: #6c5ce7;
     outline: none;
     box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
   }
 
   .preview-fieldset {
-    border: 3px solid #6C5CE7;
-    background: linear-gradient(135deg, #F9F8FF 0%, #FFFFFF 100%);
+    border: 3px solid #6c5ce7;
+    background: linear-gradient(135deg, #f9f8ff 0%, #ffffff 100%);
     padding: 28px;
     margin: 16px 0;
     border-radius: 16px;
@@ -299,7 +308,7 @@
   }
 
   .preview-fieldset::before {
-    content: 'DROP ZONE';
+    content: "DROP ZONE";
     position: absolute;
     top: 50%;
     left: 50%;
@@ -316,15 +325,15 @@
   }
 
   .preview-fieldset.drag-over {
-    background: linear-gradient(135deg, #FFF9E6 0%, #FFFEF5 100%);
-    border-color: #FFB84D;
+    background: linear-gradient(135deg, #fff9e6 0%, #fffef5 100%);
+    border-color: #ffb84d;
     border-width: 3px;
     border-style: dashed;
     box-shadow: 0 4px 20px rgba(255, 184, 77, 0.25);
   }
 
   .preview-fieldset.drag-over::before {
-    content: 'DROP HERE';
+    content: "DROP HERE";
     color: rgba(255, 184, 77, 0.3);
     font-size: 28px;
   }
@@ -336,7 +345,7 @@
     font-size: 13px;
     font-weight: 700;
     border: none;
-    background: #6C5CE7;
+    background: #6c5ce7;
     color: white;
     border-radius: 16px 0 16px 0;
     box-shadow: 0 3px 8px rgba(108, 92, 231, 0.3);
@@ -413,22 +422,22 @@
   .element-actions .drag-handle {
     cursor: move;
     background: #ffffff;
-    color: #6C5CE7;
+    color: #6c5ce7;
   }
 
   .element-actions .drag-handle:hover {
-    background: #F3F1FF;
-    border-color: #6C5CE7;
+    background: #f3f1ff;
+    border-color: #6c5ce7;
   }
 
   .element-actions .btn-danger {
     background: #ffffff;
     border-color: #e8e8eb;
-    color: #FF6B6B;
+    color: #ff6b6b;
   }
 
   .element-actions .btn-danger:hover {
-    background: #FFE8E8;
-    border-color: #FF6B6B;
+    background: #ffe8e8;
+    border-color: #ff6b6b;
   }
 </style>

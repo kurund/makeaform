@@ -1,7 +1,7 @@
 <script lang="ts">
-  import FormPreview from './FormPreview.svelte';
-  import { store, addElement, moveElement } from '../stores/formStore.svelte';
-  import type { FormElement } from '../types';
+  import FormPreview from "./FormPreview.svelte";
+  import { store, addElement, moveElement } from "../stores/formStore.svelte";
+  import type { FormElement } from "../types";
 
   let dragOver = $state(false);
   let dropIndex = $state<number | null>(null);
@@ -10,7 +10,7 @@
   function handleDragOver(e: DragEvent) {
     e.preventDefault();
     if (e.dataTransfer) {
-      e.dataTransfer.dropEffect = 'copy';
+      e.dataTransfer.dropEffect = "copy";
     }
     dragOver = true;
   }
@@ -24,13 +24,13 @@
     dragOver = false;
 
     if (e.dataTransfer) {
-      const data = e.dataTransfer.getData('application/json');
+      const data = e.dataTransfer.getData("application/json");
       if (data) {
         try {
           const element: FormElement = JSON.parse(data);
           addElement(element);
         } catch (err) {
-          console.error('Failed to parse dropped element:', err);
+          console.error("Failed to parse dropped element:", err);
         }
       }
     }
@@ -45,10 +45,10 @@
     dropBefore = e.clientY < midpoint;
     dropIndex = index;
 
-    console.log('Drag over index:', index, 'dropBefore:', dropBefore);
+    console.log("Drag over index:", index, "dropBefore:", dropBefore);
 
     if (e.dataTransfer) {
-      e.dataTransfer.dropEffect = 'move';
+      e.dataTransfer.dropEffect = "move";
     }
   }
 
@@ -64,7 +64,7 @@
   }
 
   function handleElementDrop(e: DragEvent, targetIndex: number) {
-    console.log('handleElementDrop called for index:', targetIndex);
+    console.log("handleElementDrop called for index:", targetIndex);
     e.preventDefault();
     e.stopPropagation();
 
@@ -78,19 +78,19 @@
     if (elementId) {
       // Moving existing element
       const newIndex = wasBefore ? targetIndex : targetIndex + 1;
-      console.log('Moving element', elementId, 'to index', newIndex);
+      console.log("Moving element", elementId, "to index", newIndex);
       moveElement(elementId, null, newIndex);
       (window as any).__draggingElementId = null;
     } else if (e.dataTransfer) {
       // Adding new element from palette
-      const jsonData = e.dataTransfer.getData('application/json');
+      const jsonData = e.dataTransfer.getData("application/json");
       if (jsonData) {
         try {
           const newElement: FormElement = JSON.parse(jsonData);
-          console.log('Adding new element from palette');
+          console.log("Adding new element from palette");
           addElement(newElement, null);
         } catch (err) {
-          console.error('Failed to parse dropped element:', err);
+          console.error("Failed to parse dropped element:", err);
         }
       }
     }
@@ -202,7 +202,7 @@
 
   .element-wrapper::before,
   .element-wrapper::after {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     right: 0;

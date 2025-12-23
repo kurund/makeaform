@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { store, setIsSaving } from '../stores/formStore.svelte';
-  import { saveForm } from '../api/civicrm';
+  import { store, setIsSaving } from "../stores/formStore.svelte";
+  import { saveForm } from "../api/civicrm";
 
   let { onSave = () => {} } = $props();
 
@@ -12,9 +12,9 @@
       const title = (e.target as HTMLInputElement).value;
       const path = title
         .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-      store.formMetadata.server_route = 'civicrm/' + path;
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+      store.formMetadata.server_route = "civicrm/" + path;
     }
   }
 
@@ -22,8 +22,8 @@
   $effect(() => {
     if (store.formMetadata.server_route) {
       // Extract the path portion after 'civicrm/' and generate machine name
-      const path = store.formMetadata.server_route.replace(/^civicrm\//, '');
-      store.formMetadata.name = 'afform_' + path.replace(/-/g, '_');
+      const path = store.formMetadata.server_route.replace(/^civicrm\//, "");
+      store.formMetadata.name = "afform_" + path.replace(/-/g, "_");
       autoGeneratePath = false;
     }
   });
@@ -33,11 +33,11 @@
 
     // Validate required fields
     if (!store.formMetadata.title) {
-      alert('Please enter a form title');
+      alert("Please enter a form title");
       return;
     }
     if (!store.formMetadata.server_route) {
-      alert('Please enter a form path');
+      alert("Please enter a form path");
       return;
     }
 
@@ -50,7 +50,7 @@
   }
 
   function handleKeyboardShortcut(e: KeyboardEvent) {
-    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    if ((e.ctrlKey || e.metaKey) && e.key === "s") {
       e.preventDefault();
       handleSave();
     }
@@ -119,7 +119,7 @@
     padding: var(--crm-r) var(--crm-r4);
     background: var(--crm-c-layer0-bg);
     border-bottom: 1px solid var(--crm-c-gray-200);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   }
 
   .toolbar-left {

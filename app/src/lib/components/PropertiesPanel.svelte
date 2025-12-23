@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { store, updateElement } from '../stores/formStore.svelte';
+  import { store, updateElement } from "../stores/formStore.svelte";
 
   function updateProperty(key: string, value: any) {
     if (store.selectedElement && store.selectedElement.id) {
@@ -15,12 +15,12 @@
 
   <div class="properties-content">
     {#if store.selectedElement}
-      {#if store.selectedElement['#tag'] === 'af-field'}
+      {#if store.selectedElement["#tag"] === "af-field"}
         <div class="form-group">
           <label>Field</label>
           <div class="field-info">
             <i class="fa fa-cube"></i>
-            <strong>{store.selectedElement.name || 'Unnamed field'}</strong>
+            <strong>{store.selectedElement.name || "Unnamed field"}</strong>
           </div>
         </div>
 
@@ -31,8 +31,12 @@
               id="field-label"
               type="text"
               class="form-control"
-              value={store.selectedElement.defn.label || ''}
-              oninput={(e) => updateProperty('defn', { ...store.selectedElement.defn, label: e.currentTarget.value })}
+              value={store.selectedElement.defn.label || ""}
+              oninput={(e) =>
+                updateProperty("defn", {
+                  ...store.selectedElement.defn,
+                  label: e.currentTarget.value,
+                })}
               placeholder="Contact"
             />
           </div>
@@ -42,8 +46,12 @@
             <select
               id="input-type"
               class="form-control"
-              value={store.selectedElement.defn.input_type || 'Text'}
-              onchange={(e) => updateProperty('defn', { ...store.selectedElement.defn, input_type: e.currentTarget.value })}
+              value={store.selectedElement.defn.input_type || "Text"}
+              onchange={(e) =>
+                updateProperty("defn", {
+                  ...store.selectedElement.defn,
+                  input_type: e.currentTarget.value,
+                })}
             >
               <option value="Text">Text</option>
               <option value="TextArea">Textarea</option>
@@ -60,21 +68,29 @@
               <input
                 type="checkbox"
                 checked={store.selectedElement.defn.required || false}
-                onchange={(e) => updateProperty('defn', { ...store.selectedElement.defn, required: e.currentTarget.checked })}
+                onchange={(e) =>
+                  updateProperty("defn", {
+                    ...store.selectedElement.defn,
+                    required: e.currentTarget.checked,
+                  })}
               />
               Required
             </label>
           </div>
         {/if}
-      {:else if store.selectedElement['#tag'] === 'button'}
+      {:else if store.selectedElement["#tag"] === "button"}
         <div class="form-group">
           <label for="button-text">Button Text</label>
           <input
             id="button-text"
             type="text"
             class="form-control"
-            value={store.selectedElement['#children'] && typeof store.selectedElement['#children'][0] === 'string' ? store.selectedElement['#children'][0] : ''}
-            oninput={(e) => updateProperty('#children', [e.currentTarget.value])}
+            value={store.selectedElement["#children"] &&
+            typeof store.selectedElement["#children"][0] === "string"
+              ? store.selectedElement["#children"][0]
+              : ""}
+            oninput={(e) =>
+              updateProperty("#children", [e.currentTarget.value])}
             placeholder="Submit"
           />
         </div>
@@ -84,8 +100,8 @@
           <select
             id="button-style"
             class="form-control"
-            value={store.selectedElement.class || 'btn-primary'}
-            onchange={(e) => updateProperty('class', e.currentTarget.value)}
+            value={store.selectedElement.class || "btn-primary"}
+            onchange={(e) => updateProperty("class", e.currentTarget.value)}
           >
             <option value="btn btn-primary">Primary (Blue)</option>
             <option value="btn btn-success">Success (Green)</option>
@@ -95,27 +111,34 @@
             <option value="btn btn-default">Default (Gray)</option>
           </select>
         </div>
-      {:else if store.selectedElement['#tag'] === 'fieldset'}
+      {:else if store.selectedElement["#tag"] === "fieldset"}
         <div class="form-group">
           <label for="fieldset-legend">Legend Text</label>
           <input
             id="fieldset-legend"
             type="text"
             class="form-control"
-            value={store.selectedElement['#children']?.find((c: any) => c['#tag'] === 'legend')?.['#children']?.[0] || ''}
+            value={store.selectedElement["#children"]?.find(
+              (c: any) => c["#tag"] === "legend",
+            )?.["#children"]?.[0] || ""}
             oninput={(e) => {
-              const legend = store.selectedElement['#children']?.find((c: any) => c['#tag'] === 'legend');
+              const legend = store.selectedElement["#children"]?.find(
+                (c: any) => c["#tag"] === "legend",
+              );
               if (legend) {
-                legend['#children'] = [e.currentTarget.value];
+                legend["#children"] = [e.currentTarget.value];
               }
             }}
             placeholder="Fieldset Title"
           />
         </div>
-      {:else if store.selectedElement['#tag'] === 'div'}
+      {:else if store.selectedElement["#tag"] === "div"}
         <div class="form-group">
           <label>Container</label>
-          <p class="help-block">This is a container for grouping fields. Drag fields into it to organize your form.</p>
+          <p class="help-block">
+            This is a container for grouping fields. Drag fields into it to
+            organize your form.
+          </p>
         </div>
       {/if}
     {:else}

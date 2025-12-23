@@ -1,7 +1,7 @@
 // Core form element types
 export interface FormElement {
-  '#tag': string;
-  '#children'?: FormElement[];
+  "#tag": string;
+  "#children"?: FormElement[];
   [key: string]: any;
 }
 
@@ -62,7 +62,7 @@ export interface FieldDefinition {
   input_attrs?: Record<string, any>;
   required?: boolean;
   default_value?: any;
-  options?: Array<{ id: string | number; label: string; }>;
+  options?: Array<{ id: string | number; label: string }>;
   fk_entity?: string;
   serialize?: number;
   nullable?: boolean;

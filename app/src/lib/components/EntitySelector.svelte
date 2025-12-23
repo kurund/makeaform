@@ -1,6 +1,10 @@
 <script lang="ts">
-  import { store, setSelectedEntity, setEntityFields } from '../stores/formStore.svelte';
-  import { getEntityFields } from '../api/civicrm';
+  import {
+    store,
+    setSelectedEntity,
+    setEntityFields,
+  } from "../stores/formStore.svelte";
+  import { getEntityFields } from "../api/civicrm";
 
   let loading = $state(false);
 
@@ -9,7 +13,7 @@
       ? Object.entries(store.adminData.entities)
           .map(([name, entity]) => ({ name, ...entity }))
           .sort((a, b) => (a.title || a.name).localeCompare(b.title || b.name))
-      : []
+      : [],
   );
 
   async function handleEntityChange(e: Event) {
@@ -25,7 +29,7 @@
 
     // Generate a unique entity instance name (e.g., Individual1, Individual2, etc.)
     const existingCount = store.formElements.filter(
-      el => el['#tag'] === 'fieldset' && el['af-fieldset'] === entityName
+      (el) => el["#tag"] === "fieldset" && el["af-fieldset"] === entityName,
     ).length;
     const entityInstanceName = `${entityName}${existingCount + 1}`;
 
@@ -36,20 +40,20 @@
         name: entityInstanceName,
         actions: {
           create: true,
-          update: false
+          update: false,
         },
-        security: 'RBAC'
+        security: "RBAC",
       };
     }
 
     // Always add a new fieldset for this entity
     // af-fieldset should be just the entity name (e.g., "Individual")
     store.formElements.push({
-      '#tag': 'fieldset',
-      'af-fieldset': entityName,
-      class: 'af-container',
+      "#tag": "fieldset",
+      "af-fieldset": entityName,
+      class: "af-container",
       id: `fieldset_${Date.now()}`,
-      '#children': []
+      "#children": [],
     });
 
     loading = true;
@@ -65,7 +69,7 @@
         setEntityFields(fields);
       }
     } catch (error) {
-      console.error('Failed to load entity fields:', error);
+      console.error("Failed to load entity fields:", error);
       alert(`Failed to load fields for ${entityName}`);
     } finally {
       loading = false;
@@ -81,7 +85,7 @@
     <select
       id="entity-select"
       class="form-control"
-      value={store.selectedEntity || ''}
+      value={store.selectedEntity || ""}
       onchange={handleEntityChange}
       disabled={loading}
     >

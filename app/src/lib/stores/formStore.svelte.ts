@@ -1,14 +1,19 @@
-import type { FormElement, AfformMetadata, AdminData, EntityConfig } from '../types';
+import type {
+  FormElement,
+  AfformMetadata,
+  AdminData,
+  EntityConfig,
+} from "../types";
 
 // Create a reactive state object
 class FormStore {
   formElements = $state<FormElement[]>([]);
   formMetadata = $state<AfformMetadata>({
-    name: 'new_form',
-    title: 'New Form',
-    description: '',
-    type: 'form',
-    server_route: ''
+    name: "new_form",
+    title: "New Form",
+    description: "",
+    type: "form",
+    server_route: "",
   });
   entityConfig = $state<EntityConfig | null>(null);
   selectedElementId = $state<string | null>(null);
@@ -19,8 +24,8 @@ class FormStore {
   hasUnsavedChanges = $state(false);
 
   // Typeform-style navigation
-  currentPageIndex = $state(0);  // Index of current fieldset/page
-  currentFieldIndex = $state(0);  // Index of current field within page
+  currentPageIndex = $state(0); // Index of current fieldset/page
+  currentFieldIndex = $state(0); // Index of current field within page
 
   // Derived state - get selected element
   get selectedElement() {
@@ -31,7 +36,7 @@ class FormStore {
 
   // Derived state - get all pages (fieldsets)
   get pages() {
-    return this.formElements.filter(el => el['#tag'] === 'fieldset');
+    return this.formElements.filter((el) => el["#tag"] === "fieldset");
   }
 
   // Derived state - get current page
@@ -41,10 +46,12 @@ class FormStore {
 
   // Derived state - get all fields in current page
   get currentPageFields() {
-    if (!this.currentPage || !this.currentPage['#children']) {
+    if (!this.currentPage || !this.currentPage["#children"]) {
       return [];
     }
-    return this.currentPage['#children'].filter(child => child['#tag'] === 'af-field');
+    return this.currentPage["#children"].filter(
+      (child) => child["#tag"] === "af-field",
+    );
   }
 
   // Derived state - get current field
@@ -57,8 +64,10 @@ class FormStore {
   get totalFields() {
     let count = 0;
     for (const page of this.pages) {
-      if (page['#children']) {
-        count += page['#children'].filter(child => child['#tag'] === 'af-field').length;
+      if (page["#children"]) {
+        count += page["#children"].filter(
+          (child) => child["#tag"] === "af-field",
+        ).length;
       }
     }
     return count;
@@ -70,11 +79,14 @@ export const store = new FormStore();
 /**
  * Find an element by its ID in the tree
  */
-function findElementById(elements: FormElement[], id: string): FormElement | null {
+function findElementById(
+  elements: FormElement[],
+  id: string,
+): FormElement | null {
   for (const el of elements) {
     if (el.id === id) return el;
-    if (el['#children']) {
-      const found = findElementById(el['#children'], id);
+    if (el["#children"]) {
+      const found = findElementById(el["#children"], id);
       if (found) return found;
     }
   }
@@ -107,11 +119,11 @@ export function setIsSaving(value: boolean) {
  */
 function fieldExists(elements: FormElement[], fieldName: string): boolean {
   for (const el of elements) {
-    if (el['#tag'] === 'af-field' && el.name === fieldName) {
+    if (el["#tag"] === "af-field" && el.name === fieldName) {
       return true;
     }
-    if (el['#children']) {
-      if (fieldExists(el['#children'], fieldName)) {
+    if (el["#children"]) {
+      if (fieldExists(el["#children"], fieldName)) {
         return true;
       }
     }
@@ -124,7 +136,7 @@ function fieldExists(elements: FormElement[], fieldName: string): boolean {
  */
 export function addElement(element: FormElement, parentId?: string) {
   // Check if this is a field that already exists
-  if (element['#tag'] === 'af-field' && element.name) {
+  if (element["#tag"] === "af-field" && element.name) {
     if (fieldExists(store.formElements, element.name)) {
       alert(`Field "${element.name}" is already in the form`);
       return;
@@ -138,10 +150,10 @@ export function addElement(element: FormElement, parentId?: string) {
   if (parentId) {
     const parent = findElementById(store.formElements, parentId);
     if (parent) {
-      if (!parent['#children']) {
-        parent['#children'] = [];
+      if (!parent["#children"]) {
+        parent["#children"] = [];
       }
-      parent['#children'].push(element);
+      parent["#children"].push(element);
     }
   } else {
     store.formElements.push(element);
@@ -167,13 +179,13 @@ export function updateElement(id: string, updates: Partial<FormElement>) {
  */
 export function deleteElement(id: string) {
   function removeFromArray(elements: FormElement[]): boolean {
-    const index = elements.findIndex(el => el.id === id);
+    const index = elements.findIndex((el) => el.id === id);
     if (index !== -1) {
       elements.splice(index, 1);
       return true;
     }
     for (const el of elements) {
-      if (el['#children'] && removeFromArray(el['#children'])) {
+      if (el["#children"] && removeFromArray(el["#children"])) {
         return true;
       }
     }
@@ -190,18 +202,22 @@ export function deleteElement(id: string) {
 /**
  * Move an element to a new position
  */
-export function moveElement(elementId: string, newParentId: string | null, newIndex: number) {
+export function moveElement(
+  elementId: string,
+  newParentId: string | null,
+  newIndex: number,
+) {
   // Find and remove element
   let element: FormElement | null = null;
 
   function removeElement(elements: FormElement[]): boolean {
-    const index = elements.findIndex(el => el.id === elementId);
+    const index = elements.findIndex((el) => el.id === elementId);
     if (index !== -1) {
       element = elements.splice(index, 1)[0];
       return true;
     }
     for (const el of elements) {
-      if (el['#children'] && removeElement(el['#children'])) {
+      if (el["#children"] && removeElement(el["#children"])) {
         return true;
       }
     }
@@ -216,10 +232,10 @@ export function moveElement(elementId: string, newParentId: string | null, newIn
   if (newParentId) {
     const parent = findElementById(store.formElements, newParentId);
     if (parent) {
-      if (!parent['#children']) {
-        parent['#children'] = [];
+      if (!parent["#children"]) {
+        parent["#children"] = [];
       }
-      parent['#children'].splice(newIndex, 0, element);
+      parent["#children"].splice(newIndex, 0, element);
     }
   } else {
     store.formElements.splice(newIndex, 0, element);
@@ -265,11 +281,11 @@ export function setEntityFields(fields: Record<string, any>) {
 export function resetForm() {
   store.formElements = [];
   store.formMetadata = {
-    name: 'new_form',
-    title: 'New Form',
-    description: '',
-    type: 'form',
-    server_route: ''
+    name: "new_form",
+    title: "New Form",
+    description: "",
+    type: "form",
+    server_route: "",
   };
   store.selectedElementId = null;
   store.hasUnsavedChanges = false;
@@ -327,8 +343,12 @@ export function gotoField(pageIndex: number, fieldIndex: number = 0) {
   if (pageIndex >= 0 && pageIndex < store.pages.length) {
     store.currentPageIndex = pageIndex;
     const page = store.pages[pageIndex];
-    const fields = page['#children']?.filter(child => child['#tag'] === 'af-field') || [];
-    store.currentFieldIndex = Math.min(fieldIndex, Math.max(0, fields.length - 1));
+    const fields =
+      page["#children"]?.filter((child) => child["#tag"] === "af-field") || [];
+    store.currentFieldIndex = Math.min(
+      fieldIndex,
+      Math.max(0, fields.length - 1),
+    );
 
     // Update selected element
     if (store.currentField) {
@@ -342,7 +362,10 @@ export function gotoField(pageIndex: number, fieldIndex: number = 0) {
  */
 export function canGoNext(): boolean {
   const fields = store.currentPageFields;
-  return store.currentFieldIndex < fields.length - 1 || store.currentPageIndex < store.pages.length - 1;
+  return (
+    store.currentFieldIndex < fields.length - 1 ||
+    store.currentPageIndex < store.pages.length - 1
+  );
 }
 
 /**

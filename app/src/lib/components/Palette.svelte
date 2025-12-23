@@ -1,38 +1,41 @@
 <script lang="ts">
-  import type { PaletteItem } from '../types';
-  import EntitySelector from './EntitySelector.svelte';
-  import { store } from '../stores/formStore.svelte';
+  import type { PaletteItem } from "../types";
+  import EntitySelector from "./EntitySelector.svelte";
+  import { store } from "../stores/formStore.svelte";
 
-  let searchQuery = $state('');
+  let searchQuery = $state("");
 
   const layoutItems: PaletteItem[] = [
     {
-      id: 'container',
-      label: 'Container',
-      category: 'Layout',
-      icon: 'fa-square-o',
-      element: { '#tag': 'div', class: 'af-container', '#children': [] }
+      id: "container",
+      label: "Container",
+      category: "Layout",
+      icon: "fa-square-o",
+      element: { "#tag": "div", class: "af-container", "#children": [] },
     },
     {
-      id: 'fieldset',
-      label: 'Fieldset',
-      category: 'Layout',
-      icon: 'fa-object-group',
-      element: { '#tag': 'fieldset', '#children': [{ '#tag': 'legend', '#children': ['Fieldset Title'] }] }
-    },
-    {
-      id: 'button',
-      label: 'Submit Button',
-      category: 'Actions',
-      icon: 'fa-hand-pointer-o',
+      id: "fieldset",
+      label: "Fieldset",
+      category: "Layout",
+      icon: "fa-object-group",
       element: {
-        '#tag': 'button',
-        class: 'af-button btn btn-primary',
-        'crm-icon': 'fa-check',
-        'ng-click': 'afform.submit()',
-        '#children': ['{{:: ts(\'Submit\') }}']
-      }
-    }
+        "#tag": "fieldset",
+        "#children": [{ "#tag": "legend", "#children": ["Fieldset Title"] }],
+      },
+    },
+    {
+      id: "button",
+      label: "Submit Button",
+      category: "Actions",
+      icon: "fa-hand-pointer-o",
+      element: {
+        "#tag": "button",
+        class: "af-button btn btn-primary",
+        "crm-icon": "fa-check",
+        "ng-click": "afform.submit()",
+        "#children": ["{{:: ts('Submit') }}"],
+      },
+    },
   ];
 
   // Get list of field names already used in the form
@@ -40,11 +43,11 @@
     const fields = new Set<string>();
     const collectFields = (elements: any[]): void => {
       for (const el of elements) {
-        if (el['#tag'] === 'af-field' && el.name) {
+        if (el["#tag"] === "af-field" && el.name) {
           fields.add(el.name);
         }
-        if (el['#children']) {
-          collectFields(el['#children']);
+        if (el["#children"]) {
+          collectFields(el["#children"]);
         }
       }
     };
@@ -73,16 +76,16 @@
           id: `field_${entityName}_${fieldName}`,
           label: field.label || field.title || fieldName,
           category: `${entityName} Fields`,
-          icon: 'fa-field',
+          icon: "fa-field",
           element: {
-            '#tag': 'af-field',
+            "#tag": "af-field",
             name: fullFieldName,
             defn: {
               label: field.label || field.title || fieldName,
-              input_type: field.input_type || 'Text',
-              required: field.required || false
-            }
-          }
+              input_type: field.input_type || "Text",
+              required: field.required || false,
+            },
+          },
         });
       }
     }
@@ -92,26 +95,29 @@
 
   const filteredItems = $derived(
     searchQuery
-      ? allItems().filter(item =>
-          item.label.toLowerCase().includes(searchQuery.toLowerCase())
+      ? allItems().filter((item) =>
+          item.label.toLowerCase().includes(searchQuery.toLowerCase()),
         )
-      : allItems()
+      : allItems(),
   );
 
   const groupedItems = $derived(
-    filteredItems.reduce((acc, item) => {
-      if (!acc[item.category]) {
-        acc[item.category] = [];
-      }
-      acc[item.category].push(item);
-      return acc;
-    }, {} as Record<string, PaletteItem[]>)
+    filteredItems.reduce(
+      (acc, item) => {
+        if (!acc[item.category]) {
+          acc[item.category] = [];
+        }
+        acc[item.category].push(item);
+        return acc;
+      },
+      {} as Record<string, PaletteItem[]>,
+    ),
   );
 
   function handleDragStart(e: DragEvent, item: PaletteItem) {
     if (e.dataTransfer) {
-      e.dataTransfer.effectAllowed = 'copy';
-      e.dataTransfer.setData('application/json', JSON.stringify(item.element));
+      e.dataTransfer.effectAllowed = "copy";
+      e.dataTransfer.setData("application/json", JSON.stringify(item.element));
     }
   }
 </script>
@@ -189,7 +195,7 @@
     margin: 0;
     font-size: 16px;
     font-weight: 700;
-    color: #2C2C2C;
+    color: #2c2c2c;
     letter-spacing: 0.3px;
   }
 
@@ -207,7 +213,7 @@
   }
 
   .palette-search input:focus {
-    border-color: #6C5CE7;
+    border-color: #6c5ce7;
     outline: none;
     box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
   }
@@ -227,7 +233,7 @@
     margin: 0 0 12px 0;
     font-size: 11px;
     font-weight: 700;
-    color: #8B8B8B;
+    color: #8b8b8b;
     text-transform: uppercase;
     letter-spacing: 0.8px;
     padding: 0 4px;
@@ -252,8 +258,8 @@
   }
 
   .palette-item:hover {
-    background: #FAFAFA;
-    border-color: #6C5CE7;
+    background: #fafafa;
+    border-color: #6c5ce7;
     transform: translateX(4px);
     box-shadow: 0 2px 8px rgba(108, 92, 231, 0.15);
   }
@@ -265,14 +271,14 @@
 
   .palette-item i {
     font-size: 18px;
-    color: #6C5CE7;
+    color: #6c5ce7;
     width: 24px;
     text-align: center;
   }
 
   .palette-item span {
     font-size: 14px;
-    color: #2C2C2C;
+    color: #2c2c2c;
     font-weight: 500;
   }
 
@@ -282,24 +288,24 @@
     align-items: center;
     justify-content: center;
     padding: 60px 20px;
-    color: #BDBDBD;
+    color: #bdbdbd;
     text-align: center;
   }
 
   .palette-empty i {
     margin-bottom: 16px;
     opacity: 0.4;
-    color: #6C5CE7;
+    color: #6c5ce7;
   }
 
   .palette-empty p {
     margin: 4px 0;
     font-size: 14px;
-    color: #8B8B8B;
+    color: #8b8b8b;
   }
 
   .palette-empty p strong {
-    color: #4A4A4A;
+    color: #4a4a4a;
     font-weight: 600;
   }
 </style>

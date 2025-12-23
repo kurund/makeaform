@@ -1,25 +1,38 @@
 <script lang="ts">
-  import type { FormElement } from '../types';
-  import { store, selectElement, deleteElement } from '../stores/formStore.svelte';
+  import type { FormElement } from "../types";
+  import {
+    store,
+    selectElement,
+    deleteElement,
+  } from "../stores/formStore.svelte";
 
-  let { element, level = 0 }: { element: FormElement; level?: number } = $props();
+  let { element, level = 0 }: { element: FormElement; level?: number } =
+    $props();
 
   let expanded = $state(true);
 
   const isSelected = $derived(store.selectedElementId === element.id);
-  const hasChildren = $derived(element['#children'] && element['#children'].length > 0);
+  const hasChildren = $derived(
+    element["#children"] && element["#children"].length > 0,
+  );
 
   function getElementLabel(el: FormElement): string {
-    if (el['#tag'] === 'af-field' && el.name) {
+    if (el["#tag"] === "af-field" && el.name) {
       return `Field: ${el.name}`;
     }
-    if (el['#tag'] === 'fieldset' && el['#children']) {
-      const legend = el['#children'].find((c: FormElement) => c['#tag'] === 'legend');
-      if (legend && legend['#children'] && typeof legend['#children'][0] === 'string') {
-        return `Fieldset: ${legend['#children'][0]}`;
+    if (el["#tag"] === "fieldset" && el["#children"]) {
+      const legend = el["#children"].find(
+        (c: FormElement) => c["#tag"] === "legend",
+      );
+      if (
+        legend &&
+        legend["#children"] &&
+        typeof legend["#children"][0] === "string"
+      ) {
+        return `Fieldset: ${legend["#children"][0]}`;
       }
     }
-    return el['#tag'] || 'Element';
+    return el["#tag"] || "Element";
   }
 
   function handleSelect() {
@@ -28,7 +41,7 @@
 
   function handleDelete(e: Event) {
     e.stopPropagation();
-    if (confirm('Delete this element?')) {
+    if (confirm("Delete this element?")) {
       deleteElement(element.id);
     }
   }
@@ -38,7 +51,7 @@
   }
 
   function handleKeydown(e: KeyboardEvent) {
-    if (e.key === 'Enter' || e.key === ' ') {
+    if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       handleSelect();
     }
@@ -60,8 +73,11 @@
         <button
           type="button"
           class="btn-expand"
-          onclick={(e) => { e.stopPropagation(); toggleExpanded(); }}
-          aria-label={expanded ? 'Collapse' : 'Expand'}
+          onclick={(e) => {
+            e.stopPropagation();
+            toggleExpanded();
+          }}
+          aria-label={expanded ? "Collapse" : "Expand"}
         >
           <i class="fa fa-{expanded ? 'caret-down' : 'caret-right'}"></i>
         </button>
@@ -87,8 +103,8 @@
 
   {#if hasChildren && expanded}
     <div class="element-children">
-      {#each element['#children'] as child}
-        {#if typeof child === 'object' && child['#tag']}
+      {#each element["#children"] as child}
+        {#if typeof child === "object" && child["#tag"]}
           <svelte:self element={child} level={level + 1} />
         {/if}
       {/each}
