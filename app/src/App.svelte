@@ -1,14 +1,39 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import Toolbar from './lib/components/Toolbar.svelte';
-  import Palette from './lib/components/Palette.svelte';
-  import Canvas from './lib/components/Canvas.svelte';
-  import PropertiesPanel from './lib/components/PropertiesPanel.svelte';
-  import { store, setAdminData, setHasUnsavedChanges } from './lib/stores/formStore.svelte';
+  import FieldNavigator from './lib/components/FieldNavigator.svelte';
+  import FieldPreview from './lib/components/FieldPreview.svelte';
+  import FieldSettings from './lib/components/FieldSettings.svelte';
+  import { store, setAdminData, setHasUnsavedChanges, nextField, prevField, canGoNext, canGoPrev } from './lib/stores/formStore.svelte';
   import { loadAdminData, saveForm } from './lib/api/civicrm';
 
   let loading = $state(true);
   let error = $state<string | null>(null);
+
+  // Keyboard shortcuts for navigation
+  function handleKeyDown(e: KeyboardEvent) {
+    // Don't trigger if user is typing in an input/textarea
+    if ((e.target as HTMLElement).tagName === 'INPUT' || (e.target as HTMLElement).tagName === 'TEXTAREA') {
+      return;
+    }
+
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (canGoNext()) {
+        nextField();
+      }
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (canGoNext()) {
+        nextField();
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (canGoPrev()) {
+        prevField();
+      }
+    }
+  }
 
   onMount(async () => {
     try {
@@ -179,6 +204,8 @@
   }
 </script>
 
+<svelte:window onkeydown={handleKeyDown} />
+
 <div class="form-builder-app">
   {#if loading}
     <div class="loading-screen">
@@ -195,25 +222,26 @@
 
     <div class="form-builder-content">
       <div class="panel-left">
-        <Palette />
+        <FieldNavigator />
       </div>
 
       <div class="panel-center">
-        <Canvas />
+        <FieldPreview />
       </div>
 
       <div class="panel-right">
-        <PropertiesPanel />
+        <FieldSettings />
       </div>
     </div>
   {/if}
 </div>
 
 <style>
-  :global(body) {
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  :root {
+    --makeaform-accent: var(--crm-c-link);
+    --makeaform-accent-hover: var(--crm-c-link-hover);
+    --makeaform-accent-bg: color-mix(in srgb, var(--crm-c-link) 10%, transparent 90%);
+    --makeaform-radius: 0.5rem; /* 8px - maintain modern rounded corners */
   }
 
   .form-builder-app {
@@ -221,6 +249,10 @@
     flex-direction: column;
     height: 100vh;
     overflow: hidden;
+    background: var(--crm-c-container-bg);
+    margin: 0;
+    padding: 0;
+    font-family: var(--crm-font);
   }
 
   .loading-screen,
@@ -230,22 +262,25 @@
     align-items: center;
     justify-content: center;
     height: 100vh;
-    color: #666;
+    color: var(--crm-c-gray-800);
+    background: var(--crm-c-container-bg);
   }
 
   .loading-screen i,
   .error-screen i {
-    margin-bottom: 20px;
+    margin-bottom: var(--crm-r2);
+    color: var(--makeaform-accent);
   }
 
   .loading-screen p,
   .error-screen p {
-    font-size: 16px;
+    font-size: var(--crm-r1);
     margin: 0;
+    font-weight: 500;
   }
 
-  .error-screen {
-    color: #d9534f;
+  .error-screen i {
+    color: var(--crm-c-danger);
   }
 
   .form-builder-content {
@@ -257,16 +292,21 @@
   .panel-left {
     width: 280px;
     flex-shrink: 0;
+    background: var(--crm-c-layer0-bg);
+    border-right: 1px solid var(--crm-c-gray-200);
   }
 
   .panel-center {
     flex: 1;
     min-width: 0;
+    background: var(--crm-c-container-bg);
   }
 
   .panel-right {
     width: 320px;
     flex-shrink: 0;
+    background: var(--crm-c-layer0-bg);
+    border-left: 1px solid var(--crm-c-gray-200);
   }
 
   @media (max-width: 1200px) {

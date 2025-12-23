@@ -18,11 +18,50 @@ class FormStore {
   isSaving = $state(false);
   hasUnsavedChanges = $state(false);
 
+  // Typeform-style navigation
+  currentPageIndex = $state(0);  // Index of current fieldset/page
+  currentFieldIndex = $state(0);  // Index of current field within page
+
   // Derived state - get selected element
   get selectedElement() {
     return this.selectedElementId
       ? findElementById(this.formElements, this.selectedElementId)
       : null;
+  }
+
+  // Derived state - get all pages (fieldsets)
+  get pages() {
+    return this.formElements.filter(el => el['#tag'] === 'fieldset');
+  }
+
+  // Derived state - get current page
+  get currentPage() {
+    return this.pages[this.currentPageIndex] || null;
+  }
+
+  // Derived state - get all fields in current page
+  get currentPageFields() {
+    if (!this.currentPage || !this.currentPage['#children']) {
+      return [];
+    }
+    return this.currentPage['#children'].filter(child => child['#tag'] === 'af-field');
+  }
+
+  // Derived state - get current field
+  get currentField() {
+    const fields = this.currentPageFields;
+    return fields[this.currentFieldIndex] || null;
+  }
+
+  // Derived state - get total field count across all pages
+  get totalFields() {
+    let count = 0;
+    for (const page of this.pages) {
+      if (page['#children']) {
+        count += page['#children'].filter(child => child['#tag'] === 'af-field').length;
+      }
+    }
+    return count;
   }
 }
 
@@ -234,4 +273,81 @@ export function resetForm() {
   };
   store.selectedElementId = null;
   store.hasUnsavedChanges = false;
+  store.currentPageIndex = 0;
+  store.currentFieldIndex = 0;
+}
+
+/**
+ * Navigation: Go to next field
+ */
+export function nextField() {
+  const fields = store.currentPageFields;
+
+  // If there's a next field in current page
+  if (store.currentFieldIndex < fields.length - 1) {
+    store.currentFieldIndex++;
+  }
+  // Otherwise, go to first field of next page
+  else if (store.currentPageIndex < store.pages.length - 1) {
+    store.currentPageIndex++;
+    store.currentFieldIndex = 0;
+  }
+
+  // Update selected element
+  if (store.currentField) {
+    store.selectedElementId = store.currentField.id || null;
+  }
+}
+
+/**
+ * Navigation: Go to previous field
+ */
+export function prevField() {
+  // If there's a previous field in current page
+  if (store.currentFieldIndex > 0) {
+    store.currentFieldIndex--;
+  }
+  // Otherwise, go to last field of previous page
+  else if (store.currentPageIndex > 0) {
+    store.currentPageIndex--;
+    const prevPageFields = store.currentPageFields;
+    store.currentFieldIndex = Math.max(0, prevPageFields.length - 1);
+  }
+
+  // Update selected element
+  if (store.currentField) {
+    store.selectedElementId = store.currentField.id || null;
+  }
+}
+
+/**
+ * Navigation: Go to specific page and field
+ */
+export function gotoField(pageIndex: number, fieldIndex: number = 0) {
+  if (pageIndex >= 0 && pageIndex < store.pages.length) {
+    store.currentPageIndex = pageIndex;
+    const page = store.pages[pageIndex];
+    const fields = page['#children']?.filter(child => child['#tag'] === 'af-field') || [];
+    store.currentFieldIndex = Math.min(fieldIndex, Math.max(0, fields.length - 1));
+
+    // Update selected element
+    if (store.currentField) {
+      store.selectedElementId = store.currentField.id || null;
+    }
+  }
+}
+
+/**
+ * Navigation: Check if we can go to next field
+ */
+export function canGoNext(): boolean {
+  const fields = store.currentPageFields;
+  return store.currentFieldIndex < fields.length - 1 || store.currentPageIndex < store.pages.length - 1;
+}
+
+/**
+ * Navigation: Check if we can go to previous field
+ */
+export function canGoPrev(): boolean {
+  return store.currentFieldIndex > 0 || store.currentPageIndex > 0;
 }

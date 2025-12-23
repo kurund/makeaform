@@ -227,23 +227,25 @@
 <style>
   .preview-element {
     position: relative;
-    margin: 10px 0;
-    padding: 10px;
+    margin: 12px 0;
+    padding: 16px;
     border: 2px solid transparent;
-    border-radius: 4px;
-    transition: all 0.2s;
+    border-radius: 12px;
+    transition: all 0.2s ease;
     cursor: move;
+    background: #ffffff;
   }
 
   .preview-element:hover {
-    background: #f9f9f9;
-    border-color: #ddd;
+    background: #FAFAFA;
+    border-color: #e8e8eb;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   }
 
   .preview-element.selected {
-    background: #e6f2ff;
-    border-color: #337ab7;
-    box-shadow: 0 0 0 3px rgba(51, 122, 183, 0.1);
+    background: #F3F1FF;
+    border-color: #6C5CE7;
+    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
   }
 
   .preview-element.dragging {
@@ -257,24 +259,43 @@
 
   .form-group label {
     display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #333;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #2C2C2C;
+    font-size: 15px;
   }
 
   .crm-marker {
-    color: #d9534f;
+    color: #FF6B6B;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    border: 1px solid #e8e8eb;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 15px;
+    transition: all 0.2s ease;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    border-color: #6C5CE7;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
   }
 
   .preview-fieldset {
-    border: 4px solid #337ab7;
-    background: linear-gradient(135deg, #e8f4f8 0%, #f0f8ff 100%);
-    padding: 25px;
-    margin: 15px 0;
-    border-radius: 8px;
-    min-height: 150px;
+    border: 3px solid #6C5CE7;
+    background: linear-gradient(135deg, #F9F8FF 0%, #FFFFFF 100%);
+    padding: 28px;
+    margin: 16px 0;
+    border-radius: 16px;
+    min-height: 160px;
     position: relative;
-    box-shadow: 0 2px 8px rgba(51, 122, 183, 0.15);
+    box-shadow: 0 2px 12px rgba(108, 92, 231, 0.12);
   }
 
   .preview-fieldset::before {
@@ -283,11 +304,11 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 24px;
-    font-weight: bold;
-    color: rgba(51, 122, 183, 0.1);
+    font-size: 22px;
+    font-weight: 700;
+    color: rgba(108, 92, 231, 0.08);
     pointer-events: none;
-    letter-spacing: 4px;
+    letter-spacing: 6px;
   }
 
   .preview-fieldset.has-children::before {
@@ -295,32 +316,33 @@
   }
 
   .preview-fieldset.drag-over {
-    background: linear-gradient(135deg, #fff3cd 0%, #fffaeb 100%);
-    border-color: #ffc107;
-    border-width: 5px;
+    background: linear-gradient(135deg, #FFF9E6 0%, #FFFEF5 100%);
+    border-color: #FFB84D;
+    border-width: 3px;
     border-style: dashed;
-    box-shadow: 0 4px 16px rgba(255, 193, 7, 0.3);
+    box-shadow: 0 4px 20px rgba(255, 184, 77, 0.25);
   }
 
   .preview-fieldset.drag-over::before {
     content: 'DROP HERE';
-    color: rgba(255, 193, 7, 0.3);
-    font-size: 32px;
+    color: rgba(255, 184, 77, 0.3);
+    font-size: 28px;
   }
 
   .preview-fieldset legend {
     width: auto;
-    padding: 8px 20px;
-    margin: -25px 0 20px -25px;
-    font-size: 14px;
-    font-weight: bold;
+    padding: 10px 24px;
+    margin: -28px 0 20px -28px;
+    font-size: 13px;
+    font-weight: 700;
     border: none;
-    background: #337ab7;
+    background: #6C5CE7;
     color: white;
-    border-radius: 8px 0 8px 0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    border-radius: 16px 0 16px 0;
+    box-shadow: 0 3px 8px rgba(108, 92, 231, 0.3);
     position: relative;
     z-index: 1;
+    letter-spacing: 0.3px;
   }
 
   .fieldset-content {
@@ -368,10 +390,12 @@
 
   .element-actions {
     position: absolute;
-    top: 5px;
-    right: 5px;
+    top: 8px;
+    right: 8px;
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s ease;
+    display: flex;
+    gap: 4px;
   }
 
   .preview-element.selected .element-actions {
@@ -379,15 +403,32 @@
   }
 
   .element-actions button {
-    padding: 2px 6px;
-    margin-left: 4px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    transition: all 0.2s ease;
+    border: 1px solid #e8e8eb;
   }
 
   .element-actions .drag-handle {
     cursor: move;
+    background: #ffffff;
+    color: #6C5CE7;
   }
 
   .element-actions .drag-handle:hover {
-    background: #e0e0e0;
+    background: #F3F1FF;
+    border-color: #6C5CE7;
+  }
+
+  .element-actions .btn-danger {
+    background: #ffffff;
+    border-color: #e8e8eb;
+    color: #FF6B6B;
+  }
+
+  .element-actions .btn-danger:hover {
+    background: #FFE8E8;
+    border-color: #FF6B6B;
   }
 </style>

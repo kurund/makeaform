@@ -23,9 +23,9 @@
 
     setSelectedEntity(entityName);
 
-    // Generate a unique entity name (e.g., Contact1, Contact2, etc.)
+    // Generate a unique entity instance name (e.g., Individual1, Individual2, etc.)
     const existingCount = store.formElements.filter(
-      el => el['#tag'] === 'fieldset' && el['af-fieldset']?.startsWith(entityName)
+      el => el['#tag'] === 'fieldset' && el['af-fieldset'] === entityName
     ).length;
     const entityInstanceName = `${entityName}${existingCount + 1}`;
 
@@ -43,9 +43,10 @@
     }
 
     // Always add a new fieldset for this entity
+    // af-fieldset should be just the entity name (e.g., "Individual")
     store.formElements.push({
       '#tag': 'fieldset',
-      'af-fieldset': entityInstanceName,
+      'af-fieldset': entityName,
       class: 'af-container',
       id: `fieldset_${Date.now()}`,
       '#children': []
@@ -105,9 +106,9 @@
 
 <style>
   .entity-selector {
-    padding: 15px;
-    background: #fff;
-    border-bottom: 1px solid #ddd;
+    padding: var(--crm-r) var(--crm-r2);
+    background: var(--crm-c-layer0-bg);
+    border-bottom: 1px solid var(--crm-c-gray-200);
   }
 
   .form-group {
@@ -116,21 +117,43 @@
 
   .form-group label {
     display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    font-size: 13px;
-    color: #333;
+    margin-bottom: var(--crm-m);
+    font-weight: 700;
+    font-size: var(--crm-small-font-size);
+    color: var(--crm-c-gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
   }
 
   .form-group label i {
-    color: #337ab7;
-    margin-right: 5px;
+    color: var(--makeaform-accent);
+    margin-right: var(--crm-s);
+  }
+
+  .form-group select {
+    border: 1px solid var(--crm-input-border-color);
+    border-radius: var(--makeaform-radius);
+    padding: var(--crm-m) var(--crm-m2);
+    transition: all 0.2s ease;
+    background: var(--crm-input-bg);
+    color: var(--crm-input-color);
+  }
+
+  .form-group select:focus {
+    border-color: var(--makeaform-accent);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--makeaform-accent-bg);
   }
 
   .help-block {
     display: block;
-    margin-top: 5px;
-    color: #737373;
-    font-size: 12px;
+    margin-top: var(--crm-m);
+    color: var(--crm-c-gray-600);
+    font-size: var(--crm-small-font-size);
+    font-weight: 500;
+  }
+
+  .help-block i {
+    color: var(--makeaform-accent);
   }
 </style>
