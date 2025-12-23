@@ -1,32 +1,32 @@
 <script lang="ts">
-  import { store, updateElement } from '../stores/formStore.svelte';
+  import { store, updateElement } from "../stores/formStore.svelte";
 
   const fieldTypes = [
-    { value: 'Text', label: 'Short Text', icon: 'fa-font' },
-    { value: 'TextArea', label: 'Long Text', icon: 'fa-align-left' },
-    { value: 'Number', label: 'Number', icon: 'fa-hashtag' },
-    { value: 'Email', label: 'Email', icon: 'fa-envelope' },
-    { value: 'Date', label: 'Date', icon: 'fa-calendar' },
-    { value: 'Select', label: 'Dropdown', icon: 'fa-caret-down' },
-    { value: 'Radio', label: 'Multiple Choice', icon: 'fa-dot-circle-o' },
-    { value: 'CheckBox', label: 'Checkboxes', icon: 'fa-check-square-o' },
-    { value: 'EntityRef', label: 'Entity Reference', icon: 'fa-link' }
+    { value: "Text", label: "Short Text", icon: "fa-font" },
+    { value: "TextArea", label: "Long Text", icon: "fa-align-left" },
+    { value: "Number", label: "Number", icon: "fa-hashtag" },
+    { value: "Email", label: "Email", icon: "fa-envelope" },
+    { value: "Date", label: "Date", icon: "fa-calendar" },
+    { value: "Select", label: "Dropdown", icon: "fa-caret-down" },
+    { value: "Radio", label: "Multiple Choice", icon: "fa-dot-circle-o" },
+    { value: "CheckBox", label: "Checkboxes", icon: "fa-check-square-o" },
+    { value: "EntityRef", label: "Entity Reference", icon: "fa-link" },
   ];
 
   function handleFieldChange(field: string, value: any) {
     if (!store.currentField) return;
 
-    if (field.startsWith('defn.')) {
-      const defnField = field.replace('defn.', '');
+    if (field.startsWith("defn.")) {
+      const defnField = field.replace("defn.", "");
       updateElement(store.currentField.id, {
         defn: {
           ...store.currentField.defn,
-          [defnField]: value
-        }
+          [defnField]: value,
+        },
       });
     } else {
       updateElement(store.currentField.id, {
-        [field]: value
+        [field]: value,
       });
     }
   }
@@ -54,8 +54,12 @@
           id="field-label"
           type="text"
           class="form-control"
-          value={store.currentField.defn?.label || ''}
-          oninput={(e) => handleFieldChange('defn.label', (e.target as HTMLInputElement).value)}
+          value={store.currentField.defn?.label || ""}
+          oninput={(e) =>
+            handleFieldChange(
+              "defn.label",
+              (e.target as HTMLInputElement).value,
+            )}
           placeholder="Enter field label..."
         />
       </div>
@@ -69,8 +73,12 @@
         <select
           id="field-type"
           class="form-control"
-          value={store.currentField.defn?.input_type || 'Text'}
-          onchange={(e) => handleFieldChange('defn.input_type', (e.target as HTMLSelectElement).value)}
+          value={store.currentField.defn?.input_type || "Text"}
+          onchange={(e) =>
+            handleFieldChange(
+              "defn.input_type",
+              (e.target as HTMLSelectElement).value,
+            )}
         >
           {#each fieldTypes as type}
             <option value={type.value}>
@@ -80,23 +88,24 @@
         </select>
       </div>
 
-      <!-- Field Name -->
+      <!-- Placeholder -->
       <div class="form-group">
-        <label for="field-name">
-          <i class="fa fa-tag"></i>
-          Field Name
+        <label for="placeholder">
+          <i class="fa fa-text-width"></i>
+          Placeholder
         </label>
         <input
-          id="field-name"
+          id="placeholder"
           type="text"
           class="form-control"
-          value={store.currentField.name || ''}
-          oninput={(e) => handleFieldChange('name', (e.target as HTMLInputElement).value)}
-          placeholder="field_name"
+          value={store.currentField.defn?.placeholder || ""}
+          oninput={(e) =>
+            handleFieldChange(
+              "defn.placeholder",
+              (e.target as HTMLInputElement).value,
+            )}
+          placeholder="Placeholder text..."
         />
-        <small class="help-block">
-          Internal field name (e.g., Individual.first_name)
-        </small>
       </div>
 
       <!-- Help Text -->
@@ -109,8 +118,12 @@
           id="help-text"
           class="form-control"
           rows="2"
-          value={store.currentField.defn?.help_text || ''}
-          oninput={(e) => handleFieldChange('defn.help_text', (e.target as HTMLTextAreaElement).value)}
+          value={store.currentField.defn?.help_text || ""}
+          oninput={(e) =>
+            handleFieldChange(
+              "defn.help_text",
+              (e.target as HTMLTextAreaElement).value,
+            )}
           placeholder="Optional hint or description..."
         ></textarea>
       </div>
@@ -121,7 +134,11 @@
           <input
             type="checkbox"
             checked={store.currentField.defn?.required || false}
-            onchange={(e) => handleFieldChange('defn.required', (e.target as HTMLInputElement).checked)}
+            onchange={(e) =>
+              handleFieldChange(
+                "defn.required",
+                (e.target as HTMLInputElement).checked,
+              )}
           />
           <span>
             <i class="fa fa-asterisk"></i>
@@ -131,7 +148,7 @@
       </div>
 
       <!-- Validation (if applicable) -->
-      {#if ['Email', 'Number'].includes(store.currentField.defn?.input_type || '')}
+      {#if ["Email", "Number"].includes(store.currentField.defn?.input_type || "")}
         <div class="form-group">
           <label for="validation">
             <i class="fa fa-check-circle"></i>
@@ -141,8 +158,12 @@
             id="validation"
             type="text"
             class="form-control"
-            value={store.currentField.defn?.validation || ''}
-            oninput={(e) => handleFieldChange('defn.validation', (e.target as HTMLInputElement).value)}
+            value={store.currentField.defn?.validation || ""}
+            oninput={(e) =>
+              handleFieldChange(
+                "defn.validation",
+                (e.target as HTMLInputElement).value,
+              )}
             placeholder="Validation rules..."
           />
         </div>
@@ -151,12 +172,8 @@
       <!-- Field Info -->
       <div class="field-info-box">
         <div class="info-row">
-          <span class="info-label">Field ID:</span>
-          <code class="info-value">{store.currentField.id}</code>
-        </div>
-        <div class="info-row">
           <span class="info-label">Entity:</span>
-          <span class="info-value">{store.selectedEntity || 'None'}</span>
+          <span class="info-value">{store.selectedEntity || "None"}</span>
         </div>
       </div>
     </div>
@@ -339,7 +356,7 @@
     background: var(--crm-c-layer0-bg);
     padding: var(--crm-xs1) var(--crm-m);
     border-radius: var(--crm-roundness);
-    font-family: 'Monaco', 'Courier New', monospace;
+    font-family: "Monaco", "Courier New", monospace;
     font-size: var(--crm-small-font-size);
     color: var(--makeaform-accent);
   }

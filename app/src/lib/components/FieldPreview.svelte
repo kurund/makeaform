@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { store, nextField, prevField, canGoNext, canGoPrev } from '../stores/formStore.svelte';
+  import {
+    store,
+    nextField,
+    prevField,
+    canGoNext,
+    canGoPrev,
+  } from "../stores/formStore.svelte";
 
   // Calculate progress
   const progress = $derived(() => {
@@ -8,8 +14,10 @@
     let currentFieldNumber = 0;
     for (let i = 0; i < store.currentPageIndex; i++) {
       const page = store.pages[i];
-      if (page['#children']) {
-        currentFieldNumber += page['#children'].filter(c => c['#tag'] === 'af-field').length;
+      if (page["#children"]) {
+        currentFieldNumber += page["#children"].filter(
+          (c) => c["#tag"] === "af-field",
+        ).length;
       }
     }
     currentFieldNumber += store.currentFieldIndex + 1;
@@ -32,17 +40,17 @@
   // Render field input based on type
   function getInputType(fieldType: string) {
     const typeMap: Record<string, string> = {
-      'Text': 'text',
-      'Number': 'number',
-      'Email': 'email',
-      'Date': 'date',
-      'TextArea': 'textarea',
-      'Select': 'select',
-      'Radio': 'radio',
-      'CheckBox': 'checkbox',
-      'EntityRef': 'text'
+      Text: "text",
+      Number: "number",
+      Email: "email",
+      Date: "date",
+      TextArea: "textarea",
+      Select: "select",
+      Radio: "radio",
+      CheckBox: "checkbox",
+      EntityRef: "text",
     };
-    return typeMap[fieldType] || 'text';
+    return typeMap[fieldType] || "text";
   }
 </script>
 
@@ -73,11 +81,12 @@
       <!-- Page Header -->
       {#if store.currentPage}
         <div class="page-header-preview">
-          <h2>{store.currentPage['af-fieldset'] || 'Form Section'}</h2>
+          <h2>{store.currentPage["af-fieldset"] || "Form Section"}</h2>
           <div class="page-meta">
             <span class="field-count-badge">
               <i class="fa fa-list"></i>
-              {store.currentPageFields.length} {store.currentPageFields.length === 1 ? 'field' : 'fields'}
+              {store.currentPageFields.length}
+              {store.currentPageFields.length === 1 ? "field" : "fields"}
             </span>
           </div>
         </div>
@@ -87,19 +96,19 @@
       <div class="questions-list-preview">
         {#each store.currentPageFields as question, index}
           {@const isSelected = store.currentField?.id === question.id}
-          {@const inputType = getInputType(question.defn?.input_type || 'Text')}
+          {@const inputType = getInputType(question.defn?.input_type || "Text")}
 
           <div
             class="question-card"
             class:selected={isSelected}
-            onclick={() => store.currentFieldIndex = index}
+            onclick={() => (store.currentFieldIndex = index)}
             role="button"
             tabindex="0"
           >
             <div class="question-card-header">
               <span class="question-number">{index + 1}</span>
               <h3 class="question-label">
-                {question.defn?.label || question.name || 'Untitled Question'}
+                {question.defn?.label || question.name || "Untitled Question"}
                 {#if question.defn?.required}
                   <span class="required-badge">*</span>
                 {/if}
@@ -107,18 +116,21 @@
             </div>
 
             <div class="question-card-input">
-              {#if inputType === 'textarea'}
+              {#if inputType === "textarea"}
                 <textarea
                   class="preview-input"
-                  placeholder="Long text answer..."
+                  placeholder={question.defn?.placeholder || ""}
                   rows="3"
                   disabled
                 ></textarea>
-              {:else if inputType === 'select'}
+              {:else if inputType === "select"}
                 <select class="preview-input" disabled>
-                  <option>Select an option...</option>
+                  <option
+                    >{question.defn?.placeholder ||
+                      "Select an option..."}</option
+                  >
                 </select>
-              {:else if inputType === 'checkbox'}
+              {:else if inputType === "checkbox"}
                 <div class="option-preview">
                   <div class="option-item">
                     <input type="checkbox" disabled />
@@ -129,7 +141,7 @@
                     <span>Option 2</span>
                   </div>
                 </div>
-              {:else if inputType === 'radio'}
+              {:else if inputType === "radio"}
                 <div class="option-preview">
                   <div class="option-item">
                     <input type="radio" disabled />
@@ -144,7 +156,7 @@
                 <input
                   type={inputType}
                   class="preview-input"
-                  placeholder="Answer..."
+                  placeholder={question.defn?.placeholder || ""}
                   disabled
                 />
               {/if}
@@ -231,7 +243,7 @@
     padding: var(--crm-r2) var(--crm-r4);
     border-radius: var(--crm-m2);
     margin-bottom: var(--crm-r2);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   }
 
   .page-header-preview h2 {

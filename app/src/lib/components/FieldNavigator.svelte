@@ -1,17 +1,22 @@
 <script lang="ts">
-  import EntitySelector from './EntitySelector.svelte';
-  import { store, gotoField, deleteElement, addElement } from '../stores/formStore.svelte';
+  import EntitySelector from "./EntitySelector.svelte";
+  import {
+    store,
+    gotoField,
+    deleteElement,
+    addElement,
+  } from "../stores/formStore.svelte";
 
   // Track which fields are already in the form
   const usedFields = $derived(() => {
     const fields = new Set<string>();
     const collectFields = (elements: any[]): void => {
       for (const el of elements) {
-        if (el['#tag'] === 'af-field' && el.name) {
+        if (el["#tag"] === "af-field" && el.name) {
           fields.add(el.name);
         }
-        if (el['#children']) {
-          collectFields(el['#children']);
+        if (el["#children"]) {
+          collectFields(el["#children"]);
         }
       }
     };
@@ -26,13 +31,12 @@
     const used = usedFields();
     return Object.entries(store.entityFields)
       .filter(([fieldName]) => {
-        const fullFieldName = `${store.selectedEntity}.${fieldName}`;
-        return !used.has(fullFieldName);
+        return !used.has(fieldName);
       })
       .map(([fieldName, field]) => ({
         name: fieldName,
         label: field.label || field.title || fieldName,
-        field: field
+        field: field,
       }));
   });
 
@@ -47,17 +51,15 @@
   function handleAddField(fieldName: string, field: any) {
     if (!store.currentPage) return;
 
-    const fullFieldName = `${store.selectedEntity}.${fieldName}`;
-
     const newQuestion = {
-      '#tag': 'af-field' as const,
-      name: fullFieldName,
+      "#tag": "af-field" as const,
+      name: fieldName,
       defn: {
         label: field.label || field.title || fieldName,
-        input_type: field.input_type || 'Text',
-        required: field.required || false
+        input_type: field.input_type || "Text",
+        required: field.required || false,
       },
-      id: `element_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      id: `element_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     };
 
     addElement(newQuestion, store.currentPage.id);
@@ -67,10 +69,15 @@
     gotoField(store.currentPageIndex, newFieldIndex);
   }
 
-  function handleDeleteField(pageIndex: number, fieldIndex: number, fieldId: string, e: Event) {
+  function handleDeleteField(
+    pageIndex: number,
+    fieldIndex: number,
+    fieldId: string,
+    e: Event,
+  ) {
     e.stopPropagation();
 
-    if (confirm('Delete this field?')) {
+    if (confirm("Delete this field?")) {
       deleteElement(fieldId);
 
       // Navigate to previous field or stay on first
@@ -83,7 +90,9 @@
   }
 
   const isCurrentField = (pageIdx: number, fieldIdx: number) => {
-    return store.currentPageIndex === pageIdx && store.currentFieldIndex === fieldIdx;
+    return (
+      store.currentPageIndex === pageIdx && store.currentFieldIndex === fieldIdx
+    );
   };
 
   let showAvailableFields = $state(false);
@@ -112,8 +121,9 @@
     {:else}
       <div class="pages-list">
         {#each store.pages as page, pageIndex}
-          {@const questions = page['#children']?.filter(q => q['#tag'] === 'af-field') || []}
-          {@const pageName = page['af-fieldset'] || `Page ${pageIndex + 1}`}
+          {@const questions =
+            page["#children"]?.filter((q) => q["#tag"] === "af-field") || []}
+          {@const pageName = page["af-fieldset"] || `Page ${pageIndex + 1}`}
 
           <div class="page-item">
             <div
@@ -131,7 +141,8 @@
             {#if questions.length > 0}
               <div class="questions-list">
                 {#each questions as question, questionIndex}
-                  {@const label = question.defn?.label || question.name || 'Untitled'}
+                  {@const label =
+                    question.defn?.label || question.name || "Untitled"}
 
                   <div
                     class="question-item"
@@ -145,7 +156,13 @@
                     <button
                       type="button"
                       class="btn-delete"
-                      onclick={(e) => handleDeleteField(pageIndex, questionIndex, question.id, e)}
+                      onclick={(e) =>
+                        handleDeleteField(
+                          pageIndex,
+                          questionIndex,
+                          question.id,
+                          e,
+                        )}
                       title="Delete field"
                     >
                       <i class="fa fa-trash"></i>
@@ -163,10 +180,10 @@
           <button
             type="button"
             class="btn btn-primary btn-block"
-            onclick={() => showAvailableFields = !showAvailableFields}
+            onclick={() => (showAvailableFields = !showAvailableFields)}
           >
             <i class="fa fa-plus"></i>
-            {showAvailableFields ? 'Hide Fields' : 'Add Field'}
+            {showAvailableFields ? "Hide Fields" : "Add Field"}
           </button>
         </div>
 
@@ -522,3 +539,4 @@
     font-weight: 500;
   }
 </style>
+
