@@ -86,8 +86,8 @@
         if (afForm && afForm["#children"]) {
           const children = afForm["#children"];
 
-          // Separate af-entity from form elements
-          const afEntity = children.find(
+          // Separate af-entity elements from form elements
+          const afEntities = children.filter(
             (el: any) => el["#tag"] === "af-entity",
           );
           let formElements = children.filter(
@@ -130,8 +130,9 @@
             JSON.stringify(formElements, null, 2),
           );
 
-          // Set entity config if present
-          if (afEntity) {
+          // Process ALL af-entity elements
+          store.entityConfigs = [];
+          for (const afEntity of afEntities) {
             // Parse actions if it's a string
             let actions = afEntity.actions;
             if (typeof actions === "string") {
@@ -143,25 +144,91 @@
               }
             }
 
-            store.entityConfig = {
+            // Parse data if it's a string
+            let data = afEntity.data;
+            if (typeof data === "string") {
+              try {
+                data = eval("(" + data + ")");
+              } catch (e) {
+                console.error("Failed to parse data:", data, e);
+                data = {};
+              }
+            }
+
+            store.entityConfigs.push({
               type: afEntity.type,
               name: afEntity.name,
+              label: afEntity.label || afEntity.name,
+              data: data || { source: "" },
               actions: actions || {},
               security: afEntity.security || "RBAC",
-            };
-            store.selectedEntity = afEntity.type;
-
-            // Load entity fields
-            const fields = await window.CRM.api4(afEntity.type, "getFields", {
-              loadOptions: ["id", "label"],
-              where: [["type", "!=", "Extra"]],
             });
+          }
+
+          // Set selected entity to the first one
+          if (afEntities.length > 0) {
+            const firstEntity = afEntities[0];
+            store.selectedEntity = firstEntity.type;
+
+            // Load entity fields for the first entity
+            const fields = await window.CRM.api4(
+              firstEntity.type,
+              "getFields",
+              {
+                loadOptions: ["id", "label"],
+                where: [["type", "!=", "Extra"]],
+              },
+            );
             const fieldsMap: Record<string, any> = {};
             fields.forEach((field: any) => {
               fieldsMap[field.name] = field;
             });
             store.entityFields = fieldsMap;
           }
+
+          // Process fieldsets to add entityType based on af-fieldset -> entity mapping
+          formElements = formElements.map((el: any) => {
+            if (el["#tag"] === "fieldset" && el["af-fieldset"]) {
+              // Find the matching entity config
+              const entityConfig = store.entityConfigs.find(
+                (ec) => ec.name === el["af-fieldset"],
+              );
+              if (entityConfig) {
+                el.entityType = entityConfig.type;
+                el.label = el["af-title"] || el.label || entityConfig.label;
+              }
+              // Add ID for internal use
+              el.id =
+                el.id ||
+                `fieldset_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+              // Flatten fields from container div if present
+              if (el["#children"]) {
+                const containerDiv = el["#children"].find(
+                  (c: any) =>
+                    c["#tag"] === "div" && c.class?.includes("af-container"),
+                );
+                if (containerDiv && containerDiv["#children"]) {
+                  // Move fields up and add IDs
+                  el["#children"] = containerDiv["#children"].map(
+                    (field: any) => ({
+                      ...field,
+                      id:
+                        field.id ||
+                        `element_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                    }),
+                  );
+                  // Preserve container actions
+                  if (containerDiv.actions) {
+                    el.actions = containerDiv.actions;
+                  }
+                }
+              }
+            } else if (el["#tag"] === "button") {
+              el.id = el.id || `button_${Date.now()}`;
+            }
+            return el;
+          });
 
           // Load form elements
           store.formElements = formElements;
@@ -200,7 +267,8 @@
 
   // Helper function to check if field has customizations
   function hasCustomizations(field: any): boolean {
-    const entityDefaults = getEntityFieldDefaults(field.name);
+    // Use originalDefn if stored on the field, otherwise try entity defaults
+    const defaults = field.originalDefn || getEntityFieldDefaults(field.name);
     if (!field.defn) return false;
 
     const checkProps = [
@@ -213,7 +281,7 @@
 
     for (const key of checkProps) {
       const currentValue = field.defn[key];
-      const defaultValue = entityDefaults[key];
+      const defaultValue = defaults[key];
 
       // Handle empty strings and undefined
       if (currentValue === "" && !defaultValue) continue;
@@ -225,7 +293,8 @@
 
   // Helper function to get only customized defn properties
   function getCustomDefn(field: any): any {
-    const entityDefaults = getEntityFieldDefaults(field.name);
+    // Use originalDefn if stored on the field, otherwise try entity defaults
+    const defaults = field.originalDefn || getEntityFieldDefaults(field.name);
     const customDefn: any = {};
 
     const checkProps = [
@@ -238,7 +307,7 @@
 
     for (const key of checkProps) {
       const currentValue = field.defn?.[key];
-      const defaultValue = entityDefaults[key];
+      const defaultValue = defaults[key];
 
       // Only include if different from default (and not empty string vs undefined)
       if (currentValue === "" && !defaultValue) continue;
@@ -255,81 +324,79 @@
       // Build the proper Afform structure
       const formChildren: any[] = [];
 
-      // 1. Add af-entity with all attributes
-      if (store.entityConfig) {
+      // 1. Add ALL af-entity elements at the top
+      for (const entityConfig of store.entityConfigs) {
         formChildren.push({
           "#tag": "af-entity",
-          data: store.entityConfig.data || { source: "" },
-          type: store.entityConfig.type,
-          name: store.entityConfig.name,
-          label: store.entityConfig.label || store.entityConfig.name,
-          actions: store.entityConfig.actions,
-          security: store.entityConfig.security || "RBAC",
+          data: entityConfig.data || { source: "" },
+          type: entityConfig.type,
+          name: entityConfig.name,
+          label: entityConfig.label || entityConfig.name,
+          actions: entityConfig.actions,
+          security: entityConfig.security || "RBAC",
         });
       }
 
-      // 2. Process form elements (fieldsets and buttons)
-      let fieldsetIndex = 0;
-      const processedElements = store.formElements.map((element: any) => {
-        if (element["#tag"] === "fieldset") {
-          // Get af-field children
-          const fields =
-            element["#children"]?.filter(
-              (c: any) => c["#tag"] === "af-field",
-            ) || [];
+      // 2. Separate fieldsets and buttons
+      const fieldsets = store.formElements.filter(
+        (el: any) => el["#tag"] === "fieldset",
+      );
+      const buttons = store.formElements.filter(
+        (el: any) => el["#tag"] === "button",
+      );
 
-          // Process each field - remove IDs, filter defn
-          const processedFields = fields.map((field: any) => {
-            const fieldDef: any = {
-              "#tag": "af-field",
-              name: field.name,
-            };
+      // 3. Process fieldsets
+      for (const element of fieldsets) {
+        // Get af-field children
+        const fields =
+          element["#children"]?.filter((c: any) => c["#tag"] === "af-field") ||
+          [];
 
-            // Only add defn if there are customizations
-            const customDefn = getCustomDefn(field);
-            if (customDefn) {
-              fieldDef.defn = customDefn;
-            }
-
-            return fieldDef;
-          });
-
-          // Wrap fields in container div with actions
-          const containerDiv = {
-            "#tag": "div",
-            actions: element.actions || { update: true, delete: true },
-            class: "af-container",
-            "#children": processedFields,
+        // Process each field - remove IDs, filter defn
+        const processedFields = fields.map((field: any) => {
+          const fieldDef: any = {
+            "#tag": "af-field",
+            name: field.name,
           };
 
-          // Generate fieldset name: Individual1, Individual2, etc.
-          const entityBaseName = store.entityConfig?.type || "Entity";
-          fieldsetIndex++;
-          const fieldsetName = `${entityBaseName}${fieldsetIndex}`;
+          // Only add defn if there are customizations
+          const customDefn = getCustomDefn(field);
+          if (customDefn) {
+            fieldDef.defn = customDefn;
+          }
 
-          // Return fieldset with proper structure (no id attribute)
-          return {
-            "#tag": "fieldset",
-            "af-fieldset": fieldsetName,
-            "af-title": element.label || element["af-fieldset"] || "Form Section",
-            class: "af-container",
-            "#children": [containerDiv],
-          };
-        } else if (element["#tag"] === "button") {
-          // Process button - remove id attribute
-          return {
-            "#tag": "button",
-            class: element.class || "af-button btn btn-primary",
-            "crm-icon": element["crm-icon"] || "fa-check",
-            "ng-click": element["ng-click"] || "afform.submit()",
-            "ng-if": element["ng-if"] || "afform.showSubmitButton",
-            "#children": element["#children"] || ["Submit"],
-          };
-        }
-        return element;
-      });
+          return fieldDef;
+        });
 
-      formChildren.push(...processedElements);
+        // Wrap fields in container div with actions
+        const containerDiv = {
+          "#tag": "div",
+          actions: element.actions || { update: true, delete: true },
+          class: "af-container",
+          "#children": processedFields,
+        };
+
+        // Use the af-fieldset value from the element (e.g., "Individual1")
+        formChildren.push({
+          "#tag": "fieldset",
+          "af-fieldset": element["af-fieldset"],
+          "af-title": element.label || element["af-fieldset"] || "Form Section",
+          class: "af-container",
+          "#children": [containerDiv],
+        });
+      }
+
+      // 4. Add button(s) LAST
+      for (const element of buttons) {
+        formChildren.push({
+          "#tag": "button",
+          class: element.class || "af-button btn btn-primary",
+          "crm-icon": element["crm-icon"] || "fa-check",
+          "ng-click": element["ng-click"] || "afform.submit()",
+          "ng-if": element["ng-if"] || "afform.showSubmitButton",
+          "#children": element["#children"] || ["Submit"],
+        });
+      }
 
       // Wrap everything in af-form
       const layout = [

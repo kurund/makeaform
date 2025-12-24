@@ -95,8 +95,9 @@
       <div class="entities-wrapper">
         {#each store.pages as page, pageIndex}
           {@const pageFields =
-            page["#children"]?.filter((child) => child["#tag"] === "af-field") ||
-            []}
+            page["#children"]?.filter(
+              (child) => child["#tag"] === "af-field",
+            ) || []}
           {@const isActivePage = store.currentPageIndex === pageIndex}
 
           <div class="entity-container" class:active={isActivePage}>
@@ -107,145 +108,154 @@
               role="button"
               tabindex="0"
             >
-          <div class="page-header-content" onclick={() => gotoField(pageIndex, 0)}>
-            <input
-              type="text"
-              class="container-label-input"
-              value={page.label || page["af-fieldset"] || "Form Section"}
-              onclick={(e) => e.stopPropagation()}
-              oninput={(e) => updatePageLabel(pageIndex, (e.target as HTMLInputElement).value)}
-              placeholder="Container Label"
-            />
-          </div>
-          {#if store.pages.length > 1}
-            <div class="page-reorder-buttons">
-              {#if pageIndex > 0}
-                <button
-                  type="button"
-                  class="btn-reorder"
-                  onclick={(e) => {
-                    e.stopPropagation();
-                    movePageUp(pageIndex);
-                  }}
-                  title="Move up"
-                >
-                  <i class="fa fa-arrow-up"></i>
-                </button>
-              {/if}
-              {#if pageIndex < store.pages.length - 1}
-                <button
-                  type="button"
-                  class="btn-reorder"
-                  onclick={(e) => {
-                    e.stopPropagation();
-                    movePageDown(pageIndex);
-                  }}
-                  title="Move down"
-                >
-                  <i class="fa fa-arrow-down"></i>
-                </button>
-              {/if}
-            </div>
-          {/if}
-        </div>
-
-        <!-- All Fields in This Page -->
-        {#if pageFields.length > 0}
-          <div class="questions-list-preview">
-            {#each pageFields as question, fieldIndex}
-              {@const isSelected =
-                isActivePage && store.currentFieldIndex === fieldIndex}
-              {@const inputType = getInputType(
-                question.defn?.input_type || "Text",
-              )}
-              {@const globalFieldNumber =
-                store.pages
-                  .slice(0, pageIndex)
-                  .reduce(
-                    (sum, p) =>
-                      sum +
-                      (p["#children"]?.filter(
-                        (c) => c["#tag"] === "af-field",
-                      ).length || 0),
-                    0,
-                  ) +
-                fieldIndex +
-                1}
-
               <div
-                class="question-card"
-                class:selected={isSelected}
-                onclick={() => gotoField(pageIndex, fieldIndex)}
-                role="button"
-                tabindex="0"
+                class="page-header-content"
+                onclick={() => gotoField(pageIndex, 0)}
               >
-                <div class="question-card-header">
-                  <span class="question-number">{globalFieldNumber}</span>
-                  <h3 class="question-label">
-                    {question.defn?.label || question.name || "Untitled Question"}
-                    {#if question.defn?.required}
-                      <span class="required-badge">*</span>
-                    {/if}
-                  </h3>
-                </div>
-
-                <div class="question-card-input">
-                  {#if inputType === "textarea"}
-                    <textarea
-                      class="preview-input"
-                      placeholder={question.defn?.placeholder || ""}
-                      rows="3"
-                      disabled
-                    ></textarea>
-                  {:else if inputType === "select"}
-                    <select class="preview-input" disabled>
-                      <option
-                        >{question.defn?.placeholder ||
-                          "Select an option..."}</option
-                      >
-                    </select>
-                  {:else if inputType === "checkbox"}
-                    <div class="option-preview">
-                      <div class="option-item">
-                        <input type="checkbox" disabled />
-                        <span>Option 1</span>
-                      </div>
-                      <div class="option-item">
-                        <input type="checkbox" disabled />
-                        <span>Option 2</span>
-                      </div>
-                    </div>
-                  {:else if inputType === "radio"}
-                    <div class="option-preview">
-                      <div class="option-item">
-                        <input type="radio" disabled />
-                        <span>Option 1</span>
-                      </div>
-                      <div class="option-item">
-                        <input type="radio" disabled />
-                        <span>Option 2</span>
-                      </div>
-                    </div>
-                  {:else}
-                    <input
-                      type={inputType}
-                      class="preview-input"
-                      placeholder={question.defn?.placeholder || ""}
-                      disabled
-                    />
+                <input
+                  type="text"
+                  class="container-label-input"
+                  value={page.label || page["af-fieldset"] || "Form Section"}
+                  onclick={(e) => e.stopPropagation()}
+                  oninput={(e) =>
+                    updatePageLabel(
+                      pageIndex,
+                      (e.target as HTMLInputElement).value,
+                    )}
+                  placeholder="Container Label"
+                />
+              </div>
+              {#if store.pages.length > 1}
+                <div class="page-reorder-buttons">
+                  {#if pageIndex > 0}
+                    <button
+                      type="button"
+                      class="btn-reorder"
+                      onclick={(e) => {
+                        e.stopPropagation();
+                        movePageUp(pageIndex);
+                      }}
+                      title="Move up"
+                    >
+                      <i class="fa fa-arrow-up"></i>
+                    </button>
+                  {/if}
+                  {#if pageIndex < store.pages.length - 1}
+                    <button
+                      type="button"
+                      class="btn-reorder"
+                      onclick={(e) => {
+                        e.stopPropagation();
+                        movePageDown(pageIndex);
+                      }}
+                      title="Move down"
+                    >
+                      <i class="fa fa-arrow-down"></i>
+                    </button>
                   {/if}
                 </div>
+              {/if}
+            </div>
 
-                {#if question.defn?.help_post}
-                  <div class="question-help">
-                    <i class="fa fa-info-circle"></i>
-                    {question.defn.help_post}
+            <!-- All Fields in This Page -->
+            {#if pageFields.length > 0}
+              <div class="questions-list-preview">
+                {#each pageFields as question, fieldIndex}
+                  {@const isSelected =
+                    isActivePage && store.currentFieldIndex === fieldIndex}
+                  {@const inputType = getInputType(
+                    question.defn?.input_type || "Text",
+                  )}
+                  {@const globalFieldNumber =
+                    store.pages
+                      .slice(0, pageIndex)
+                      .reduce(
+                        (sum, p) =>
+                          sum +
+                          (p["#children"]?.filter(
+                            (c) => c["#tag"] === "af-field",
+                          ).length || 0),
+                        0,
+                      ) +
+                    fieldIndex +
+                    1}
+
+                  <div
+                    class="question-card"
+                    class:selected={isSelected}
+                    onclick={() => gotoField(pageIndex, fieldIndex)}
+                    role="button"
+                    tabindex="0"
+                  >
+                    <div class="question-card-header">
+                      <span class="question-number">{globalFieldNumber}</span>
+                      <h3 class="question-label">
+                        {question.defn?.label ||
+                          question.name ||
+                          "Untitled Question"}
+                        {#if question.defn?.required}
+                          <span class="required-badge">*</span>
+                        {/if}
+                      </h3>
+                    </div>
+
+                    <div class="question-card-input">
+                      {#if inputType === "textarea"}
+                        <textarea
+                          class="preview-input"
+                          placeholder={question.defn?.placeholder || ""}
+                          rows="3"
+                          disabled
+                        ></textarea>
+                      {:else if inputType === "select"}
+                        <select class="preview-input" disabled>
+                          <option
+                            >{question.defn?.placeholder ||
+                              "Select an option..."}</option
+                          >
+                        </select>
+                      {:else if inputType === "checkbox"}
+                        <div class="option-preview">
+                          <div class="option-item">
+                            <input type="checkbox" disabled />
+                            <span>Option 1</span>
+                          </div>
+                          <div class="option-item">
+                            <input type="checkbox" disabled />
+                            <span>Option 2</span>
+                          </div>
+                        </div>
+                      {:else if inputType === "radio"}
+                        <div class="option-preview">
+                          <div class="option-item">
+                            <input type="radio" disabled />
+                            <span>Option 1</span>
+                          </div>
+                          <div class="option-item">
+                            <input type="radio" disabled />
+                            <span>Option 2</span>
+                          </div>
+                        </div>
+                      {:else}
+                        <input
+                          type={inputType}
+                          class="preview-input"
+                          placeholder={question.defn?.placeholder || ""}
+                          disabled
+                        />
+                      {/if}
+                    </div>
+
+                    {#if question.defn?.help_post}
+                      <div class="question-help">
+                        <i class="fa fa-info-circle"></i>
+                        {question.defn.help_post}
+                      </div>
+                    {/if}
                   </div>
-                {/if}
+                {/each}
               </div>
-            {/each}
-          </div>
-        {/if}
+            {/if}
           </div>
         {/each}
       </div>

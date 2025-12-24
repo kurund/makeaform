@@ -15,7 +15,7 @@ class FormStore {
     type: "form",
     server_route: "",
   });
-  entityConfig = $state<EntityConfig | null>(null);
+  entityConfigs = $state<EntityConfig[]>([]);
   selectedElementId = $state<string | null>(null);
   adminData = $state<AdminData | null>(null);
   selectedEntity = $state<string | null>(null);

@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { store, updateElement } from "../stores/formStore.svelte";
+  import {
+    store,
+    updateElement,
+    deleteElement,
+    gotoField,
+  } from "../stores/formStore.svelte";
 
   const fieldTypes = [
     { value: "Text", label: "Short Text", icon: "fa-font" },
@@ -30,11 +35,34 @@
       });
     }
   }
+
+  function handleDeleteField() {
+    if (!store.currentField) return;
+
+    if (confirm("Delete this field?")) {
+      const fieldId = store.currentField.id;
+      const currentIndex = store.currentFieldIndex;
+      const pageIndex = store.currentPageIndex;
+
+      deleteElement(fieldId);
+
+      // Navigate to previous field or stay on first
+      if (currentIndex > 0) {
+        gotoField(pageIndex, currentIndex - 1);
+      } else {
+        gotoField(pageIndex, 0);
+      }
+    }
+  }
 </script>
 
 <div class="question-settings">
   <div class="settings-header">
-    <h3>{store.selectedElement?.["#tag"] === "button" ? "Button Settings" : "Field Settings"}</h3>
+    <h3>
+      {store.selectedElement?.["#tag"] === "button"
+        ? "Button Settings"
+        : "Field Settings"}
+    </h3>
   </div>
 
   {#if !store.selectedElement}
@@ -80,7 +108,9 @@
             })}
           placeholder="fa-check"
         />
-        <small class="help-block">FontAwesome icon class (e.g., fa-check, fa-paper-plane)</small>
+        <small class="help-block"
+          >FontAwesome icon class (e.g., fa-check, fa-paper-plane)</small
+        >
       </div>
 
       <!-- Button Style -->
@@ -119,7 +149,9 @@
       <div class="field-info-box">
         <div class="info-row">
           <i class="fa fa-info-circle" style="margin-right: var(--crm-m);"></i>
-          <span style="font-size: var(--crm-small-font-size); color: var(--crm-c-gray-600);">
+          <span
+            style="font-size: var(--crm-small-font-size); color: var(--crm-c-gray-600);"
+          >
             The button will automatically submit the form when clicked.
           </span>
         </div>
@@ -258,6 +290,18 @@
           <span class="info-label">Entity:</span>
           <span class="info-value">{store.selectedEntity || "None"}</span>
         </div>
+      </div>
+
+      <!-- Delete Field -->
+      <div class="delete-section">
+        <button
+          type="button"
+          class="btn-delete-field"
+          onclick={handleDeleteField}
+        >
+          <i class="fa fa-trash"></i>
+          Delete Field
+        </button>
       </div>
     </div>
   {/if}
@@ -442,5 +486,33 @@
     font-family: "Monaco", "Courier New", monospace;
     font-size: var(--crm-small-font-size);
     color: var(--makeaform-accent);
+  }
+
+  .delete-section {
+    margin-top: var(--crm-r4);
+    padding-top: var(--crm-r4);
+    border-top: 1px solid var(--crm-c-gray-200);
+  }
+
+  .btn-delete-field {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--crm-m);
+    padding: var(--crm-m1) var(--crm-r);
+    background: transparent;
+    border: 1px solid var(--crm-c-danger);
+    border-radius: var(--makeaform-radius);
+    color: var(--crm-c-danger);
+    font-size: var(--crm-m3);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-delete-field:hover {
+    background: var(--crm-c-danger);
+    color: white;
   }
 </style>

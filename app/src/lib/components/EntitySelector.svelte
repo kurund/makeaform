@@ -28,34 +28,33 @@
 
     setSelectedEntity(entityName);
 
-    // Generate a unique entity instance name (e.g., Individual1, Individual2, etc.)
+    // Count existing fieldsets for this entity type to generate unique instance name
     const existingCount = store.formElements.filter(
-      (el) => el["#tag"] === "fieldset" && el["af-fieldset"] === entityName,
+      (el) => el["#tag"] === "fieldset" && el.entityType === entityName,
     ).length;
     const entityInstanceName = `${entityName}${existingCount + 1}`;
 
-    // Add entity configuration if it's the first entity
-    if (!store.entityConfig) {
-      store.entityConfig = {
-        type: entityName,
-        name: entityInstanceName,
-        label: `${entityName} ${existingCount + 1}`,
-        data: {
-          source: "",
-        },
-        actions: {
-          create: true,
-          update: false,
-        },
-        security: "RBAC",
-      };
-    }
+    // Add entity configuration for this entity instance
+    store.entityConfigs.push({
+      type: entityName,
+      name: entityInstanceName,
+      label: `${entityName} ${existingCount + 1}`,
+      data: {
+        source: "",
+      },
+      actions: {
+        create: true,
+        update: true,
+      },
+      security: "RBAC",
+    });
 
-    // Always add a new fieldset for this entity
-    // af-fieldset should be just the entity name (e.g., "Individual")
+    // Add a new fieldset for this entity
+    // af-fieldset references the entity instance name (e.g., "Individual1")
     store.formElements.push({
       "#tag": "fieldset",
-      "af-fieldset": entityName,
+      "af-fieldset": entityInstanceName,
+      entityType: entityName, // Track the entity type for counting
       label: `${entityName} ${existingCount + 1}`,
       class: "af-container",
       id: `fieldset_${Date.now()}`,
@@ -68,7 +67,7 @@
 
     // Add submit button if it doesn't exist yet
     const hasSubmitButton = store.formElements.some(
-      (el) => el["#tag"] === "button"
+      (el) => el["#tag"] === "button",
     );
     if (!hasSubmitButton) {
       store.formElements.push({

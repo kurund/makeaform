@@ -3,9 +3,7 @@
   import {
     store,
     gotoField,
-    deleteElement,
     addElement,
-    selectElement,
     setSelectedEntity,
     setEntityFields,
   } from "../stores/formStore.svelte";
@@ -50,18 +48,19 @@
     // Load entity fields for the clicked page
     const page = store.pages[pageIndex];
     if (page) {
-      const entityName = page["af-fieldset"];
-      if (entityName && entityName !== store.selectedEntity) {
-        setSelectedEntity(entityName);
+      // Use entityType (the entity type like "Individual") for loading fields
+      const entityType = page.entityType || page["af-fieldset"];
+      if (entityType && entityType !== store.selectedEntity) {
+        setSelectedEntity(entityType);
 
         // Check if we already have fields from loadAdminData
-        const existingFields = store.adminData?.fields?.[entityName];
+        const existingFields = store.adminData?.fields?.[entityType];
         if (existingFields) {
           setEntityFields(existingFields);
         } else {
           // Fallback to fetching fields if not in adminData
           try {
-            const fields = await getEntityFields(entityName);
+            const fields = await getEntityFields(entityType);
             setEntityFields(fields);
           } catch (error) {
             console.error("Failed to load entity fields:", error);
@@ -71,21 +70,24 @@
     }
   }
 
-  function handleFieldClick(pageIndex: number, fieldIndex: number) {
-    gotoField(pageIndex, fieldIndex);
-  }
-
   function handleAddField(fieldName: string, field: any) {
     if (!store.currentPage) return;
+
+    // Build default defn from entity field metadata
+    const defaultDefn = {
+      label: field.label || field.title || fieldName,
+      input_type: field.input_type || "Text",
+      required: field.required || false,
+      placeholder: "",
+      help_post: field.help_pre || field.help_post || "",
+    };
 
     const newQuestion = {
       "#tag": "af-field" as const,
       name: fieldName,
-      defn: {
-        label: field.label || field.title || fieldName,
-        input_type: field.input_type || "Text",
-        required: field.required || false,
-      },
+      defn: { ...defaultDefn },
+      // Store original defaults for comparison during save
+      originalDefn: { ...defaultDefn },
       id: `element_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     };
 
@@ -95,34 +97,6 @@
     const newFieldIndex = store.currentPageFields.length - 1;
     gotoField(store.currentPageIndex, newFieldIndex);
   }
-
-  function handleDeleteField(
-    pageIndex: number,
-    fieldIndex: number,
-    fieldId: string,
-    e: Event,
-  ) {
-    e.stopPropagation();
-
-    if (confirm("Delete this field?")) {
-      deleteElement(fieldId);
-
-      // Navigate to previous field or stay on first
-      if (fieldIndex > 0) {
-        gotoField(pageIndex, fieldIndex - 1);
-      } else {
-        gotoField(pageIndex, 0);
-      }
-    }
-  }
-
-  const isCurrentField = (pageIdx: number, fieldIdx: number) => {
-    return (
-      store.currentPageIndex === pageIdx && store.currentFieldIndex === fieldIdx
-    );
-  };
-
-  let showAvailableFields = $state(false);
 </script>
 
 <div class="question-navigator">
@@ -150,7 +124,8 @@
         {#each store.pages as page, pageIndex}
           {@const questions =
             page["#children"]?.filter((q) => q["#tag"] === "af-field") || []}
-          {@const pageName = page["af-fieldset"] || `Page ${pageIndex + 1}`}
+          {@const pageName =
+            page.label || page["af-fieldset"] || `Page ${pageIndex + 1}`}
 
           <div class="page-item">
             <div
@@ -164,102 +139,37 @@
               <span class="page-name">{pageName}</span>
               <span class="question-count">{questions.length}</span>
             </div>
-
-            {#if questions.length > 0}
-              <div class="questions-list">
-                {#each questions as question, questionIndex}
-                  {@const label =
-                    question.defn?.label || question.name || "Untitled"}
-
-                  <div
-                    class="question-item"
-                    class:active={isCurrentField(pageIndex, questionIndex)}
-                    onclick={() => handleFieldClick(pageIndex, questionIndex)}
-                    role="button"
-                    tabindex="0"
-                  >
-                    <span class="question-number">{questionIndex + 1}</span>
-                    <span class="question-label">{label}</span>
-                    <button
-                      type="button"
-                      class="btn-delete"
-                      onclick={(e) =>
-                        handleDeleteField(
-                          pageIndex,
-                          questionIndex,
-                          question.id,
-                          e,
-                        )}
-                      title="Delete field"
-                    >
-                      <i class="fa fa-trash"></i>
-                    </button>
-                  </div>
-                {/each}
-              </div>
-            {/if}
           </div>
         {/each}
       </div>
 
-      <!-- Submit Button Section -->
-      {#each store.formElements.filter((el) => el["#tag"] === "button") as submitButton}
-        <div class="pages-list" style="margin-top: var(--crm-r);">
-          <div class="page-item">
-            <div
-              class="page-header"
-              class:active={store.selectedElementId === submitButton.id}
-              onclick={() => selectElement(submitButton.id)}
-              role="button"
-              tabindex="0"
-            >
-              <i class="fa fa-paper-plane"></i>
-              <span class="page-name">Submit Button</span>
-            </div>
-          </div>
-        </div>
-      {/each}
-
       {#if store.currentPage}
-        <div class="navigator-actions">
-          <button
-            type="button"
-            class="btn btn-primary btn-block"
-            onclick={() => (showAvailableFields = !showAvailableFields)}
-          >
-            <i class="fa fa-plus"></i>
-            {showAvailableFields ? "Hide Fields" : "Add Field"}
-          </button>
-        </div>
-
-        {#if showAvailableFields}
-          <div class="available-fields">
-            <div class="available-fields-header">
-              <h4>Available Fields</h4>
-              <span class="field-count">{availableFields().length}</span>
-            </div>
-
-            {#if availableFields().length === 0}
-              <div class="no-fields">
-                <i class="fa fa-check-circle"></i>
-                <p>All fields added!</p>
-              </div>
-            {:else}
-              <div class="fields-list">
-                {#each availableFields() as item}
-                  <button
-                    type="button"
-                    class="field-item"
-                    onclick={() => handleAddField(item.name, item.field)}
-                  >
-                    <i class="fa fa-plus-circle"></i>
-                    <span>{item.label}</span>
-                  </button>
-                {/each}
-              </div>
-            {/if}
+        <div class="available-fields">
+          <div class="available-fields-header">
+            <h4>Available Fields</h4>
+            <span class="field-count">{availableFields().length}</span>
           </div>
-        {/if}
+
+          {#if availableFields().length === 0}
+            <div class="no-fields">
+              <i class="fa fa-check-circle"></i>
+              <p>All fields added!</p>
+            </div>
+          {:else}
+            <div class="fields-list">
+              {#each availableFields() as item}
+                <button
+                  type="button"
+                  class="field-item"
+                  onclick={() => handleAddField(item.name, item.field)}
+                >
+                  <i class="fa fa-plus-circle"></i>
+                  <span>{item.label}</span>
+                </button>
+              {/each}
+            </div>
+          {/if}
+        </div>
       {/if}
     {/if}
   </div>
@@ -377,120 +287,6 @@
     color: var(--crm-c-text-light);
   }
 
-  .questions-list {
-    margin-top: var(--crm-m);
-    padding-left: var(--crm-r4);
-  }
-
-  .question-item {
-    display: flex;
-    align-items: center;
-    gap: var(--crm-m1);
-    padding: var(--crm-m1) var(--crm-m2);
-    background: var(--crm-c-layer0-bg);
-    border: 1px solid var(--crm-c-gray-200);
-    border-radius: var(--crm-roundness);
-    cursor: pointer;
-    transition: all 0.15s ease;
-    margin-bottom: var(--crm-s);
-  }
-
-  .question-item:hover {
-    border-color: var(--makeaform-accent);
-    background: var(--crm-c-layer1-bg);
-    transform: translateX(2px);
-  }
-
-  .question-item.active {
-    background: var(--makeaform-accent-bg);
-    border-color: var(--makeaform-accent);
-    box-shadow: 0 2px 6px rgba(from var(--makeaform-accent) r g b / 0.12);
-  }
-
-  .question-number {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    background: var(--crm-c-gray-100);
-    border-radius: 50%;
-    font-size: var(--crm-small-font-size);
-    font-weight: 700;
-    color: var(--crm-c-gray-600);
-  }
-
-  .question-item.active .question-number {
-    background: var(--makeaform-accent);
-    color: var(--crm-c-text-light);
-  }
-
-  .question-label {
-    flex: 1;
-    font-size: var(--crm-m3);
-    color: var(--crm-c-gray-800);
-    font-weight: 500;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .btn-delete {
-    opacity: 0;
-    padding: var(--crm-xs1) var(--crm-m);
-    background: transparent;
-    border: none;
-    color: var(--crm-c-danger);
-    cursor: pointer;
-    transition: all 0.15s ease;
-    border-radius: var(--crm-roundness);
-  }
-
-  .question-item:hover .btn-delete {
-    opacity: 1;
-  }
-
-  .btn-delete:hover {
-    background: var(--crm-c-danger-light);
-  }
-
-  .navigator-actions {
-    padding: var(--crm-r);
-    border-top: 1px solid var(--crm-c-gray-200);
-    background: var(--crm-c-layer0-bg);
-  }
-
-  .btn-block {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--crm-m);
-  }
-
-  .btn-primary {
-    background: var(--crm-c-primary);
-    border: 1px solid var(--crm-c-primary);
-    color: var(--crm-c-primary-text);
-    padding: var(--crm-m1) var(--crm-r);
-    border-radius: var(--makeaform-radius);
-    font-weight: 600;
-    font-size: var(--crm-m3);
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .btn-primary:hover {
-    background: var(--crm-c-primary-hover);
-    border-color: var(--crm-c-primary-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(from var(--crm-c-primary) r g b / 0.3);
-  }
-
-  .btn-primary i {
-    font-size: var(--crm-m3);
-  }
-
   .available-fields {
     background: var(--crm-c-layer0-bg);
     border-top: 1px solid var(--crm-c-gray-200);
@@ -584,4 +380,3 @@
     font-weight: 500;
   }
 </style>
-
