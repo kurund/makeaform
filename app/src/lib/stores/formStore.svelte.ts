@@ -374,3 +374,67 @@ export function canGoNext(): boolean {
 export function canGoPrev(): boolean {
   return store.currentFieldIndex > 0 || store.currentPageIndex > 0;
 }
+
+/**
+ * Move a page/entity up in the order
+ */
+export function movePageUp(pageIndex: number) {
+  if (pageIndex <= 0 || pageIndex >= store.pages.length) return;
+
+  // Find the indices of the two pages in formElements
+  const pages = store.pages;
+  const pageToMove = pages[pageIndex];
+  const pageBefore = pages[pageIndex - 1];
+
+  const indexToMove = store.formElements.indexOf(pageToMove);
+  const indexBefore = store.formElements.indexOf(pageBefore);
+
+  if (indexToMove === -1 || indexBefore === -1) return;
+
+  // Swap the pages in formElements
+  [store.formElements[indexBefore], store.formElements[indexToMove]] = [
+    store.formElements[indexToMove],
+    store.formElements[indexBefore],
+  ];
+
+  // Update current page index if needed
+  if (store.currentPageIndex === pageIndex) {
+    store.currentPageIndex = pageIndex - 1;
+  } else if (store.currentPageIndex === pageIndex - 1) {
+    store.currentPageIndex = pageIndex;
+  }
+
+  store.hasUnsavedChanges = true;
+}
+
+/**
+ * Move a page/entity down in the order
+ */
+export function movePageDown(pageIndex: number) {
+  if (pageIndex < 0 || pageIndex >= store.pages.length - 1) return;
+
+  // Find the indices of the two pages in formElements
+  const pages = store.pages;
+  const pageToMove = pages[pageIndex];
+  const pageAfter = pages[pageIndex + 1];
+
+  const indexToMove = store.formElements.indexOf(pageToMove);
+  const indexAfter = store.formElements.indexOf(pageAfter);
+
+  if (indexToMove === -1 || indexAfter === -1) return;
+
+  // Swap the pages in formElements
+  [store.formElements[indexToMove], store.formElements[indexAfter]] = [
+    store.formElements[indexAfter],
+    store.formElements[indexToMove],
+  ];
+
+  // Update current page index if needed
+  if (store.currentPageIndex === pageIndex) {
+    store.currentPageIndex = pageIndex + 1;
+  } else if (store.currentPageIndex === pageIndex + 1) {
+    store.currentPageIndex = pageIndex;
+  }
+
+  store.hasUnsavedChanges = true;
+}

@@ -3,6 +3,7 @@
     store,
     setSelectedEntity,
     setEntityFields,
+    gotoField,
   } from "../stores/formStore.svelte";
   import { getEntityFields } from "../api/civicrm";
 
@@ -55,6 +56,7 @@
     store.formElements.push({
       "#tag": "fieldset",
       "af-fieldset": entityName,
+      label: `${entityName} ${existingCount + 1}`,
       class: "af-container",
       id: `fieldset_${Date.now()}`,
       "#children": [],
@@ -77,6 +79,10 @@
         id: `button_${Date.now()}`,
       });
     }
+
+    // Navigate to the newly created entity
+    const newPageIndex = store.pages.length - 1;
+    gotoField(newPageIndex, 0);
 
     loading = true;
 

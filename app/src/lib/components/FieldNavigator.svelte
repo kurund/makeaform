@@ -6,7 +6,10 @@
     deleteElement,
     addElement,
     selectElement,
+    setSelectedEntity,
+    setEntityFields,
   } from "../stores/formStore.svelte";
+  import { getEntityFields } from "../api/civicrm";
 
   // Track which fields are already in the form
   const usedFields = $derived(() => {
@@ -41,8 +44,31 @@
       }));
   });
 
-  function handlePageClick(pageIndex: number) {
+  async function handlePageClick(pageIndex: number) {
     gotoField(pageIndex, 0);
+
+    // Load entity fields for the clicked page
+    const page = store.pages[pageIndex];
+    if (page) {
+      const entityName = page["af-fieldset"];
+      if (entityName && entityName !== store.selectedEntity) {
+        setSelectedEntity(entityName);
+
+        // Check if we already have fields from loadAdminData
+        const existingFields = store.adminData?.fields?.[entityName];
+        if (existingFields) {
+          setEntityFields(existingFields);
+        } else {
+          // Fallback to fetching fields if not in adminData
+          try {
+            const fields = await getEntityFields(entityName);
+            setEntityFields(fields);
+          } catch (error) {
+            console.error("Failed to load entity fields:", error);
+          }
+        }
+      }
+    }
   }
 
   function handleFieldClick(pageIndex: number, fieldIndex: number) {

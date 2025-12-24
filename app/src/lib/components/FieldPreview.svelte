@@ -6,6 +6,9 @@
     canGoNext,
     canGoPrev,
     selectElement,
+    movePageUp,
+    movePageDown,
+    gotoField,
   } from "../stores/formStore.svelte";
 
   // Calculate progress
@@ -53,6 +56,15 @@
     };
     return typeMap[fieldType] || "text";
   }
+
+  // Update page/container label
+  function updatePageLabel(pageIndex: number, newLabel: string) {
+    const page = store.pages[pageIndex];
+    if (page) {
+      page.label = newLabel;
+      store.hasUnsavedChanges = true;
+    }
+  }
 </script>
 
 <div class="typeform-preview">
@@ -69,7 +81,7 @@
         <p>Select an entity from the left panel to begin building your form</p>
       </div>
     </div>
-  {:else if store.currentPageFields.length === 0}
+  {:else if store.pages.length === 0}
     <div class="preview-empty">
       <div class="empty-content">
         <i class="fa fa-plus-circle fa-3x"></i>
@@ -79,96 +91,161 @@
     </div>
   {:else}
     <div class="form-preview-container">
-      <!-- Page Header -->
-      {#if store.currentPage}
-        <div class="page-header-preview">
-          <h2>{store.currentPage["af-fieldset"] || "Form Section"}</h2>
-          <div class="page-meta">
-            <span class="field-count-badge">
-              <i class="fa fa-list"></i>
-              {store.currentPageFields.length}
-              {store.currentPageFields.length === 1 ? "field" : "fields"}
-            </span>
+      <!-- All Pages/Entities -->
+      <div class="entities-wrapper">
+        {#each store.pages as page, pageIndex}
+          {@const pageFields =
+            page["#children"]?.filter((child) => child["#tag"] === "af-field") ||
+            []}
+          {@const isActivePage = store.currentPageIndex === pageIndex}
+
+          <div class="entity-container" class:active={isActivePage}>
+            <!-- Page/Entity Header -->
+            <div
+              class="page-header-preview"
+              class:active={isActivePage}
+              role="button"
+              tabindex="0"
+            >
+          <div class="page-header-content" onclick={() => gotoField(pageIndex, 0)}>
+            <input
+              type="text"
+              class="container-label-input"
+              value={page.label || page["af-fieldset"] || "Form Section"}
+              onclick={(e) => e.stopPropagation()}
+              oninput={(e) => updatePageLabel(pageIndex, (e.target as HTMLInputElement).value)}
+              placeholder="Container Label"
+            />
           </div>
-        </div>
-      {/if}
-
-      <!-- All Fields in Current Page -->
-      <div class="questions-list-preview">
-        {#each store.currentPageFields as question, index}
-          {@const isSelected = store.currentField?.id === question.id}
-          {@const inputType = getInputType(question.defn?.input_type || "Text")}
-
-          <div
-            class="question-card"
-            class:selected={isSelected}
-            onclick={() => (store.currentFieldIndex = index)}
-            role="button"
-            tabindex="0"
-          >
-            <div class="question-card-header">
-              <span class="question-number">{index + 1}</span>
-              <h3 class="question-label">
-                {question.defn?.label || question.name || "Untitled Question"}
-                {#if question.defn?.required}
-                  <span class="required-badge">*</span>
-                {/if}
-              </h3>
-            </div>
-
-            <div class="question-card-input">
-              {#if inputType === "textarea"}
-                <textarea
-                  class="preview-input"
-                  placeholder={question.defn?.placeholder || ""}
-                  rows="3"
-                  disabled
-                ></textarea>
-              {:else if inputType === "select"}
-                <select class="preview-input" disabled>
-                  <option
-                    >{question.defn?.placeholder ||
-                      "Select an option..."}</option
-                  >
-                </select>
-              {:else if inputType === "checkbox"}
-                <div class="option-preview">
-                  <div class="option-item">
-                    <input type="checkbox" disabled />
-                    <span>Option 1</span>
-                  </div>
-                  <div class="option-item">
-                    <input type="checkbox" disabled />
-                    <span>Option 2</span>
-                  </div>
-                </div>
-              {:else if inputType === "radio"}
-                <div class="option-preview">
-                  <div class="option-item">
-                    <input type="radio" disabled />
-                    <span>Option 1</span>
-                  </div>
-                  <div class="option-item">
-                    <input type="radio" disabled />
-                    <span>Option 2</span>
-                  </div>
-                </div>
-              {:else}
-                <input
-                  type={inputType}
-                  class="preview-input"
-                  placeholder={question.defn?.placeholder || ""}
-                  disabled
-                />
+          {#if store.pages.length > 1}
+            <div class="page-reorder-buttons">
+              {#if pageIndex > 0}
+                <button
+                  type="button"
+                  class="btn-reorder"
+                  onclick={(e) => {
+                    e.stopPropagation();
+                    movePageUp(pageIndex);
+                  }}
+                  title="Move up"
+                >
+                  <i class="fa fa-arrow-up"></i>
+                </button>
+              {/if}
+              {#if pageIndex < store.pages.length - 1}
+                <button
+                  type="button"
+                  class="btn-reorder"
+                  onclick={(e) => {
+                    e.stopPropagation();
+                    movePageDown(pageIndex);
+                  }}
+                  title="Move down"
+                >
+                  <i class="fa fa-arrow-down"></i>
+                </button>
               {/if}
             </div>
+          {/if}
+        </div>
 
-            {#if question.defn?.help_post}
-              <div class="question-help">
-                <i class="fa fa-info-circle"></i>
-                {question.defn.help_post}
+        <!-- All Fields in This Page -->
+        {#if pageFields.length > 0}
+          <div class="questions-list-preview">
+            {#each pageFields as question, fieldIndex}
+              {@const isSelected =
+                isActivePage && store.currentFieldIndex === fieldIndex}
+              {@const inputType = getInputType(
+                question.defn?.input_type || "Text",
+              )}
+              {@const globalFieldNumber =
+                store.pages
+                  .slice(0, pageIndex)
+                  .reduce(
+                    (sum, p) =>
+                      sum +
+                      (p["#children"]?.filter(
+                        (c) => c["#tag"] === "af-field",
+                      ).length || 0),
+                    0,
+                  ) +
+                fieldIndex +
+                1}
+
+              <div
+                class="question-card"
+                class:selected={isSelected}
+                onclick={() => gotoField(pageIndex, fieldIndex)}
+                role="button"
+                tabindex="0"
+              >
+                <div class="question-card-header">
+                  <span class="question-number">{globalFieldNumber}</span>
+                  <h3 class="question-label">
+                    {question.defn?.label || question.name || "Untitled Question"}
+                    {#if question.defn?.required}
+                      <span class="required-badge">*</span>
+                    {/if}
+                  </h3>
+                </div>
+
+                <div class="question-card-input">
+                  {#if inputType === "textarea"}
+                    <textarea
+                      class="preview-input"
+                      placeholder={question.defn?.placeholder || ""}
+                      rows="3"
+                      disabled
+                    ></textarea>
+                  {:else if inputType === "select"}
+                    <select class="preview-input" disabled>
+                      <option
+                        >{question.defn?.placeholder ||
+                          "Select an option..."}</option
+                      >
+                    </select>
+                  {:else if inputType === "checkbox"}
+                    <div class="option-preview">
+                      <div class="option-item">
+                        <input type="checkbox" disabled />
+                        <span>Option 1</span>
+                      </div>
+                      <div class="option-item">
+                        <input type="checkbox" disabled />
+                        <span>Option 2</span>
+                      </div>
+                    </div>
+                  {:else if inputType === "radio"}
+                    <div class="option-preview">
+                      <div class="option-item">
+                        <input type="radio" disabled />
+                        <span>Option 1</span>
+                      </div>
+                      <div class="option-item">
+                        <input type="radio" disabled />
+                        <span>Option 2</span>
+                      </div>
+                    </div>
+                  {:else}
+                    <input
+                      type={inputType}
+                      class="preview-input"
+                      placeholder={question.defn?.placeholder || ""}
+                      disabled
+                    />
+                  {/if}
+                </div>
+
+                {#if question.defn?.help_post}
+                  <div class="question-help">
+                    <i class="fa fa-info-circle"></i>
+                    {question.defn.help_post}
+                  </div>
+                {/if}
               </div>
-            {/if}
+            {/each}
+          </div>
+        {/if}
           </div>
         {/each}
       </div>
@@ -256,40 +333,106 @@
     padding: var(--crm-r4);
   }
 
-  .page-header-preview {
-    background: var(--crm-c-layer0-bg);
-    padding: var(--crm-r2) var(--crm-r4);
+  .entities-wrapper {
+    background: var(--crm-c-layer1-bg);
+    border: 1px solid var(--crm-c-gray-200);
     border-radius: var(--crm-m2);
-    margin-bottom: var(--crm-r2);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    padding: var(--crm-r2);
   }
 
-  .page-header-preview h2 {
-    margin: 0 0 var(--crm-m) 0;
+  .entity-container {
+    background: var(--crm-c-layer0-bg);
+    border: 2px solid var(--crm-c-gray-200);
+    border-radius: var(--crm-m2);
+    padding: var(--crm-r2);
+    margin-bottom: var(--crm-r2);
+    transition: all 0.2s ease;
+  }
+
+  .entity-container:last-child {
+    margin-bottom: 0;
+  }
+
+  .entity-container.active {
+    border-color: var(--makeaform-accent);
+    box-shadow: 0 4px 16px rgba(from var(--makeaform-accent) r g b / 0.15);
+  }
+
+  .page-header-preview {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--crm-r);
+    margin-bottom: var(--crm-m);
+  }
+
+  .page-header-content {
+    flex: 1;
+    cursor: pointer;
+  }
+
+  .page-reorder-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--crm-xs1);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .entity-container:hover .page-reorder-buttons {
+    opacity: 1;
+  }
+
+  .btn-reorder {
+    background: var(--crm-c-layer1-bg);
+    border: 1px solid var(--crm-c-gray-300);
+    color: var(--crm-c-gray-700);
+    cursor: pointer;
+    padding: var(--crm-xs1) var(--crm-m);
+    border-radius: var(--crm-roundness);
+    font-size: var(--crm-small-font-size);
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+  }
+
+  .btn-reorder:hover {
+    background: var(--makeaform-accent);
+    border-color: var(--makeaform-accent);
+    color: var(--crm-c-text-light);
+    transform: scale(1.1);
+  }
+
+  .btn-reorder i {
+    font-size: var(--crm-small-font-size);
+  }
+
+  .container-label-input {
+    background: transparent;
+    border: 1px solid transparent;
     font-size: var(--crm-r2);
     font-weight: 700;
     color: var(--crm-c-text);
+    width: 100%;
+    padding: var(--crm-xs1) var(--crm-m);
+    margin: 0 0 var(--crm-m) 0;
+    border-radius: var(--crm-roundness);
+    transition: all 0.15s ease;
   }
 
-  .page-meta {
-    display: flex;
-    gap: var(--crm-m2);
+  .container-label-input:hover {
+    background: var(--crm-c-layer1-bg);
+    border-color: var(--crm-c-gray-300);
   }
 
-  .field-count-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--crm-s);
-    background: var(--makeaform-accent-bg);
-    color: var(--makeaform-accent);
-    padding: var(--crm-s) var(--crm-m2);
-    border-radius: var(--crm-r);
-    font-size: var(--crm-m3);
-    font-weight: 600;
-  }
-
-  .field-count-badge i {
-    font-size: var(--crm-small-font-size);
+  .container-label-input:focus {
+    outline: none;
+    background: var(--crm-c-layer1-bg);
+    border-color: var(--makeaform-accent);
+    box-shadow: 0 0 0 2px var(--makeaform-accent-bg);
   }
 
   .questions-list-preview {
