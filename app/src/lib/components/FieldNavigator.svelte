@@ -5,6 +5,7 @@
     gotoField,
     deleteElement,
     addElement,
+    selectElement,
   } from "../stores/formStore.svelte";
 
   // Track which fields are already in the form
@@ -174,6 +175,24 @@
           </div>
         {/each}
       </div>
+
+      <!-- Submit Button Section -->
+      {#each store.formElements.filter((el) => el["#tag"] === "button") as submitButton}
+        <div class="pages-list" style="margin-top: var(--crm-r);">
+          <div class="page-item">
+            <div
+              class="page-header"
+              class:active={store.selectedElementId === submitButton.id}
+              onclick={() => selectElement(submitButton.id)}
+              role="button"
+              tabindex="0"
+            >
+              <i class="fa fa-paper-plane"></i>
+              <span class="page-name">Submit Button</span>
+            </div>
+          </div>
+        </div>
+      {/each}
 
       {#if store.currentPage}
         <div class="navigator-actions">

@@ -38,6 +38,10 @@
       store.entityConfig = {
         type: entityName,
         name: entityInstanceName,
+        label: `${entityName} ${existingCount + 1}`,
+        data: {
+          source: "",
+        },
         actions: {
           create: true,
           update: false,
@@ -54,7 +58,25 @@
       class: "af-container",
       id: `fieldset_${Date.now()}`,
       "#children": [],
+      actions: {
+        update: true,
+        delete: true,
+      },
     });
+
+    // Add submit button if it doesn't exist yet
+    const hasSubmitButton = store.formElements.some(
+      (el) => el["#tag"] === "button"
+    );
+    if (!hasSubmitButton) {
+      store.formElements.push({
+        "#tag": "button",
+        class: "af-button btn btn-primary",
+        "crm-icon": "fa-check",
+        "#children": ["Submit"],
+        id: `button_${Date.now()}`,
+      });
+    }
 
     loading = true;
 

@@ -5,6 +5,7 @@
     prevField,
     canGoNext,
     canGoPrev,
+    selectElement,
   } from "../stores/formStore.svelte";
 
   // Calculate progress
@@ -162,15 +163,32 @@
               {/if}
             </div>
 
-            {#if question.defn?.help_text}
+            {#if question.defn?.help_post}
               <div class="question-help">
                 <i class="fa fa-info-circle"></i>
-                {question.defn.help_text}
+                {question.defn.help_post}
               </div>
             {/if}
           </div>
         {/each}
       </div>
+
+      <!-- Submit Button Preview -->
+      {#each store.formElements.filter((el) => el["#tag"] === "button") as submitButton}
+        <div style="margin-top: var(--crm-r4); text-align: center;">
+          <button
+            type="button"
+            class={submitButton.class || "af-button btn btn-primary"}
+            onclick={() => selectElement(submitButton.id)}
+            style="pointer-events: all; cursor: pointer;"
+          >
+            {#if submitButton["crm-icon"]}
+              <i class="fa {submitButton['crm-icon']}"></i>
+            {/if}
+            {submitButton["#children"]?.[0] || "Submit"}
+          </button>
+        </div>
+      {/each}
     </div>
   {/if}
 </div>

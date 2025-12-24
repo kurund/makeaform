@@ -34,15 +34,98 @@
 
 <div class="question-settings">
   <div class="settings-header">
-    <h3>Field Settings</h3>
+    <h3>{store.selectedElement?.["#tag"] === "button" ? "Button Settings" : "Field Settings"}</h3>
   </div>
 
-  {#if !store.currentField}
+  {#if !store.selectedElement}
     <div class="settings-empty">
       <i class="fa fa-cog fa-2x"></i>
-      <p>Select a field to edit its settings</p>
+      <p>Select a field or button to edit its settings</p>
     </div>
-  {:else}
+  {:else if store.selectedElement?.["#tag"] === "button"}
+    <div class="settings-content">
+      <!-- Button Label -->
+      <div class="form-group">
+        <label for="button-label">
+          <i class="fa fa-pencil"></i>
+          Button Text
+        </label>
+        <input
+          id="button-label"
+          type="text"
+          class="form-control"
+          value={store.selectedElement?.["#children"]?.[0] || ""}
+          oninput={(e) =>
+            updateElement(store.selectedElement.id, {
+              "#children": [(e.target as HTMLInputElement).value],
+            })}
+          placeholder="Submit"
+        />
+      </div>
+
+      <!-- Button Icon -->
+      <div class="form-group">
+        <label for="button-icon">
+          <i class="fa fa-picture-o"></i>
+          Icon
+        </label>
+        <input
+          id="button-icon"
+          type="text"
+          class="form-control"
+          value={store.selectedElement?.["crm-icon"] || ""}
+          oninput={(e) =>
+            updateElement(store.selectedElement.id, {
+              "crm-icon": (e.target as HTMLInputElement).value,
+            })}
+          placeholder="fa-check"
+        />
+        <small class="help-block">FontAwesome icon class (e.g., fa-check, fa-paper-plane)</small>
+      </div>
+
+      <!-- Button Style -->
+      <div class="form-group">
+        <label for="button-class">
+          <i class="fa fa-paint-brush"></i>
+          Button Style
+        </label>
+        <select
+          id="button-class"
+          class="form-control"
+          value={store.selectedElement?.["class"]?.includes("btn-primary")
+            ? "btn-primary"
+            : store.selectedElement?.["class"]?.includes("btn-success")
+              ? "btn-success"
+              : store.selectedElement?.["class"]?.includes("btn-danger")
+                ? "btn-danger"
+                : store.selectedElement?.["class"]?.includes("btn-secondary")
+                  ? "btn-secondary"
+                  : "btn-primary"}
+          onchange={(e) => {
+            const value = (e.target as HTMLSelectElement).value;
+            updateElement(store.selectedElement.id, {
+              class: `af-button btn ${value}`,
+            });
+          }}
+        >
+          <option value="btn-primary">Primary (Blue)</option>
+          <option value="btn-success">Success (Green)</option>
+          <option value="btn-danger">Danger (Red)</option>
+          <option value="btn-secondary">Secondary (Gray)</option>
+        </select>
+      </div>
+
+      <!-- Info Note -->
+      <div class="field-info-box">
+        <div class="info-row">
+          <i class="fa fa-info-circle" style="margin-right: var(--crm-m);"></i>
+          <span style="font-size: var(--crm-small-font-size); color: var(--crm-c-gray-600);">
+            The button will automatically submit the form when clicked.
+          </span>
+        </div>
+      </div>
+    </div>
+  {:else if store.currentField}
     <div class="settings-content">
       <!-- Field Label -->
       <div class="form-group">
@@ -118,10 +201,10 @@
           id="help-text"
           class="form-control"
           rows="2"
-          value={store.currentField.defn?.help_text || ""}
+          value={store.currentField.defn?.help_post || ""}
           oninput={(e) =>
             handleFieldChange(
-              "defn.help_text",
+              "defn.help_post",
               (e.target as HTMLTextAreaElement).value,
             )}
           placeholder="Optional hint or description..."

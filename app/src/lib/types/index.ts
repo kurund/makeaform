@@ -2,6 +2,17 @@
 export interface FormElement {
   "#tag": string;
   "#children"?: FormElement[];
+  id?: string;
+  name?: string;
+  defn?: Record<string, any>;
+  actions?: {
+    create?: boolean;
+    update?: boolean;
+    delete?: boolean;
+  };
+  "af-fieldset"?: string;
+  "af-title"?: string;
+  class?: string;
   [key: string]: any;
 }
 
@@ -25,6 +36,11 @@ export interface AfformMetadata {
 export interface EntityConfig {
   type: string;
   name: string;
+  label?: string;
+  data?: {
+    source?: string;
+    [key: string]: any;
+  };
   actions: {
     create?: boolean;
     update?: boolean;
