@@ -247,6 +247,7 @@
           description: form.description || "",
           type: form.type || "form",
           server_route: form.server_route || "",
+          is_public: form.is_public || false,
         };
 
         store.hasUnsavedChanges = false;
@@ -418,6 +419,7 @@
         title: store.formMetadata.title,
         description: store.formMetadata.description,
         server_route: store.formMetadata.server_route,
+        is_public: store.formMetadata.is_public,
         layout: layout,
       });
       setHasUnsavedChanges(false);

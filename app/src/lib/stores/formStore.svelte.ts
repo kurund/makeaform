@@ -14,6 +14,7 @@ class FormStore {
     description: "",
     type: "form",
     server_route: "",
+    is_public: false,
   });
   entityConfigs = $state<EntityConfig[]>([]);
   selectedElementId = $state<string | null>(null);
@@ -286,6 +287,7 @@ export function resetForm() {
     description: "",
     type: "form",
     server_route: "",
+    is_public: false,
   };
   store.selectedElementId = null;
   store.hasUnsavedChanges = false;

@@ -7,30 +7,19 @@ declare global {
 }
 
 /**
- * Load admin data including entities, fields, and blocks
- * This provides the list of searchable entities and their metadata
+ * Load admin data including entities for the form builder
+ * Uses our custom Makeaform API to get available entities
  */
 export async function loadAdminData(): Promise<AdminData> {
   try {
-    // Get list of searchable entities
-    const entityResults = await window.CRM.api4("Entity", "get", {
-      select: [
-        "name",
-        "title",
-        "title_plural",
-        "description",
-        "type",
-        "icon",
-        "primary_key",
-      ],
-      where: [["searchable", "=", "primary"]],
-    });
+    // Call our custom Makeaform API to get available entities
+    const result = await window.CRM.api4("Makeaform", "getEntities", {});
 
-    // Convert entity array to object keyed by name
+    // Convert array result to object keyed by entity name
     const entities: Record<string, any> = {};
-    entityResults.forEach((entity: any) => {
+    for (const entity of result) {
       entities[entity.name] = entity;
-    });
+    }
 
     return {
       entities: entities,

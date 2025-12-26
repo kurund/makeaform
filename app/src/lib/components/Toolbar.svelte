@@ -1,10 +1,19 @@
 <script lang="ts">
-  import { store, setIsSaving } from "../stores/formStore.svelte";
-  import { saveForm } from "../api/civicrm";
+  import { store, setIsSaving, setHasUnsavedChanges } from "../stores/formStore.svelte";
+  import { saveForm, deleteForm } from "../api/civicrm";
 
-  let { onSave = () => {} } = $props();
+  let { onSave = () => {}, onDelete = () => {} } = $props();
 
   let autoGeneratePath = $state(true);
+  let showSettings = $state(false);
+  let isDeleting = $state(false);
+
+  // Check if this is an existing form (editing mode)
+  const isExistingForm = $derived(
+    store.formMetadata.name &&
+      store.formMetadata.name !== "new_form" &&
+      store.formMetadata.name.startsWith("afform_"),
+  );
 
   // Auto-generate path from title on first input
   function handleTitleChange(e: Event) {
@@ -49,11 +58,47 @@
     }
   }
 
+  function handlePreview() {
+    if (!isExistingForm || store.hasUnsavedChanges) {
+      alert("Please save the form first before previewing.");
+      return;
+    }
+    // Open the form in a new tab
+    const previewUrl = window.CRM.url(store.formMetadata.server_route);
+    window.open(previewUrl, "_blank");
+  }
+
+  async function handleDelete() {
+    if (!isExistingForm) return;
+
+    const confirmed = confirm(
+      `Are you sure you want to delete the form "${store.formMetadata.title}"?\n\nThis action cannot be undone.`,
+    );
+    if (!confirmed) return;
+
+    isDeleting = true;
+    try {
+      await deleteForm(store.formMetadata.name);
+      window.CRM.alert("Form deleted successfully!", "Success", "success");
+      // Redirect to afform list
+      window.location.href = window.CRM.url("civicrm/admin/afform");
+    } catch (err: any) {
+      console.error("Delete failed:", err);
+      alert("Failed to delete form: " + (err?.message || "Unknown error"));
+    } finally {
+      isDeleting = false;
+    }
+  }
+
   function handleKeyboardShortcut(e: KeyboardEvent) {
     if ((e.ctrlKey || e.metaKey) && e.key === "s") {
       e.preventDefault();
       handleSave();
     }
+  }
+
+  function toggleSettings() {
+    showSettings = !showSettings;
   }
 </script>
 
@@ -86,6 +131,14 @@
           title="Use full path starting with civicrm/"
         />
       </div>
+      <button
+        type="button"
+        class="btn btn-settings"
+        onclick={toggleSettings}
+        title="Form Settings"
+      >
+        <i class="fa fa-cog"></i>
+      </button>
     </div>
   </div>
 
@@ -94,6 +147,18 @@
       <span class="label label-warning">Unsaved Changes</span>
     {:else}
       <span class="label label-success">Saved</span>
+    {/if}
+
+    {#if isExistingForm}
+      <button
+        type="button"
+        class="btn btn-secondary"
+        onclick={handlePreview}
+        disabled={store.hasUnsavedChanges}
+        title={store.hasUnsavedChanges ? "Save first to preview" : "Preview form"}
+      >
+        <i class="fa fa-eye"></i> Preview
+      </button>
     {/if}
 
     <button
@@ -108,8 +173,64 @@
         <i class="fa fa-save"></i> Save
       {/if}
     </button>
+
+    {#if isExistingForm}
+      <button
+        type="button"
+        class="btn btn-danger"
+        onclick={handleDelete}
+        disabled={isDeleting}
+        title="Delete this form"
+      >
+        {#if isDeleting}
+          <i class="fa fa-spinner fa-spin"></i>
+        {:else}
+          <i class="fa fa-trash"></i>
+        {/if}
+      </button>
+    {/if}
   </div>
 </div>
+
+<!-- Settings Panel -->
+{#if showSettings}
+  <div class="settings-panel">
+    <div class="settings-panel-header">
+      <h4>Form Settings</h4>
+      <button type="button" class="btn-close" onclick={toggleSettings} title="Close settings">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>
+    <div class="settings-panel-body">
+      <div class="form-group">
+        <label for="form-description">Description</label>
+        <textarea
+          id="form-description"
+          bind:value={store.formMetadata.description}
+          class="form-control"
+          placeholder="Optional description for this form..."
+          rows="2"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            bind:checked={store.formMetadata.is_public}
+          />
+          <span>
+            <i class="fa fa-globe"></i>
+            Make Public
+          </span>
+        </label>
+        <small class="help-text">
+          Allow anonymous users to access this form without logging in.
+        </small>
+      </div>
+    </div>
+  </div>
+{/if}
 
 <style>
   .form-builder-toolbar {
@@ -241,5 +362,176 @@
     border-color: var(--crm-c-gray-400);
     transform: none;
     box-shadow: none;
+  }
+
+  .btn-settings {
+    background: transparent;
+    border: 1px solid var(--crm-c-gray-300);
+    color: var(--crm-c-gray-600);
+    padding: var(--crm-m) var(--crm-m2);
+    border-radius: var(--makeaform-radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    align-self: flex-end;
+    margin-bottom: 1px;
+  }
+
+  .btn-settings:hover {
+    background: var(--makeaform-accent-bg);
+    border-color: var(--makeaform-accent);
+    color: var(--makeaform-accent);
+  }
+
+  .toolbar-right .btn-secondary {
+    background: var(--crm-c-layer1-bg);
+    border: 1px solid var(--crm-c-gray-300);
+    color: var(--crm-c-gray-700);
+    padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
+    border-radius: var(--makeaform-radius);
+    font-weight: 600;
+    font-size: var(--crm-m3);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .toolbar-right .btn-secondary:hover {
+    background: var(--crm-c-gray-100);
+    border-color: var(--crm-c-gray-400);
+  }
+
+  .toolbar-right .btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .toolbar-right .btn-danger {
+    background: transparent;
+    border: 1px solid var(--crm-c-danger);
+    color: var(--crm-c-danger);
+    padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
+    border-radius: var(--makeaform-radius);
+    font-weight: 600;
+    font-size: var(--crm-m3);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .toolbar-right .btn-danger:hover {
+    background: var(--crm-c-danger);
+    color: white;
+  }
+
+  .toolbar-right .btn-danger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Settings Panel */
+  .settings-panel {
+    background: var(--crm-c-layer0-bg);
+    border-bottom: 1px solid var(--crm-c-gray-200);
+    padding: var(--crm-r2) var(--crm-r4);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .settings-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--crm-r2);
+  }
+
+  .settings-panel-header h4 {
+    margin: 0;
+    font-size: var(--crm-font-size);
+    font-weight: 700;
+    color: var(--crm-c-text);
+  }
+
+  .btn-close {
+    background: transparent;
+    border: none;
+    color: var(--crm-c-gray-500);
+    cursor: pointer;
+    padding: var(--crm-s);
+    font-size: var(--crm-font-size);
+    transition: color 0.2s ease;
+  }
+
+  .btn-close:hover {
+    color: var(--crm-c-gray-800);
+  }
+
+  .settings-panel-body {
+    display: flex;
+    gap: var(--crm-r4);
+    align-items: flex-start;
+  }
+
+  .settings-panel-body .form-group {
+    flex: 1;
+    max-width: 400px;
+  }
+
+  .settings-panel-body textarea {
+    width: 100%;
+    border: 1px solid var(--crm-input-border-color);
+    border-radius: var(--crm-roundness);
+    padding: var(--crm-m) var(--crm-m2);
+    font-size: var(--crm-m3);
+    font-family: inherit;
+    resize: vertical;
+    background: var(--crm-input-bg);
+    color: var(--crm-input-color);
+  }
+
+  .settings-panel-body textarea:focus {
+    border-color: var(--makeaform-accent);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--makeaform-accent-bg);
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--crm-m2);
+    padding: var(--crm-m2);
+    background: var(--crm-c-layer1-bg);
+    border: 1px solid var(--crm-c-gray-200);
+    border-radius: var(--crm-roundness);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .checkbox-label:hover {
+    background: var(--makeaform-accent-bg);
+    border-color: var(--makeaform-accent);
+  }
+
+  .checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+
+  .checkbox-label span {
+    display: flex;
+    align-items: center;
+    gap: var(--crm-m);
+    font-size: var(--crm-m3);
+    font-weight: 600;
+    color: var(--crm-c-text);
+  }
+
+  .checkbox-label span i {
+    color: var(--makeaform-accent);
+  }
+
+  .help-text {
+    display: block;
+    margin-top: var(--crm-s);
+    font-size: var(--crm-small-font-size);
+    color: var(--crm-c-gray-600);
+    font-style: italic;
   }
 </style>
