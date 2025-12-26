@@ -39,10 +39,40 @@ function makeaform_civicrm_enable(): void {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
  */
 function makeaform_civicrm_entityTypes(&$entityTypes): void {
-  // Register custom Afform actions
-  if (isset($entityTypes['Afform'])) {
-    $entityTypes['Afform']['paths']['loadAdminData'] = [
-      'Civi\Api4\Action\Afform\LoadAdminData',
-    ];
-  }
+  // Makeaform entity is auto-discovered via scan-classes mixin
+}
+
+/**
+ * Implements hook_civicrm_alterAngular().
+ *
+ * Adds "Edit with MakeaForm" and "Create with MakeaForm" links to the afform admin list.
+ */
+function makeaform_civicrm_alterAngular(\Civi\Angular\Manager $angular): void {
+  $changeSet = \Civi\Angular\ChangeSet::create('makeaform')
+    ->alterHtml('~/afAdmin/afAdminList.html', function(\phpQueryObject $doc, $path) {
+      $makeaformUrl = CRM_Utils_System::url('civicrm/admin/formcreator', NULL, FALSE, NULL, FALSE);
+
+      // Add "Edit with MakeaForm" link to action buttons for each form
+      $actionCell = $doc->find('td.text-right');
+      $editLink = '<a ng-if="afform.type === \'form\' && afform.can_manage" '
+        . 'ng-href="' . $makeaformUrl . '?name={{:: afform.name }}" '
+        . 'class="btn btn-xs btn-info" '
+        . 'title="{{:: ts(\'Edit with simplified form builder\') }}">'
+        . '{{:: ts(\'MakeaForm\') }}'
+        . '</a> ';
+      $actionCell->prepend($editLink);
+
+      // Add "Create with MakeaForm" button next to the "New Form" button group
+      $btnGroup = $doc->find('.btn-group.pull-right');
+      $createButton = '<a ng-if="$ctrl.tab === \'form\'" '
+        . 'href="' . $makeaformUrl . '" '
+        . 'class="btn btn-info pull-right" '
+        . 'style="margin-right: 10px;" '
+        . 'title="{{:: ts(\'Create a new form with the simplified form builder\') }}">'
+        . '<i class="crm-i fa-plus" aria-hidden="true"></i> '
+        . '{{:: ts(\'New with MakeaForm\') }}'
+        . '</a> ';
+      $btnGroup->before($createButton);
+    });
+  $angular->add($changeSet);
 }
