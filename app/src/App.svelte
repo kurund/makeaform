@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import Toolbar from "./lib/components/Toolbar.svelte";
   import FieldNavigator from "./lib/components/FieldNavigator.svelte";
   import FieldPreview from "./lib/components/FieldPreview.svelte";
@@ -17,6 +16,7 @@
 
   let loading = $state(true);
   let error = $state<string | null>(null);
+  let initialized = $state(false);
 
   // Keyboard shortcuts for navigation
   function handleKeyDown(e: KeyboardEvent) {
@@ -46,24 +46,30 @@
     }
   }
 
-  onMount(async () => {
-    try {
-      const data = await loadAdminData();
-      setAdminData(data);
+  // Initialize on mount using $effect
+  $effect(() => {
+    if (initialized) return;
+    initialized = true;
 
-      // Check if we're in edit mode (form name provided)
-      const formName = (window as any).CRM?.vars?.makeaform?.formName;
-      if (formName) {
-        console.log("Loading form for editing:", formName);
-        await loadExistingForm(formName);
+    (async () => {
+      try {
+        const data = await loadAdminData();
+        setAdminData(data);
+
+        // Check if we're in edit mode (form name provided)
+        const formName = (window as any).CRM?.vars?.makeaform?.formName;
+        if (formName) {
+          console.log("Loading form for editing:", formName);
+          await loadExistingForm(formName);
+        }
+
+        loading = false;
+      } catch (err) {
+        console.error("Failed to load admin data:", err);
+        error = "Failed to load form builder. Please refresh the page.";
+        loading = false;
       }
-
-      loading = false;
-    } catch (err) {
-      console.error("Failed to load admin data:", err);
-      error = "Failed to load form builder. Please refresh the page.";
-      loading = false;
-    }
+    })();
   });
 
   async function loadExistingForm(formName: string) {
