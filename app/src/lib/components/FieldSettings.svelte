@@ -6,7 +6,8 @@
     gotoField,
   } from "../stores/formStore.svelte";
 
-  const fieldTypes = [
+  // All available field types
+  const allFieldTypes = [
     { value: "Text", label: "Short Text", icon: "fa-font" },
     { value: "TextArea", label: "Long Text", icon: "fa-align-left" },
     { value: "Number", label: "Number", icon: "fa-hashtag" },
@@ -17,6 +18,38 @@
     { value: "CheckBox", label: "Checkboxes", icon: "fa-check-square-o" },
     { value: "EntityRef", label: "Entity Reference", icon: "fa-link" },
   ];
+
+  // Field types for fields with options (select, radio, checkbox)
+  const optionFieldTypes = [
+    { value: "Select", label: "Dropdown", icon: "fa-caret-down" },
+    { value: "Radio", label: "Radio Buttons", icon: "fa-dot-circle-o" },
+    { value: "CheckBox", label: "Checkboxes", icon: "fa-check-square-o" },
+  ];
+
+  // Field types for text-like fields
+  const textFieldTypes = [
+    { value: "Text", label: "Short Text", icon: "fa-font" },
+    { value: "TextArea", label: "Long Text", icon: "fa-align-left" },
+  ];
+
+  // Get available field types based on current field
+  const availableFieldTypes = $derived(() => {
+    if (!store.currentField) return allFieldTypes;
+
+    // If field has options, only show option-based input types
+    if (store.currentField.defn?.options?.length > 0) {
+      return optionFieldTypes;
+    }
+
+    // For fields without options, show text-based types
+    const currentType = store.currentField.defn?.input_type;
+    if (["Text", "TextArea", "Email", "Number"].includes(currentType)) {
+      return textFieldTypes;
+    }
+
+    // Default: show all types
+    return allFieldTypes;
+  });
 
   function handleFieldChange(field: string, value: any) {
     if (!store.currentField) return;
@@ -195,7 +228,7 @@
               (e.target as HTMLSelectElement).value,
             )}
         >
-          {#each fieldTypes as type}
+          {#each availableFieldTypes() as type}
             <option value={type.value}>
               {type.label}
             </option>
