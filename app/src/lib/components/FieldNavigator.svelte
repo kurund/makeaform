@@ -74,13 +74,18 @@
     if (!store.currentPage) return;
 
     // Build default defn from entity field metadata
-    const defaultDefn = {
+    const defaultDefn: Record<string, any> = {
       label: field.label || field.title || fieldName,
       input_type: field.input_type || "Text",
       required: field.required || false,
       placeholder: "",
       help_post: field.help_pre || field.help_post || "",
     };
+
+    // Include options for Select, Radio, CheckBox fields
+    if (field.options && Array.isArray(field.options) && field.options.length > 0) {
+      defaultDefn.options = field.options;
+    }
 
     const newQuestion = {
       "#tag": "af-field" as const,

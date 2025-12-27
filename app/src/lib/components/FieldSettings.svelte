@@ -284,6 +284,24 @@
         </div>
       {/if}
 
+      <!-- Options (for Select, Radio, CheckBox) -->
+      {#if ["Select", "Radio", "CheckBox"].includes(store.currentField.defn?.input_type || "") && store.currentField.defn?.options?.length}
+        <div class="form-group">
+          <label>
+            <i class="fa fa-list-ul"></i>
+            Options ({store.currentField.defn.options.length})
+          </label>
+          <div class="options-list">
+            {#each store.currentField.defn.options as option}
+              <div class="option-row">
+                <span class="option-label">{option.label || option.id}</span>
+              </div>
+            {/each}
+          </div>
+          <small class="help-block">Options are defined by the entity field schema</small>
+        </div>
+      {/if}
+
       <!-- Field Info -->
       <div class="field-info-box">
         <div class="info-row">
@@ -407,6 +425,28 @@
     font-size: var(--crm-small-font-size);
     color: var(--crm-c-gray-600);
     font-style: italic;
+  }
+
+  .options-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid var(--crm-c-gray-200);
+    border-radius: var(--makeaform-radius);
+    background: var(--crm-c-layer1-bg);
+  }
+
+  .option-row {
+    padding: var(--crm-m) var(--crm-m2);
+    border-bottom: 1px solid var(--crm-c-gray-200);
+    font-size: var(--crm-m3);
+  }
+
+  .option-row:last-child {
+    border-bottom: none;
+  }
+
+  .option-label {
+    color: var(--crm-c-text);
   }
 
   .checkbox-label {

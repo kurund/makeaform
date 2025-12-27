@@ -159,12 +159,12 @@
 
             <!-- All Fields in This Page -->
             {#if pageFields.length > 0}
-              <div class="questions-list-preview">
-                {#each pageFields as question, fieldIndex}
+              <div class="fields-list-preview">
+                {#each pageFields as field, fieldIndex}
                   {@const isSelected =
                     isActivePage && store.currentFieldIndex === fieldIndex}
                   {@const inputType = getInputType(
-                    question.defn?.input_type || "Text",
+                    field.defn?.input_type || "Text",
                   )}
                   {@const globalFieldNumber =
                     store.pages
@@ -181,75 +181,101 @@
                     1}
 
                   <div
-                    class="question-card"
+                    class="field-card"
                     class:selected={isSelected}
                     onclick={() => gotoField(pageIndex, fieldIndex)}
                     role="button"
                     tabindex="0"
                   >
-                    <div class="question-card-header">
-                      <span class="question-number">{globalFieldNumber}</span>
-                      <h3 class="question-label">
-                        {question.defn?.label ||
-                          question.name ||
-                          "Untitled Question"}
-                        {#if question.defn?.required}
+                    <div class="field-card-header">
+                      <span class="field-number">{globalFieldNumber}</span>
+                      <h3 class="field-label">
+                        {field.defn?.label ||
+                          field.name ||
+                          "Untitled Field"}
+                        {#if field.defn?.required}
                           <span class="required-badge">*</span>
                         {/if}
                       </h3>
                     </div>
 
-                    <div class="question-card-input">
+                    <div class="field-card-input">
                       {#if inputType === "textarea"}
                         <textarea
                           class="preview-input"
-                          placeholder={question.defn?.placeholder || ""}
+                          placeholder={field.defn?.placeholder || ""}
                           rows="3"
                           disabled
                         ></textarea>
                       {:else if inputType === "select"}
                         <select class="preview-input" disabled>
-                          <option
-                            >{question.defn?.placeholder ||
-                              "Select an option..."}</option
-                          >
+                          <option value="">{field.defn?.placeholder || "Select an option..."}</option>
+                          {#if field.defn?.options?.length}
+                            {#each field.defn.options as option}
+                              <option value={option.id}>{option.label || option.id}</option>
+                            {/each}
+                          {/if}
                         </select>
                       {:else if inputType === "checkbox"}
                         <div class="option-preview">
-                          <div class="option-item">
-                            <input type="checkbox" disabled />
-                            <span>Option 1</span>
-                          </div>
-                          <div class="option-item">
-                            <input type="checkbox" disabled />
-                            <span>Option 2</span>
-                          </div>
+                          {#if field.defn?.options?.length}
+                            {#each field.defn.options.slice(0, 4) as option}
+                              <div class="option-item">
+                                <input type="checkbox" disabled />
+                                <span>{option.label || option.id}</span>
+                              </div>
+                            {/each}
+                            {#if field.defn.options.length > 4}
+                              <div class="option-more">+{field.defn.options.length - 4} more options</div>
+                            {/if}
+                          {:else}
+                            <div class="option-item">
+                              <input type="checkbox" disabled />
+                              <span>Option 1</span>
+                            </div>
+                            <div class="option-item">
+                              <input type="checkbox" disabled />
+                              <span>Option 2</span>
+                            </div>
+                          {/if}
                         </div>
                       {:else if inputType === "radio"}
                         <div class="option-preview">
-                          <div class="option-item">
-                            <input type="radio" disabled />
-                            <span>Option 1</span>
-                          </div>
-                          <div class="option-item">
-                            <input type="radio" disabled />
-                            <span>Option 2</span>
-                          </div>
+                          {#if field.defn?.options?.length}
+                            {#each field.defn.options.slice(0, 4) as option}
+                              <div class="option-item">
+                                <input type="radio" disabled />
+                                <span>{option.label || option.id}</span>
+                              </div>
+                            {/each}
+                            {#if field.defn.options.length > 4}
+                              <div class="option-more">+{field.defn.options.length - 4} more options</div>
+                            {/if}
+                          {:else}
+                            <div class="option-item">
+                              <input type="radio" disabled />
+                              <span>Option 1</span>
+                            </div>
+                            <div class="option-item">
+                              <input type="radio" disabled />
+                              <span>Option 2</span>
+                            </div>
+                          {/if}
                         </div>
                       {:else}
                         <input
                           type={inputType}
                           class="preview-input"
-                          placeholder={question.defn?.placeholder || ""}
+                          placeholder={field.defn?.placeholder || ""}
                           disabled
                         />
                       {/if}
                     </div>
 
-                    {#if question.defn?.help_post}
-                      <div class="question-help">
+                    {#if field.defn?.help_post}
+                      <div class="field-help">
                         <i class="fa fa-info-circle"></i>
-                        {question.defn.help_post}
+                        {field.defn.help_post}
                       </div>
                     {/if}
                   </div>
@@ -445,13 +471,13 @@
     box-shadow: 0 0 0 2px var(--makeaform-accent-bg);
   }
 
-  .questions-list-preview {
+  .fields-list-preview {
     display: flex;
     flex-direction: column;
     gap: var(--crm-r);
   }
 
-  .question-card {
+  .field-card {
     background: var(--crm-c-layer0-bg);
     border: 2px solid var(--crm-c-gray-200);
     border-radius: var(--crm-m2);
@@ -460,25 +486,25 @@
     transition: all 0.2s ease;
   }
 
-  .question-card:hover {
+  .field-card:hover {
     border-color: var(--makeaform-accent);
     box-shadow: 0 4px 12px rgba(from var(--makeaform-accent) r g b / 0.15);
   }
 
-  .question-card.selected {
+  .field-card.selected {
     border-color: var(--makeaform-accent);
     background: var(--makeaform-accent-bg);
     box-shadow: 0 4px 16px rgba(from var(--makeaform-accent) r g b / 0.2);
   }
 
-  .question-card-header {
+  .field-card-header {
     display: flex;
     align-items: center;
     gap: var(--crm-m2);
     margin-bottom: var(--crm-r);
   }
 
-  .question-number {
+  .field-number {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -492,11 +518,11 @@
     flex-shrink: 0;
   }
 
-  .question-card.selected .question-number {
+  .field-card.selected .field-number {
     background: var(--makeaform-accent-hover);
   }
 
-  .question-label {
+  .field-label {
     margin: 0;
     font-size: var(--crm-r1);
     font-weight: 600;
@@ -509,7 +535,7 @@
     margin-left: var(--crm-xs1);
   }
 
-  .question-card-input {
+  .field-card-input {
     margin-bottom: var(--crm-m2);
   }
 
@@ -559,7 +585,7 @@
     color: var(--crm-c-gray-800);
   }
 
-  .question-help {
+  .field-help {
     display: flex;
     align-items: center;
     gap: var(--crm-s);
@@ -568,8 +594,15 @@
     font-style: italic;
   }
 
-  .question-help i {
+  .field-help i {
     color: var(--makeaform-accent);
     font-size: var(--crm-small-font-size);
+  }
+
+  .option-more {
+    font-size: var(--crm-small-font-size);
+    color: var(--crm-c-gray-600);
+    font-style: italic;
+    padding: var(--crm-s) var(--crm-m1);
   }
 </style>
