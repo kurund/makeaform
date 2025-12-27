@@ -217,8 +217,8 @@
                           {/if}
                         </select>
                       {:else if inputType === "checkbox"}
-                        <div class="option-preview">
-                          {#if field.defn?.options?.length}
+                        {#if field.defn?.options?.length}
+                          <div class="option-preview">
                             {#each field.defn.options.slice(0, 4) as option}
                               <div class="option-item">
                                 <input type="checkbox" disabled />
@@ -228,20 +228,13 @@
                             {#if field.defn.options.length > 4}
                               <div class="option-more">+{field.defn.options.length - 4} more options</div>
                             {/if}
-                          {:else}
-                            <div class="option-item">
-                              <input type="checkbox" disabled />
-                              <span>Option 1</span>
-                            </div>
-                            <div class="option-item">
-                              <input type="checkbox" disabled />
-                              <span>Option 2</span>
-                            </div>
-                          {/if}
-                        </div>
+                          </div>
+                        {:else}
+                          <input type="checkbox" class="preview-checkbox" disabled />
+                        {/if}
                       {:else if inputType === "radio"}
-                        <div class="option-preview">
-                          {#if field.defn?.options?.length}
+                        {#if field.defn?.options?.length}
+                          <div class="option-preview">
                             {#each field.defn.options.slice(0, 4) as option}
                               <div class="option-item">
                                 <input type="radio" disabled />
@@ -251,17 +244,10 @@
                             {#if field.defn.options.length > 4}
                               <div class="option-more">+{field.defn.options.length - 4} more options</div>
                             {/if}
-                          {:else}
-                            <div class="option-item">
-                              <input type="radio" disabled />
-                              <span>Option 1</span>
-                            </div>
-                            <div class="option-item">
-                              <input type="radio" disabled />
-                              <span>Option 2</span>
-                            </div>
-                          {/if}
-                        </div>
+                          </div>
+                        {:else}
+                          <input type="radio" class="preview-radio" disabled />
+                        {/if}
                       {:else}
                         <input
                           type={inputType}
