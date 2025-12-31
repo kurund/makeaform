@@ -2,7 +2,7 @@
 <extension key="makeaform" type="module">
   <file>makeaform</file>
   <name>Make a Form</name>
-  <description>Simplified interface for Form Builder</description>
+  <description>Simplified interface for creating forms in CiviCRM</description>
   <license>AGPL-3.0</license>
   <authors>
     <author>

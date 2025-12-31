@@ -7,10 +7,11 @@ in CiviCRM.
 
 Note that this extension creates forms that are compatible with the Core Afform extension.
 
-## Technology stack
+## How it works
 
 - Frontend interface is built using SvelteKit, a Javascript framework.
 - It inherits the theme configured by Riverlea extension.
+- This extension only provides admin interface for creating forms and it is saved in a format that is compatible with the Core Afform extension.
 
 This is an [extension for CiviCRM](https://docs.civicrm.org/sysadmin/en/latest/customize/extensions/), licensed under [AGPL-3.0](LICENSE.txt).
 
