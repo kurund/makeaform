@@ -222,61 +222,6 @@ export function deleteElement(id: string) {
 }
 
 /**
- * Move an element to a new position
- */
-export function moveElement(
-  elementId: string,
-  newParentId: string | null,
-  newIndex: number,
-) {
-  // Find and remove element
-  let element: FormElement | null = null;
-
-  function removeElement(elements: FormElement[]): boolean {
-    const index = elements.findIndex((el) => el.id === elementId);
-    if (index !== -1) {
-      element = elements.splice(index, 1)[0];
-      return true;
-    }
-    for (const el of elements) {
-      if (el["#children"] && removeElement(el["#children"])) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  removeElement(store.formElements);
-
-  if (!element) return;
-
-  // Insert at new position
-  if (newParentId) {
-    const parent = findElementById(store.formElements, newParentId);
-    if (parent) {
-      if (!parent["#children"]) {
-        parent["#children"] = [];
-      }
-      parent["#children"].splice(newIndex, 0, element);
-    }
-  } else {
-    store.formElements.splice(newIndex, 0, element);
-  }
-
-  store.hasUnsavedChanges = true;
-}
-
-/**
- * Load form data
- */
-export function loadForm(elements: FormElement[], metadata: AfformMetadata) {
-  store.formElements = elements;
-  store.formMetadata = metadata;
-  store.selectedElementId = null;
-  store.hasUnsavedChanges = false;
-}
-
-/**
  * Set admin data
  */
 export function setAdminData(data: AdminData) {

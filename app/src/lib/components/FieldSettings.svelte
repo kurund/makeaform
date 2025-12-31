@@ -552,15 +552,6 @@
     font-weight: 500;
   }
 
-  code.info-value {
-    background: var(--crm-c-layer0-bg);
-    padding: var(--crm-xs1) var(--crm-m);
-    border-radius: var(--crm-roundness);
-    font-family: "Monaco", "Courier New", monospace;
-    font-size: var(--crm-small-font-size);
-    color: var(--makeaform-accent);
-  }
-
   .delete-section {
     margin-top: var(--crm-r4);
     padding-top: var(--crm-r4);

@@ -288,24 +288,6 @@
     min-width: 200px;
   }
 
-  .input-group {
-    display: flex;
-  }
-
-  .input-group-addon {
-    padding: var(--crm-s) var(--crm-m1);
-    font-size: var(--crm-m3);
-    background: var(--crm-c-gray-100);
-    border: 1px solid var(--crm-c-gray-300);
-    border-right: none;
-    border-radius: var(--crm-roundness) 0 0 var(--crm-roundness);
-    color: var(--crm-c-gray-700);
-  }
-
-  .input-group .form-control {
-    border-radius: 0 var(--crm-roundness) var(--crm-roundness) 0;
-  }
-
   .toolbar-right {
     display: flex;
     align-items: center;
