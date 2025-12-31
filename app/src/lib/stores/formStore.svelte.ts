@@ -11,10 +11,31 @@ class FormStore {
   formMetadata = $state<AfformMetadata>({
     name: "new_form",
     title: "New Form",
-    description: "",
     type: "form",
+    description: null,
+    icon: null,
     server_route: "",
+    permission: null,
+    permission_operator: null,
+    placement: null,
+    placement_filters: null,
+    placement_weight: null,
+    submit_enabled: true,
+    create_submission: true,
+    submit_limit: null,
+    confirmation_type: null,
+    confirmation_message: null,
+    redirect: null,
     is_public: false,
+    requires: null,
+    entity_type: null,
+    join_entity: null,
+    tags: null,
+    manual_processing: null,
+    allow_verification_by_email: null,
+    email_confirmation_template_id: null,
+    autosave_draft: null,
+    navigation: null,
   });
   entityConfigs = $state<EntityConfig[]>([]);
   selectedElementId = $state<string | null>(null);
@@ -274,25 +295,6 @@ export function setSelectedEntity(entityName: string | null) {
  */
 export function setEntityFields(fields: Record<string, any>) {
   store.entityFields = fields;
-}
-
-/**
- * Reset to empty form
- */
-export function resetForm() {
-  store.formElements = [];
-  store.formMetadata = {
-    name: "new_form",
-    title: "New Form",
-    description: "",
-    type: "form",
-    server_route: "",
-    is_public: false,
-  };
-  store.selectedElementId = null;
-  store.hasUnsavedChanges = false;
-  store.currentPageIndex = 0;
-  store.currentFieldIndex = 0;
 }
 
 /**

@@ -16,20 +16,37 @@ export interface FormElement {
   [key: string]: any;
 }
 
-// Afform metadata
+// Afform metadata - includes all fields to preserve when editing existing forms
 export interface AfformMetadata {
   name: string;
   title: string;
-  description?: string;
   type?: string;
+  description?: string | null;
+  icon?: string | null;
   server_route?: string;
-  requires?: string[];
-  entity_type?: string;
-  is_dashlet?: boolean;
+  permission?: string[] | null;
+  permission_operator?: string | null;
+  placement?: any[] | null;
+  placement_filters?: any[] | null;
+  placement_weight?: number | null;
+  submit_enabled?: boolean;
+  create_submission?: boolean;
+  submit_limit?: number | null;
+  confirmation_type?: string | null;
+  confirmation_message?: string | null;
+  redirect?: string | null;
   is_public?: boolean;
-  is_token?: boolean;
-  permission?: string;
-  redirect?: string;
+  requires?: string[] | null;
+  entity_type?: string | null;
+  join_entity?: string | null;
+  tags?: any[] | null;
+  manual_processing?: boolean | null;
+  allow_verification_by_email?: boolean | null;
+  email_confirmation_template_id?: number | null;
+  autosave_draft?: boolean | null;
+  navigation?: any | null;
+  // Additional fields that may exist
+  [key: string]: any;
 }
 
 // Entity configuration for the form

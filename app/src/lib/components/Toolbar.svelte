@@ -218,21 +218,6 @@
         ></textarea>
       </div>
 
-      <div class="form-group">
-        <label class="checkbox-label">
-          <input
-            type="checkbox"
-            bind:checked={store.formMetadata.is_public}
-          />
-          <span>
-            <i class="fa fa-globe"></i>
-            Make Public
-          </span>
-        </label>
-        <small class="help-text">
-          Allow anonymous users to access this form without logging in.
-        </small>
-      </div>
     </div>
   </div>
 {/if}
@@ -496,47 +481,4 @@
     box-shadow: 0 0 0 3px var(--makeaform-accent-bg);
   }
 
-  .checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: var(--crm-m2);
-    padding: var(--crm-m2);
-    background: var(--crm-c-layer1-bg);
-    border: 1px solid var(--crm-c-gray-200);
-    border-radius: var(--crm-roundness);
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .checkbox-label:hover {
-    background: var(--makeaform-accent-bg);
-    border-color: var(--makeaform-accent);
-  }
-
-  .checkbox-label input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-  }
-
-  .checkbox-label span {
-    display: flex;
-    align-items: center;
-    gap: var(--crm-m);
-    font-size: var(--crm-m3);
-    font-weight: 600;
-    color: var(--crm-c-text);
-  }
-
-  .checkbox-label span i {
-    color: var(--makeaform-accent);
-  }
-
-  .help-text {
-    display: block;
-    margin-top: var(--crm-s);
-    font-size: var(--crm-small-font-size);
-    color: var(--crm-c-gray-600);
-    font-style: italic;
-  }
 </style>

@@ -240,14 +240,35 @@
           store.formElements = formElements;
         }
 
-        // Set metadata
+        // Set metadata - preserve all existing form properties
         store.formMetadata = {
           name: form.name,
           title: form.title || "",
-          description: form.description || "",
           type: form.type || "form",
+          description: form.description ?? null,
+          icon: form.icon ?? null,
           server_route: form.server_route || "",
-          is_public: form.is_public || false,
+          permission: form.permission ?? null,
+          permission_operator: form.permission_operator ?? null,
+          placement: form.placement ?? null,
+          placement_filters: form.placement_filters ?? null,
+          placement_weight: form.placement_weight ?? null,
+          submit_enabled: form.submit_enabled ?? true,
+          create_submission: form.create_submission ?? true,
+          submit_limit: form.submit_limit ?? null,
+          confirmation_type: form.confirmation_type ?? null,
+          confirmation_message: form.confirmation_message ?? null,
+          redirect: form.redirect ?? null,
+          is_public: form.is_public ?? false,
+          requires: form.requires ?? null,
+          entity_type: form.entity_type ?? null,
+          join_entity: form.join_entity ?? null,
+          tags: form.tags ?? null,
+          manual_processing: form.manual_processing ?? null,
+          allow_verification_by_email: form.allow_verification_by_email ?? null,
+          email_confirmation_template_id: form.email_confirmation_template_id ?? null,
+          autosave_draft: form.autosave_draft ?? null,
+          navigation: form.navigation ?? null,
         };
 
         store.hasUnsavedChanges = false;
@@ -414,12 +435,36 @@
         },
       ];
 
+      // Use existing metadata values when editing, defaults for new forms
+      const meta = store.formMetadata;
       await saveForm({
-        name: store.formMetadata.name,
-        title: store.formMetadata.title,
-        description: store.formMetadata.description,
-        server_route: store.formMetadata.server_route,
-        is_public: store.formMetadata.is_public,
+        name: meta.name,
+        type: meta.type || "form",
+        title: meta.title,
+        description: meta.description ?? null,
+        icon: meta.icon ?? "fa-list-alt",
+        server_route: meta.server_route,
+        permission: meta.permission ?? ["access CiviCRM"],
+        permission_operator: meta.permission_operator ?? "AND",
+        placement: meta.placement ?? [],
+        placement_filters: meta.placement_filters ?? [],
+        placement_weight: meta.placement_weight ?? null,
+        submit_enabled: meta.submit_enabled ?? true,
+        create_submission: meta.create_submission ?? true,
+        submit_limit: meta.submit_limit ?? null,
+        confirmation_type: meta.confirmation_type ?? null,
+        confirmation_message: meta.confirmation_message ?? null,
+        redirect: meta.redirect ?? null,
+        is_public: meta.is_public ?? false,
+        requires: meta.requires ?? null,
+        entity_type: meta.entity_type ?? null,
+        join_entity: meta.join_entity ?? null,
+        tags: meta.tags ?? null,
+        manual_processing: meta.manual_processing ?? null,
+        allow_verification_by_email: meta.allow_verification_by_email ?? null,
+        email_confirmation_template_id: meta.email_confirmation_template_id ?? null,
+        autosave_draft: meta.autosave_draft ?? null,
+        navigation: meta.navigation ?? null,
         layout: layout,
       });
       setHasUnsavedChanges(false);
