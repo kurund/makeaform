@@ -57,8 +57,8 @@ function makeaform_civicrm_alterAngular(\Civi\Angular\Manager $angular): void {
       $editLink = '<a ng-if="afform.type === \'form\' && afform.can_manage" '
         . 'ng-href="' . $makeaformUrl . '?name={{:: afform.name }}" '
         . 'class="btn btn-xs btn-info" '
-        . 'title="{{:: ts(\'Edit with simplified form builder\') }}">'
-        . '{{:: ts(\'MakeaForm\') }}'
+        . 'title="{{:: ts(\'Edit with Make a Form builder\') }}">'
+        . '{{:: ts(\'Edit with MakeaForm\') }}'
         . '</a> ';
       $actionCell->prepend($editLink);
 
@@ -68,7 +68,7 @@ function makeaform_civicrm_alterAngular(\Civi\Angular\Manager $angular): void {
         . 'href="' . $makeaformUrl . '" '
         . 'class="btn btn-info pull-right" '
         . 'style="margin-right: 10px;" '
-        . 'title="{{:: ts(\'Create a new form with the simplified form builder\') }}">'
+        . 'title="{{:: ts(\'Create a new form with the Make a Form builder\') }}">'
         . '<i class="crm-i fa-plus" aria-hidden="true"></i> '
         . '{{:: ts(\'New with MakeaForm\') }}'
         . '</a> ';
