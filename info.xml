@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <extension key="makeaform" type="module">
   <file>makeaform</file>
-  <name>makeaform</name>
-  <description>FIXME</description>
+  <name>Make a Form</name>
+  <description>Simplified interface for Form Builder</description>
   <license>AGPL-3.0</license>
   <authors>
     <author>
@@ -12,9 +12,9 @@
     </author>
   </authors>
   <urls>
-    <url desc="Main Extension Page">https://FIXME</url>
-    <url desc="Documentation">https://FIXME</url>
-    <url desc="Support">https://FIXME</url>
+    <url desc="Main Extension Page">https://github.com/kurund/makeaform</url>
+    <url desc="Documentation">https://github.com/kurund/makeaform</url>
+    <url desc="Support">https://github.com/kurund/makeaform</url>
     <url desc="Licensing">https://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2025-10-22</releaseDate>
@@ -54,7 +54,6 @@
     <mixin>menu-xml@1.0.0</mixin>
   </mixins>
   <requires>
-    <ext>afform</ext>
-    <ext>afform_admin</ext>
+    <ext>org.civicrm.afform</ext>
   </requires>
 </extension>
