@@ -9,7 +9,31 @@
     movePageUp,
     movePageDown,
     gotoField,
+    deleteElement,
   } from "../stores/formStore.svelte";
+
+  // Delete an entity/page and all its fields
+  function deleteEntity(pageIndex: number) {
+    const page = store.pages[pageIndex];
+    if (!page || !page.id) return;
+
+    const fieldCount = page["#children"]?.filter(c => c["#tag"] === "af-field").length || 0;
+    const entityLabel = page.label || page["af-fieldset"] || "this entity";
+
+    const message = fieldCount > 0
+      ? `Are you sure you want to delete "${entityLabel}" and its ${fieldCount} field${fieldCount > 1 ? 's' : ''}?\n\nThis action cannot be undone.`
+      : `Are you sure you want to delete "${entityLabel}"?\n\nThis action cannot be undone.`;
+
+    if (!confirm(message)) return;
+
+    // Adjust current page index before deletion if needed
+    if (store.currentPageIndex >= pageIndex && store.currentPageIndex > 0) {
+      store.currentPageIndex = Math.max(0, store.currentPageIndex - 1);
+    }
+    store.currentFieldIndex = 0;
+
+    deleteElement(page.id);
+  }
 
   // Calculate progress
   const progress = $derived(() => {
@@ -125,36 +149,49 @@
                   placeholder="Container Label"
                 />
               </div>
-              {#if store.pages.length > 1}
-                <div class="page-reorder-buttons">
-                  {#if pageIndex > 0}
-                    <button
-                      type="button"
-                      class="btn-reorder"
-                      onclick={(e) => {
-                        e.stopPropagation();
-                        movePageUp(pageIndex);
-                      }}
-                      title="Move up"
-                    >
-                      <i class="fa fa-arrow-up"></i>
-                    </button>
-                  {/if}
-                  {#if pageIndex < store.pages.length - 1}
-                    <button
-                      type="button"
-                      class="btn-reorder"
-                      onclick={(e) => {
-                        e.stopPropagation();
-                        movePageDown(pageIndex);
-                      }}
-                      title="Move down"
-                    >
-                      <i class="fa fa-arrow-down"></i>
-                    </button>
-                  {/if}
-                </div>
-              {/if}
+              <div class="page-action-buttons">
+                {#if store.pages.length > 1}
+                  <div class="page-reorder-buttons">
+                    {#if pageIndex > 0}
+                      <button
+                        type="button"
+                        class="btn-reorder"
+                        onclick={(e) => {
+                          e.stopPropagation();
+                          movePageUp(pageIndex);
+                        }}
+                        title="Move up"
+                      >
+                        <i class="fa fa-arrow-up"></i>
+                      </button>
+                    {/if}
+                    {#if pageIndex < store.pages.length - 1}
+                      <button
+                        type="button"
+                        class="btn-reorder"
+                        onclick={(e) => {
+                          e.stopPropagation();
+                          movePageDown(pageIndex);
+                        }}
+                        title="Move down"
+                      >
+                        <i class="fa fa-arrow-down"></i>
+                      </button>
+                    {/if}
+                  </div>
+                {/if}
+                <button
+                  type="button"
+                  class="btn-delete-entity"
+                  onclick={(e) => {
+                    e.stopPropagation();
+                    deleteEntity(pageIndex);
+                  }}
+                  title="Delete entity and all its fields"
+                >
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
             </div>
 
             <!-- All Fields in This Page -->
@@ -393,16 +430,22 @@
     cursor: pointer;
   }
 
-  .page-reorder-buttons {
+  .page-action-buttons {
     display: flex;
-    flex-direction: column;
-    gap: var(--crm-xs1);
+    align-items: center;
+    gap: var(--crm-m);
     opacity: 0;
     transition: opacity 0.2s ease;
   }
 
-  .entity-container:hover .page-reorder-buttons {
+  .entity-container:hover .page-action-buttons {
     opacity: 1;
+  }
+
+  .page-reorder-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--crm-xs1);
   }
 
   .btn-reorder {
@@ -430,6 +473,29 @@
 
   .btn-reorder i {
     font-size: var(--crm-small-font-size);
+  }
+
+  .btn-delete-entity {
+    background: transparent;
+    border: 1px solid var(--crm-c-gray-300);
+    color: var(--crm-c-gray-500);
+    cursor: pointer;
+    padding: var(--crm-m);
+    border-radius: var(--crm-roundness);
+    font-size: var(--crm-m3);
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+  }
+
+  .btn-delete-entity:hover {
+    background: var(--crm-c-danger);
+    border-color: var(--crm-c-danger);
+    color: white;
+    transform: scale(1.1);
   }
 
   .container-label-input {
