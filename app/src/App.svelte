@@ -279,72 +279,22 @@
     }
   }
 
-  // Helper function to get entity field defaults
-  function getEntityFieldDefaults(fieldName: string): any {
-    const field = store.entityFields[fieldName];
-    if (!field) return {};
+  // Helper function to build defn for saving
+  // Preserves all existing properties from afform, updates with our edits
+  function buildFieldDefn(field: any): any {
+    if (!field.defn) return null;
 
-    return {
-      label: field.label || field.title || fieldName,
-      input_type: field.input_type || "Text",
-      required: field.required || false,
-      placeholder: "",
-      help_post: field.help_pre || field.help_post || "",
-    };
-  }
+    // Start with a copy of all existing defn properties to preserve afform data
+    const defn: any = { ...field.defn };
 
-  // Helper function to check if field has customizations
-  function hasCustomizations(field: any): boolean {
-    // Use originalDefn if stored on the field, otherwise try entity defaults
-    const defaults = field.originalDefn || getEntityFieldDefaults(field.name);
-    if (!field.defn) return false;
+    // Remove internal properties that shouldn't be saved
+    delete defn.options; // Options come from entity, not saved in defn
 
-    const checkProps = [
-      "label",
-      "input_type",
-      "required",
-      "placeholder",
-      "help_post",
-    ];
+    // Clean up empty values
+    if (!defn.placeholder) delete defn.placeholder;
+    if (!defn.help_post) delete defn.help_post;
 
-    for (const key of checkProps) {
-      const currentValue = field.defn[key];
-      const defaultValue = defaults[key];
-
-      // Handle empty strings and undefined
-      if (currentValue === "" && !defaultValue) continue;
-      if (currentValue !== defaultValue) return true;
-    }
-
-    return false;
-  }
-
-  // Helper function to get only customized defn properties
-  function getCustomDefn(field: any): any {
-    // Use originalDefn if stored on the field, otherwise try entity defaults
-    const defaults = field.originalDefn || getEntityFieldDefaults(field.name);
-    const customDefn: any = {};
-
-    const checkProps = [
-      "label",
-      "input_type",
-      "required",
-      "placeholder",
-      "help_post",
-    ];
-
-    for (const key of checkProps) {
-      const currentValue = field.defn?.[key];
-      const defaultValue = defaults[key];
-
-      // Only include if different from default (and not empty string vs undefined)
-      if (currentValue === "" && !defaultValue) continue;
-      if (currentValue !== defaultValue && currentValue !== undefined) {
-        customDefn[key] = currentValue;
-      }
-    }
-
-    return Object.keys(customDefn).length > 0 ? customDefn : null;
+    return Object.keys(defn).length > 0 ? defn : null;
   }
 
   async function handleSave() {
@@ -380,17 +330,17 @@
           element["#children"]?.filter((c: any) => c["#tag"] === "af-field") ||
           [];
 
-        // Process each field - remove IDs, filter defn
+        // Process each field - remove IDs, build defn
         const processedFields = fields.map((field: any) => {
           const fieldDef: any = {
             "#tag": "af-field",
             name: field.name,
           };
 
-          // Only add defn if there are customizations
-          const customDefn = getCustomDefn(field);
-          if (customDefn) {
-            fieldDef.defn = customDefn;
+          // Add defn with field properties
+          const defn = buildFieldDefn(field);
+          if (defn) {
+            fieldDef.defn = defn;
           }
 
           return fieldDef;

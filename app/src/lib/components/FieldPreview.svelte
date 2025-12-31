@@ -203,19 +203,6 @@
                   {@const inputType = getInputType(
                     field.defn?.input_type || "Text",
                   )}
-                  {@const globalFieldNumber =
-                    store.pages
-                      .slice(0, pageIndex)
-                      .reduce(
-                        (sum, p) =>
-                          sum +
-                          (p["#children"]?.filter(
-                            (c) => c["#tag"] === "af-field",
-                          ).length || 0),
-                        0,
-                      ) +
-                    fieldIndex +
-                    1}
 
                   <div
                     class="field-card"
@@ -225,7 +212,6 @@
                     tabindex="0"
                   >
                     <div class="field-card-header">
-                      <span class="field-number">{globalFieldNumber}</span>
                       <h3 class="field-label">
                         {field.defn?.label ||
                           field.name ||
@@ -554,24 +540,6 @@
     align-items: center;
     gap: var(--crm-m2);
     margin-bottom: var(--crm-r);
-  }
-
-  .field-number {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    background: var(--makeaform-accent);
-    color: var(--crm-c-text-light);
-    border-radius: 50%;
-    font-size: var(--crm-m3);
-    font-weight: 700;
-    flex-shrink: 0;
-  }
-
-  .field-card.selected .field-number {
-    background: var(--makeaform-accent-hover);
   }
 
   .field-label {
