@@ -30,9 +30,14 @@
   // Update machine name when server_route changes
   $effect(() => {
     if (store.formMetadata.server_route) {
-      // Extract the path portion after 'civicrm/' and generate machine name
+      // Extract the path portion after 'civicrm/' and generate machine name in camelCase
       const path = store.formMetadata.server_route.replace(/^civicrm\//, "");
-      store.formMetadata.name = "afform_" + path.replace(/-/g, "_");
+      // Convert path to camelCase: my-form -> MyForm, form4 -> Form4
+      const camelCase = path
+        .split(/[-_]/)
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join("");
+      store.formMetadata.name = "afform" + camelCase;
       autoGeneratePath = false;
     }
   });
