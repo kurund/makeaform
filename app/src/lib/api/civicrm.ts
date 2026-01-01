@@ -55,44 +55,20 @@ export async function getForm(name: string): Promise<AfformGetResult | null> {
 
 /**
  * Save a form (create or update)
+ * Uses Afform.save with records format (same as afform admin)
  */
 export async function saveForm(params: AfformSaveParams): Promise<any> {
   try {
-    console.log("Saving form with params:", params);
-
-    // Check if form exists first
-    const existing = await window.CRM.api4("Afform", "get", {
-      where: [["name", "=", params.name]],
-      limit: 1,
+    // Use Afform.save with records format (matches afform admin behavior)
+    const result = await window.CRM.api4("Afform", "save", {
+      formatWhitespace: true,
+      records: [params],
     });
-
-    let result;
-    if (existing && existing.length > 0) {
-      // Update existing form
-      console.log("Updating existing form");
-      result = await window.CRM.api4("Afform", "update", {
-        where: [["name", "=", params.name]],
-        values: params,
-      });
-    } else {
-      // Create new form
-      console.log("Creating new form");
-      result = await window.CRM.api4("Afform", "create", {
-        values: params,
-      });
-    }
-
-    console.log("Save result:", result);
     return result;
   } catch (error: any) {
-    console.error("Save API error:", error);
-    // Extract the actual error message from CiviCRM API response
-    if (error && typeof error === "object") {
-      const errorMessage =
-        error.error_message || error.message || JSON.stringify(error);
-      throw new Error(errorMessage);
-    }
-    throw error;
+    const errorMsg = error?.error_message || error?.message || error?.statusText ||
+                     (typeof error === 'string' ? error : 'Unknown server error');
+    throw new Error(errorMsg);
   }
 }
 

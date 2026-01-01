@@ -17,6 +17,8 @@
   let loading = $state(true);
   let error = $state<string | null>(null);
   let initialized = $state(false);
+  let isEditingExistingForm = $state(false);
+  let originalFormName = $state<string | null>(null);
 
   // Keyboard shortcuts for navigation
   function handleKeyDown(e: KeyboardEvent) {
@@ -59,7 +61,8 @@
         // Check if we're in edit mode (form name provided)
         const formName = (window as any).CRM?.vars?.makeaform?.formName;
         if (formName) {
-          console.log("Loading form for editing:", formName);
+          isEditingExistingForm = true;
+          originalFormName = formName;
           await loadExistingForm(formName);
         }
 
@@ -81,8 +84,6 @@
 
       if (formData && formData.length > 0) {
         const form = formData[0];
-        console.log("Loaded form:", form);
-        console.log("Form layout:", JSON.stringify(form.layout, null, 2));
 
         // Extract the form layout
         const layout = form.layout || [];
@@ -99,10 +100,6 @@
           let formElements = children.filter(
             (el: any) => el["#tag"] !== "af-entity",
           );
-          console.log(
-            "Form elements loaded:",
-            JSON.stringify(formElements, null, 2),
-          );
 
           // CiviCRM stores certain properties as strings, we need to parse them back
           const parseAfformProperties = (elements: any[]): any[] => {
@@ -115,7 +112,7 @@
                   // Use eval to parse the object literal (CiviCRM uses JS object notation, not JSON)
                   parsed.defn = eval("(" + parsed.defn + ")");
                 } catch (e) {
-                  console.error("Failed to parse defn:", parsed.defn, e);
+                  // Keep original string if parsing fails
                 }
               }
 
@@ -131,10 +128,6 @@
           };
 
           formElements = parseAfformProperties(formElements);
-          console.log(
-            "Form elements after parsing:",
-            JSON.stringify(formElements, null, 2),
-          );
 
           // Process ALL af-entity elements
           store.entityConfigs = [];
@@ -145,7 +138,6 @@
               try {
                 actions = eval("(" + actions + ")");
               } catch (e) {
-                console.error("Failed to parse actions:", actions, e);
                 actions = {};
               }
             }
@@ -156,7 +148,6 @@
               try {
                 data = eval("(" + data + ")");
               } catch (e) {
-                console.error("Failed to parse data:", data, e);
                 data = {};
               }
             }
@@ -232,6 +223,22 @@
               }
             } else if (el["#tag"] === "button") {
               el.id = el.id || `button_${Date.now()}`;
+              // Normalize button children to string format
+              if (el["#children"] && el["#children"].length > 0) {
+                const firstChild = el["#children"][0];
+                if (typeof firstChild !== "string") {
+                  // Extract text from object format
+                  let buttonText = "Submit";
+                  if (firstChild["#text"]) {
+                    buttonText = firstChild["#text"];
+                  } else if (firstChild["#markup"]) {
+                    buttonText = firstChild["#markup"];
+                  }
+                  el["#children"] = [buttonText];
+                }
+              } else {
+                el["#children"] = ["Submit"];
+              }
             }
             return el;
           });
@@ -297,8 +304,39 @@
     return Object.keys(defn).length > 0 ? defn : null;
   }
 
+  // Generate form name from server_route
+  function generateFormName(serverRoute: string): string {
+    const path = serverRoute.replace(/^civicrm\//, "");
+    const camelCase = path
+      .split(/[-_]/)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join("");
+    return "afform" + camelCase;
+  }
+
   async function handleSave() {
     try {
+      const meta = store.formMetadata;
+
+      // Generate form name for new forms (only at save time)
+      if (!isEditingExistingForm && meta.server_route) {
+        const generatedName = generateFormName(meta.server_route);
+
+        // Check if form with this name already exists
+        const existingForms = await window.CRM.api4("Afform", "get", {
+          select: ["name"],
+          where: [["name", "=", generatedName]],
+        });
+
+        if (existingForms && existingForms.length > 0) {
+          alert(`A form with the name "${generatedName}" already exists. Please use a different form path.`);
+          return;
+        }
+
+        // Set the generated name
+        store.formMetadata.name = generatedName;
+      }
+
       // Build the proper Afform structure
       const formChildren: any[] = [];
 
@@ -347,9 +385,23 @@
         });
 
         // Wrap fields in container div with actions
+        // Ensure actions is an object, not a string
+        let containerActions = { update: true, delete: true };
+        if (element.actions) {
+          if (typeof element.actions === "string") {
+            try {
+              containerActions = eval("(" + element.actions + ")");
+            } catch (e) {
+              // Keep default actions if parsing fails
+            }
+          } else {
+            containerActions = element.actions;
+          }
+        }
+
         const containerDiv = {
           "#tag": "div",
-          actions: element.actions || { update: true, delete: true },
+          actions: containerActions,
           class: "af-container",
           "#children": processedFields,
         };
@@ -366,13 +418,16 @@
 
       // 4. Add button(s) LAST
       for (const element of buttons) {
+        // Button children should already be normalized to string format
+        const buttonText = (element["#children"] && element["#children"][0]) || "Submit";
+
         formChildren.push({
           "#tag": "button",
           class: element.class || "af-button btn btn-primary",
           "crm-icon": element["crm-icon"] || "fa-check",
           "ng-click": element["ng-click"] || "afform.submit()",
           "ng-if": element["ng-if"] || "afform.showSubmitButton",
-          "#children": element["#children"] || ["Submit"],
+          "#children": [{ "#text": buttonText }],
         });
       }
 
@@ -385,39 +440,60 @@
         },
       ];
 
-      // Use existing metadata values when editing, defaults for new forms
-      const meta = store.formMetadata;
-      await saveForm({
+      // Build save params - only include fields with values (matches afform admin behavior)
+      // Ensure placement_filters is an object, not array
+      let placementFilters = meta.placement_filters;
+      if (!placementFilters || Array.isArray(placementFilters)) {
+        placementFilters = {};
+      }
+
+      const saveParams: Record<string, any> = {
         name: meta.name,
         type: meta.type || "form",
         title: meta.title,
-        description: meta.description ?? null,
-        icon: meta.icon ?? "fa-list-alt",
-        server_route: meta.server_route,
-        permission: meta.permission ?? ["access CiviCRM"],
-        permission_operator: meta.permission_operator ?? "AND",
-        placement: meta.placement ?? [],
-        placement_filters: meta.placement_filters ?? [],
-        placement_weight: meta.placement_weight ?? null,
-        submit_enabled: meta.submit_enabled ?? true,
-        create_submission: meta.create_submission ?? true,
-        submit_limit: meta.submit_limit ?? null,
-        confirmation_type: meta.confirmation_type ?? null,
-        confirmation_message: meta.confirmation_message ?? null,
-        redirect: meta.redirect ?? null,
-        is_public: meta.is_public ?? false,
-        requires: meta.requires ?? null,
-        entity_type: meta.entity_type ?? null,
-        join_entity: meta.join_entity ?? null,
-        tags: meta.tags ?? null,
-        manual_processing: meta.manual_processing ?? null,
-        allow_verification_by_email: meta.allow_verification_by_email ?? null,
-        email_confirmation_template_id: meta.email_confirmation_template_id ?? null,
-        autosave_draft: meta.autosave_draft ?? null,
-        navigation: meta.navigation ?? null,
+        icon: meta.icon || "fa-list-alt",
+        permission: meta.permission || ["access CiviCRM"],
+        permission_operator: meta.permission_operator || "AND",
+        placement: meta.placement || [],
+        placement_filters: placementFilters,
+        submit_enabled: meta.submit_enabled !== false,
+        create_submission: meta.create_submission !== false,
+        is_public: meta.is_public || false,
         layout: layout,
-      });
+      };
+
+      // Only include optional fields if they have values
+      if (meta.server_route) saveParams.server_route = meta.server_route;
+      if (meta.description) saveParams.description = meta.description;
+      if (meta.confirmation_type) saveParams.confirmation_type = meta.confirmation_type;
+      if (meta.confirmation_message) saveParams.confirmation_message = meta.confirmation_message;
+      if (meta.redirect) saveParams.redirect = meta.redirect;
+      if (meta.requires) saveParams.requires = meta.requires;
+      if (meta.entity_type) saveParams.entity_type = meta.entity_type;
+      if (meta.join_entity) saveParams.join_entity = meta.join_entity;
+      if (meta.tags) saveParams.tags = meta.tags;
+      if (meta.navigation) saveParams.navigation = meta.navigation;
+      if (meta.submit_limit) saveParams.submit_limit = meta.submit_limit;
+      if (meta.placement_weight) saveParams.placement_weight = meta.placement_weight;
+
+      await saveForm(saveParams);
       setHasUnsavedChanges(false);
+
+      // Update URL with form name so reload will edit this form
+      const currentUrl = new URL(window.location.href);
+      if (!currentUrl.searchParams.has('name') || currentUrl.searchParams.get('name') !== meta.name) {
+        currentUrl.searchParams.set('name', meta.name);
+        window.history.replaceState({}, '', currentUrl.toString());
+        // Also update CRM.vars so the app knows we're now editing
+        if (window.CRM?.vars?.makeaform) {
+          window.CRM.vars.makeaform.formName = meta.name;
+        }
+      }
+
+      // Mark as editing existing form after first save
+      isEditingExistingForm = true;
+      originalFormName = meta.name;
+
       window.CRM.alert("Form saved successfully!", "Success", "success");
     } catch (err: any) {
       console.error("Save failed:", err);

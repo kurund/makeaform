@@ -12,12 +12,12 @@
   const isExistingForm = $derived(
     store.formMetadata.name &&
       store.formMetadata.name !== "new_form" &&
-      store.formMetadata.name.startsWith("afform_"),
+      (store.formMetadata.name.startsWith("afform") || store.formMetadata.name.startsWith("Afform")),
   );
 
-  // Auto-generate path from title on first input
+  // Auto-generate path from title on first input (only for new forms)
   function handleTitleChange(e: Event) {
-    if (autoGeneratePath && !store.formMetadata.server_route) {
+    if (!isExistingForm && autoGeneratePath && !store.formMetadata.server_route) {
       const title = (e.target as HTMLInputElement).value;
       const path = title
         .toLowerCase()
@@ -26,21 +26,6 @@
       store.formMetadata.server_route = "civicrm/" + path;
     }
   }
-
-  // Update machine name when server_route changes
-  $effect(() => {
-    if (store.formMetadata.server_route) {
-      // Extract the path portion after 'civicrm/' and generate machine name in camelCase
-      const path = store.formMetadata.server_route.replace(/^civicrm\//, "");
-      // Convert path to camelCase: my-form -> MyForm, form4 -> Form4
-      const camelCase = path
-        .split(/[-_]/)
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join("");
-      store.formMetadata.name = "afform" + camelCase;
-      autoGeneratePath = false;
-    }
-  });
 
   async function handleSave() {
     if (store.isSaving) return;
