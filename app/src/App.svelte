@@ -273,7 +273,8 @@
           tags: form.tags ?? null,
           manual_processing: form.manual_processing ?? null,
           allow_verification_by_email: form.allow_verification_by_email ?? null,
-          email_confirmation_template_id: form.email_confirmation_template_id ?? null,
+          email_confirmation_template_id:
+            form.email_confirmation_template_id ?? null,
           autosave_draft: form.autosave_draft ?? null,
           navigation: form.navigation ?? null,
         };
@@ -329,7 +330,9 @@
         });
 
         if (existingForms && existingForms.length > 0) {
-          alert(`A form with the name "${generatedName}" already exists. Please use a different form path.`);
+          alert(
+            `A form with the name "${generatedName}" already exists. Please use a different form path.`,
+          );
           return;
         }
 
@@ -419,7 +422,8 @@
       // 4. Add button(s) LAST
       for (const element of buttons) {
         // Button children should already be normalized to string format
-        const buttonText = (element["#children"] && element["#children"][0]) || "Submit";
+        const buttonText =
+          (element["#children"] && element["#children"][0]) || "Submit";
 
         formChildren.push({
           "#tag": "button",
@@ -465,8 +469,10 @@
       // Only include optional fields if they have values
       if (meta.server_route) saveParams.server_route = meta.server_route;
       if (meta.description) saveParams.description = meta.description;
-      if (meta.confirmation_type) saveParams.confirmation_type = meta.confirmation_type;
-      if (meta.confirmation_message) saveParams.confirmation_message = meta.confirmation_message;
+      if (meta.confirmation_type)
+        saveParams.confirmation_type = meta.confirmation_type;
+      if (meta.confirmation_message)
+        saveParams.confirmation_message = meta.confirmation_message;
       if (meta.redirect) saveParams.redirect = meta.redirect;
       if (meta.requires) saveParams.requires = meta.requires;
       if (meta.entity_type) saveParams.entity_type = meta.entity_type;
@@ -474,16 +480,20 @@
       if (meta.tags) saveParams.tags = meta.tags;
       if (meta.navigation) saveParams.navigation = meta.navigation;
       if (meta.submit_limit) saveParams.submit_limit = meta.submit_limit;
-      if (meta.placement_weight) saveParams.placement_weight = meta.placement_weight;
+      if (meta.placement_weight)
+        saveParams.placement_weight = meta.placement_weight;
 
       await saveForm(saveParams);
       setHasUnsavedChanges(false);
 
       // Update URL with form name so reload will edit this form
       const currentUrl = new URL(window.location.href);
-      if (!currentUrl.searchParams.has('name') || currentUrl.searchParams.get('name') !== meta.name) {
-        currentUrl.searchParams.set('name', meta.name);
-        window.history.replaceState({}, '', currentUrl.toString());
+      if (
+        !currentUrl.searchParams.has("name") ||
+        currentUrl.searchParams.get("name") !== meta.name
+      ) {
+        currentUrl.searchParams.set("name", meta.name);
+        window.history.replaceState({}, "", currentUrl.toString());
         // Also update CRM.vars so the app knows we're now editing
         if (window.CRM?.vars?.makeaform) {
           window.CRM.vars.makeaform.formName = meta.name;

@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { store, setIsSaving, setHasUnsavedChanges } from "../stores/formStore.svelte";
+  import {
+    store,
+    setIsSaving,
+    setHasUnsavedChanges,
+  } from "../stores/formStore.svelte";
   import { saveForm, deleteForm } from "../api/civicrm";
 
   let { onSave = () => {}, onDelete = () => {} } = $props();
@@ -12,12 +16,17 @@
   const isExistingForm = $derived(
     store.formMetadata.name &&
       store.formMetadata.name !== "new_form" &&
-      (store.formMetadata.name.startsWith("afform") || store.formMetadata.name.startsWith("Afform")),
+      (store.formMetadata.name.startsWith("afform") ||
+        store.formMetadata.name.startsWith("Afform")),
   );
 
   // Auto-generate path from title on first input (only for new forms)
   function handleTitleChange(e: Event) {
-    if (!isExistingForm && autoGeneratePath && !store.formMetadata.server_route) {
+    if (
+      !isExistingForm &&
+      autoGeneratePath &&
+      !store.formMetadata.server_route
+    ) {
       const title = (e.target as HTMLInputElement).value;
       const path = title
         .toLowerCase()
@@ -145,7 +154,9 @@
         class="btn btn-secondary"
         onclick={handlePreview}
         disabled={store.hasUnsavedChanges}
-        title={store.hasUnsavedChanges ? "Save first to preview" : "Preview form"}
+        title={store.hasUnsavedChanges
+          ? "Save first to preview"
+          : "Preview form"}
       >
         <i class="fa fa-eye"></i> Preview
       </button>
@@ -187,7 +198,12 @@
   <div class="settings-panel">
     <div class="settings-panel-header">
       <h4>Form Settings</h4>
-      <button type="button" class="btn-close" onclick={toggleSettings} title="Close settings">
+      <button
+        type="button"
+        class="btn-close"
+        onclick={toggleSettings}
+        title="Close settings"
+      >
         <i class="fa fa-times"></i>
       </button>
     </div>
@@ -202,7 +218,6 @@
           rows="2"
         ></textarea>
       </div>
-
     </div>
   </div>
 {/if}
@@ -447,5 +462,4 @@
     outline: none;
     box-shadow: 0 0 0 3px var(--makeaform-accent-bg);
   }
-
 </style>

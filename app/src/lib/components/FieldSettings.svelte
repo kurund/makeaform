@@ -331,7 +331,9 @@
               </div>
             {/each}
           </div>
-          <small class="help-block">Options are defined by the entity field schema</small>
+          <small class="help-block"
+            >Options are defined by the entity field schema</small
+          >
         </div>
       {/if}
 

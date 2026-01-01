@@ -9,6 +9,8 @@
   } from "../stores/formStore.svelte";
   import { getEntityFields } from "../api/civicrm";
 
+  let searchQuery = $state("");
+
   // Track which fields are already in the form
   const usedFields = $derived(() => {
     const fields = new Set<string>();
@@ -40,6 +42,19 @@
         label: field.label || field.title || fieldName,
         field: field,
       }));
+  });
+
+  // Filter available fields by search query
+  const filteredFields = $derived(() => {
+    const fields = availableFields();
+    if (!searchQuery.trim()) return fields;
+
+    const query = searchQuery.toLowerCase().trim();
+    return fields.filter(
+      (item) =>
+        item.label.toLowerCase().includes(query) ||
+        item.name.toLowerCase().includes(query),
+    );
   });
 
   async function handlePageClick(pageIndex: number) {
@@ -83,7 +98,11 @@
     };
 
     // Include options for Select, Radio, CheckBox fields
-    if (field.options && Array.isArray(field.options) && field.options.length > 0) {
+    if (
+      field.options &&
+      Array.isArray(field.options) &&
+      field.options.length > 0
+    ) {
       defaultDefn.options = field.options;
     }
 
@@ -155,14 +174,40 @@
             <span class="field-count">{availableFields().length}</span>
           </div>
 
+          {#if availableFields().length > 0}
+            <div class="field-search">
+              <i class="fa fa-search"></i>
+              <input
+                type="text"
+                placeholder=" Search fields..."
+                bind:value={searchQuery}
+              />
+              {#if searchQuery}
+                <button
+                  type="button"
+                  class="clear-search"
+                  onclick={() => (searchQuery = "")}
+                  title="Clear search"
+                >
+                  <i class="fa fa-times"></i>
+                </button>
+              {/if}
+            </div>
+          {/if}
+
           {#if availableFields().length === 0}
             <div class="no-fields">
               <i class="fa fa-check-circle"></i>
               <p>All fields added!</p>
             </div>
+          {:else if filteredFields().length === 0}
+            <div class="no-fields">
+              <i class="fa fa-search"></i>
+              <p>No matching fields</p>
+            </div>
           {:else}
             <div class="fields-list">
-              {#each availableFields() as item}
+              {#each filteredFields() as item}
                 <button
                   type="button"
                   class="field-item"
@@ -324,6 +369,49 @@
     background: var(--crm-c-gray-200);
     padding: 2px var(--crm-m);
     border-radius: var(--crm-m1);
+  }
+
+  .field-search {
+    display: flex;
+    align-items: center;
+    gap: var(--crm-m1);
+    padding: var(--crm-m1) var(--crm-m2);
+    background: var(--crm-c-layer0-bg);
+    border-bottom: 1px solid var(--crm-c-gray-200);
+  }
+
+  .field-search i {
+    color: var(--crm-c-gray-400);
+    font-size: var(--crm-m3);
+  }
+
+  .field-search input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: var(--crm-m3);
+    color: var(--crm-c-text);
+    outline: none;
+    padding: var(--crm-s) 0;
+  }
+
+  .field-search input::placeholder {
+    color: var(--crm-c-gray-400);
+  }
+
+  .clear-search {
+    background: none;
+    border: none;
+    padding: var(--crm-s);
+    cursor: pointer;
+    color: var(--crm-c-gray-400);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .clear-search:hover {
+    color: var(--crm-c-gray-600);
   }
 
   .no-fields {

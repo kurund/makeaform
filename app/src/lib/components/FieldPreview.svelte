@@ -17,12 +17,14 @@
     const page = store.pages[pageIndex];
     if (!page || !page.id) return;
 
-    const fieldCount = page["#children"]?.filter(c => c["#tag"] === "af-field").length || 0;
+    const fieldCount =
+      page["#children"]?.filter((c) => c["#tag"] === "af-field").length || 0;
     const entityLabel = page.label || page["af-fieldset"] || "this entity";
 
-    const message = fieldCount > 0
-      ? `Are you sure you want to delete "${entityLabel}" and its ${fieldCount} field${fieldCount > 1 ? 's' : ''}?\n\nThis action cannot be undone.`
-      : `Are you sure you want to delete "${entityLabel}"?\n\nThis action cannot be undone.`;
+    const message =
+      fieldCount > 0
+        ? `Are you sure you want to delete "${entityLabel}" and its ${fieldCount} field${fieldCount > 1 ? "s" : ""}?\n\nThis action cannot be undone.`
+        : `Are you sure you want to delete "${entityLabel}"?\n\nThis action cannot be undone.`;
 
     if (!confirm(message)) return;
 
@@ -213,9 +215,7 @@
                   >
                     <div class="field-card-header">
                       <h3 class="field-label">
-                        {field.defn?.label ||
-                          field.name ||
-                          "Untitled Field"}
+                        {field.defn?.label || field.name || "Untitled Field"}
                         {#if field.defn?.required}
                           <span class="required-badge">*</span>
                         {/if}
@@ -232,10 +232,15 @@
                         ></textarea>
                       {:else if inputType === "select"}
                         <select class="preview-input" disabled>
-                          <option value="">{field.defn?.placeholder || "Select an option..."}</option>
+                          <option value=""
+                            >{field.defn?.placeholder ||
+                              "Select an option..."}</option
+                          >
                           {#if field.defn?.options?.length}
                             {#each field.defn.options as option}
-                              <option value={option.id}>{option.label || option.id}</option>
+                              <option value={option.id}
+                                >{option.label || option.id}</option
+                              >
                             {/each}
                           {/if}
                         </select>
@@ -249,11 +254,17 @@
                               </div>
                             {/each}
                             {#if field.defn.options.length > 4}
-                              <div class="option-more">+{field.defn.options.length - 4} more options</div>
+                              <div class="option-more">
+                                +{field.defn.options.length - 4} more options
+                              </div>
                             {/if}
                           </div>
                         {:else}
-                          <input type="checkbox" class="preview-checkbox" disabled />
+                          <input
+                            type="checkbox"
+                            class="preview-checkbox"
+                            disabled
+                          />
                         {/if}
                       {:else if inputType === "radio"}
                         {#if field.defn?.options?.length}
@@ -265,7 +276,9 @@
                               </div>
                             {/each}
                             {#if field.defn.options.length > 4}
-                              <div class="option-more">+{field.defn.options.length - 4} more options</div>
+                              <div class="option-more">
+                                +{field.defn.options.length - 4} more options
+                              </div>
                             {/if}
                           </div>
                         {:else}
