@@ -3,6 +3,7 @@ import type {
   AfformMetadata,
   AdminData,
   EntityConfig,
+  JoinEntity,
 } from "../types";
 
 // Create a reactive state object
@@ -42,6 +43,7 @@ class FormStore {
   adminData = $state<AdminData | null>(null);
   selectedEntity = $state<string | null>(null);
   entityFields = $state<Record<string, any>>({});
+  joinEntityFields = $state<Record<string, Record<string, any>>>({});  // Keyed by join entity name (Email, Phone, etc.)
   isSaving = $state(false);
   hasUnsavedChanges = $state(false);
 
@@ -66,13 +68,23 @@ class FormStore {
     return this.pages[this.currentPageIndex] || null;
   }
 
-  // Derived state - get all fields in current page
+  // Derived state - get all fields in current page (direct af-field children only)
   get currentPageFields() {
     if (!this.currentPage || !this.currentPage["#children"]) {
       return [];
     }
     return this.currentPage["#children"].filter(
       (child) => child["#tag"] === "af-field",
+    );
+  }
+
+  // Derived state - get all join entities in current page
+  get currentPageJoins() {
+    if (!this.currentPage || !this.currentPage["#children"]) {
+      return [];
+    }
+    return this.currentPage["#children"].filter(
+      (child) => child["af-join"],
     );
   }
 
@@ -240,6 +252,20 @@ export function setSelectedEntity(entityName: string | null) {
  */
 export function setEntityFields(fields: Record<string, any>) {
   store.entityFields = fields;
+}
+
+/**
+ * Set join entity fields
+ */
+export function setJoinEntityFields(joinEntity: string, fields: Record<string, any>) {
+  store.joinEntityFields[joinEntity] = fields;
+}
+
+/**
+ * Get join entity fields
+ */
+export function getJoinEntityFields(joinEntity: string): Record<string, any> {
+  return store.joinEntityFields[joinEntity] || {};
 }
 
 /**

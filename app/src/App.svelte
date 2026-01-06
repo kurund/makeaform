@@ -206,14 +206,67 @@
                     c["#tag"] === "div" && c.class?.includes("af-container"),
                 );
                 if (containerDiv && containerDiv["#children"]) {
-                  // Move fields up and add IDs
+                  // Process children - handle both af-field and af-join elements
                   el["#children"] = containerDiv["#children"].map(
-                    (field: any) => ({
-                      ...field,
-                      id:
-                        field.id ||
-                        `element_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-                    }),
+                    (child: any) => {
+                      if (child["af-join"]) {
+                        // This is a join entity - flatten its fields
+                        const joinEl = {
+                          ...child,
+                          id:
+                            child.id ||
+                            `join_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                        };
+
+                        // Parse join actions if string
+                        if (typeof joinEl.actions === "string") {
+                          try {
+                            joinEl.actions = eval("(" + joinEl.actions + ")");
+                          } catch (e) {
+                            joinEl.actions = { update: true, delete: true };
+                          }
+                        }
+
+                        // Flatten join fields from inner container
+                        if (joinEl["#children"]) {
+                          const joinContainer = joinEl["#children"].find(
+                            (c: any) =>
+                              c["#tag"] === "div" &&
+                              c.class?.includes("af-container"),
+                          );
+                          if (joinContainer && joinContainer["#children"]) {
+                            joinEl["#children"] = joinContainer["#children"].map(
+                              (field: any) => ({
+                                ...field,
+                                id:
+                                  field.id ||
+                                  `element_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                              }),
+                            );
+                          } else {
+                            // No inner container, just add IDs to existing children
+                            joinEl["#children"] = joinEl["#children"].map(
+                              (field: any) => ({
+                                ...field,
+                                id:
+                                  field.id ||
+                                  `element_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                              }),
+                            );
+                          }
+                        }
+
+                        return joinEl;
+                      } else {
+                        // Regular af-field element
+                        return {
+                          ...child,
+                          id:
+                            child.id ||
+                            `element_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                        };
+                      }
+                    },
                   );
                   // Preserve container actions
                   if (containerDiv.actions) {
@@ -366,10 +419,14 @@
 
       // 3. Process fieldsets
       for (const element of fieldsets) {
-        // Get af-field children
+        // Get af-field children (direct fields)
         const fields =
           element["#children"]?.filter((c: any) => c["#tag"] === "af-field") ||
           [];
+
+        // Get join entity children
+        const joins =
+          element["#children"]?.filter((c: any) => c["af-join"]) || [];
 
         // Process each field - remove IDs, build defn
         const processedFields = fields.map((field: any) => {
@@ -387,6 +444,57 @@
           return fieldDef;
         });
 
+        // Process join entities
+        const processedJoins = joins.map((joinEl: any) => {
+          // Get fields from the join element
+          const joinFields =
+            joinEl["#children"]?.filter((c: any) => c["#tag"] === "af-field") ||
+            [];
+
+          // Process join fields
+          const processedJoinFields = joinFields.map((field: any) => {
+            const fieldDef: any = {
+              "#tag": "af-field",
+              name: field.name,
+            };
+
+            const defn = buildFieldDefn(field);
+            if (defn) {
+              fieldDef.defn = defn;
+            }
+
+            return fieldDef;
+          });
+
+          // Parse join actions
+          let joinActions = { update: true, delete: true };
+          if (joinEl.actions) {
+            if (typeof joinEl.actions === "string") {
+              try {
+                joinActions = eval("(" + joinEl.actions + ")");
+              } catch (e) {
+                // Keep default
+              }
+            } else {
+              joinActions = joinEl.actions;
+            }
+          }
+
+          // Build the af-join structure
+          return {
+            "#tag": "div",
+            "af-join": joinEl["af-join"],
+            actions: joinActions,
+            "#children": [
+              {
+                "#tag": "div",
+                class: "af-container af-layout-inline",
+                "#children": processedJoinFields,
+              },
+            ],
+          };
+        });
+
         // Wrap fields in container div with actions
         // Ensure actions is an object, not a string
         let containerActions = { update: true, delete: true };
@@ -402,11 +510,14 @@
           }
         }
 
+        // Combine fields and joins in the container
+        const containerChildren = [...processedFields, ...processedJoins];
+
         const containerDiv = {
           "#tag": "div",
           actions: containerActions,
           class: "af-container",
-          "#children": processedFields,
+          "#children": containerChildren,
         };
 
         // Use the af-fieldset value from the element (e.g., "Individual1")

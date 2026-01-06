@@ -124,6 +124,10 @@
             page["#children"]?.filter(
               (child) => child["#tag"] === "af-field",
             ) || []}
+          {@const pageJoins =
+            page["#children"]?.filter(
+              (child) => child["af-join"],
+            ) || []}
           {@const isActivePage = store.currentPageIndex === pageIndex}
 
           <div class="entity-container" class:active={isActivePage}>
@@ -304,6 +308,77 @@
                 {/each}
               </div>
             {/if}
+
+            <!-- Join Entity Sections -->
+            {#each pageJoins as joinElement}
+              {@const joinName = joinElement["af-join"]}
+              {@const joinFields = joinElement["#children"]?.filter((c: any) => c["#tag"] === "af-field") || []}
+
+              <div class="join-section-preview">
+                <div class="join-section-header-preview">
+                  <i class="fa fa-link"></i>
+                  <span>{joinName}</span>
+                </div>
+
+                {#if joinFields.length > 0}
+                  <div class="join-fields-preview">
+                    {#each joinFields as field}
+                      {@const inputType = getInputType(field.defn?.input_type || "Text")}
+
+                      <div class="field-card join-field-card">
+                        <div class="field-card-header">
+                          <h3 class="field-label">
+                            {field.defn?.label || field.name || "Untitled Field"}
+                            {#if field.defn?.required}
+                              <span class="required-badge">*</span>
+                            {/if}
+                          </h3>
+                        </div>
+
+                        <div class="field-card-input">
+                          {#if inputType === "textarea"}
+                            <textarea
+                              class="preview-input"
+                              placeholder={field.defn?.placeholder || ""}
+                              rows="3"
+                              disabled
+                            ></textarea>
+                          {:else if inputType === "select"}
+                            <select class="preview-input" disabled>
+                              <option value="">{field.defn?.placeholder || "Select an option..."}</option>
+                              {#if field.defn?.options?.length}
+                                {#each field.defn.options as option}
+                                  <option value={option.id}>{option.label || option.id}</option>
+                                {/each}
+                              {/if}
+                            </select>
+                          {:else}
+                            <input
+                              type={inputType}
+                              class="preview-input"
+                              placeholder={field.defn?.placeholder || ""}
+                              disabled
+                            />
+                          {/if}
+                        </div>
+
+                        {#if field.defn?.help_post}
+                          <div class="field-help">
+                            <i class="fa fa-info-circle"></i>
+                            {field.defn.help_post}
+                          </div>
+                        {/if}
+                      </div>
+                    {/each}
+                  </div>
+                {:else}
+                  <div class="join-empty">
+                    <i class="fa fa-info-circle"></i>
+                    <span>No fields added yet</span>
+                  </div>
+                {/if}
+              </div>
+            {/each}
           </div>
         {/each}
       </div>
@@ -637,5 +712,58 @@
     color: var(--crm-c-gray-600);
     font-style: italic;
     padding: var(--crm-s) var(--crm-m1);
+  }
+
+  /* Join Entity Section Styles */
+  .join-section-preview {
+    margin-top: var(--crm-r2);
+    border: 1px solid var(--crm-c-gray-200);
+    border-radius: var(--crm-m2);
+    overflow: hidden;
+    background: color-mix(in srgb, var(--crm-c-success) 3%, var(--crm-c-layer0-bg) 97%);
+  }
+
+  .join-section-header-preview {
+    display: flex;
+    align-items: center;
+    gap: var(--crm-m1);
+    padding: var(--crm-m2) var(--crm-r);
+    background: color-mix(in srgb, var(--crm-c-success) 10%, var(--crm-c-layer1-bg) 90%);
+    border-bottom: 1px solid var(--crm-c-gray-200);
+  }
+
+  .join-section-header-preview i {
+    color: var(--crm-c-success);
+    font-size: var(--crm-m3);
+  }
+
+  .join-section-header-preview span {
+    font-size: var(--crm-m3);
+    font-weight: 600;
+    color: var(--crm-c-text);
+  }
+
+  .join-fields-preview {
+    padding: var(--crm-r);
+    display: flex;
+    flex-direction: column;
+    gap: var(--crm-m2);
+  }
+
+  .join-field-card {
+    border-width: 1px;
+  }
+
+  .join-empty {
+    display: flex;
+    align-items: center;
+    gap: var(--crm-m1);
+    padding: var(--crm-r);
+    color: var(--crm-c-gray-500);
+    font-size: var(--crm-m3);
+  }
+
+  .join-empty i {
+    color: var(--crm-c-gray-400);
   }
 </style>

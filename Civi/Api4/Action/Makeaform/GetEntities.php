@@ -14,9 +14,16 @@ class GetEntities extends \Civi\Api4\Generic\AbstractAction {
 
   public function _run(Result $result) {
     $entities = $this->getEntities();
+    $joins = $this->getJoinEntities();
 
     foreach ($entities as $name => $entity) {
-      $result[] = $entity + ['id' => $name];
+      // Add available joins for this entity type
+      $entityJoins = $joins[$name] ?? [];
+      // Contact subtypes inherit Contact's joins
+      if (empty($entityJoins) && in_array($name, ['Individual', 'Organization', 'Household'])) {
+        $entityJoins = $joins['Contact'] ?? [];
+      }
+      $result[] = $entity + ['id' => $name, 'joins' => $entityJoins];
     }
   }
 
@@ -78,6 +85,50 @@ class GetEntities extends \Civi\Api4\Generic\AbstractAction {
     });
 
     return $entityMap;
+  }
+
+  /**
+   * Get available join entities grouped by parent entity type.
+   *
+   * Join entities are sub-records that can be added to a form alongside
+   * the parent entity (e.g., Email, Phone for Contact entities).
+   */
+  protected function getJoinEntities(): array {
+    // Use Afform's metadata to get join entities
+    $afformMeta = AfformAdminMeta::getMetadata();
+    $entities = $afformMeta['entities'] ?? [];
+
+    $joins = [];
+
+    foreach ($entities as $name => $entity) {
+      // Skip non-join entities
+      $entityType = $entity['type'] ?? 'primary';
+      if ($entityType !== 'join') {
+        continue;
+      }
+
+      // Determine which parent entities this join applies to
+      // Join entities typically have a 'parent' property
+      $parentEntities = [];
+
+      // Common join entities and their parents
+      if (in_array($name, ['Email', 'Phone', 'Address', 'Website', 'IM'])) {
+        $parentEntities = ['Contact'];
+      }
+
+      foreach ($parentEntities as $parent) {
+        if (!isset($joins[$parent])) {
+          $joins[$parent] = [];
+        }
+        $joins[$parent][] = [
+          'name' => $name,
+          'label' => $entity['label'] ?? $name,
+          'icon' => $entity['icon'] ?? NULL,
+        ];
+      }
+    }
+
+    return $joins;
   }
 
 }

@@ -6,10 +6,14 @@
     addElement,
     setSelectedEntity,
     setEntityFields,
+    setJoinEntityFields,
+    getJoinEntityFields,
   } from "../stores/formStore.svelte";
   import { getEntityFields } from "../api/civicrm";
+  import type { JoinEntity } from "../types";
 
   let searchQuery = $state("");
+  let expandedJoins = $state<Set<string>>(new Set());  // Track which join sections are expanded
 
   // Track which fields are already in the form
   const usedFields = $derived(() => {
@@ -56,6 +60,67 @@
         item.name.toLowerCase().includes(query),
     );
   });
+
+  // Get available join entities for the current entity type
+  const availableJoins = $derived(() => {
+    if (!store.selectedEntity || !store.adminData?.entities) return [];
+    const entity = store.adminData.entities[store.selectedEntity];
+    return entity?.joins || [];
+  });
+
+  // Get joins already added to the current page
+  const addedJoins = $derived(() => {
+    if (!store.currentPage || !store.currentPage["#children"]) return [];
+    return store.currentPage["#children"]
+      .filter((child: any) => child["af-join"])
+      .map((child: any) => child["af-join"]);
+  });
+
+  // Get available (not yet added) join entities
+  const availableJoinEntities = $derived(() => {
+    const added = new Set(addedJoins());
+    return availableJoins().filter((join: JoinEntity) => !added.has(join.name));
+  });
+
+  // Get fields used in a specific join
+  function getUsedJoinFields(joinName: string): Set<string> {
+    const fields = new Set<string>();
+    if (!store.currentPage || !store.currentPage["#children"]) return fields;
+
+    const joinElement = store.currentPage["#children"].find(
+      (child: any) => child["af-join"] === joinName
+    );
+
+    if (joinElement && joinElement["#children"]) {
+      const collectFields = (elements: any[]): void => {
+        for (const el of elements) {
+          if (el["#tag"] === "af-field" && el.name) {
+            fields.add(el.name);
+          }
+          if (el["#children"]) {
+            collectFields(el["#children"]);
+          }
+        }
+      };
+      collectFields(joinElement["#children"]);
+    }
+
+    return fields;
+  }
+
+  // Get available fields for a join entity
+  function getAvailableJoinFields(joinName: string) {
+    const joinFields = getJoinEntityFields(joinName);
+    const usedFields = getUsedJoinFields(joinName);
+
+    return Object.entries(joinFields)
+      .filter(([fieldName]) => !usedFields.has(fieldName))
+      .map(([fieldName, field]: [string, any]) => ({
+        name: fieldName,
+        label: field.label || field.title || fieldName,
+        field: field,
+      }));
+  }
 
   async function handlePageClick(pageIndex: number) {
     gotoField(pageIndex, 0);
@@ -120,6 +185,113 @@
     // Navigate to the new field
     const newFieldIndex = store.currentPageFields.length - 1;
     gotoField(store.currentPageIndex, newFieldIndex);
+  }
+
+  // Add a join entity to the current page
+  async function handleAddJoin(join: JoinEntity) {
+    if (!store.currentPage) return;
+
+    // Create the join element structure
+    const joinElement = {
+      "#tag": "div" as const,
+      "af-join": join.name,
+      id: `join_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      actions: { update: true, delete: true },
+      "#children": [] as any[],
+    };
+
+    // Add the join element to the current page
+    addElement(joinElement, store.currentPage.id);
+
+    // Load fields for this join entity
+    try {
+      const fields = await getEntityFields(join.name);
+      setJoinEntityFields(join.name, fields);
+    } catch (error) {
+      console.error(`Failed to load fields for ${join.name}:`, error);
+    }
+
+    // Expand this join section
+    expandedJoins = new Set([...expandedJoins, join.name]);
+  }
+
+  // Remove a join entity from the current page
+  function handleRemoveJoin(joinName: string) {
+    if (!store.currentPage || !store.currentPage["#children"]) return;
+
+    const joinElement = store.currentPage["#children"].find(
+      (child: any) => child["af-join"] === joinName
+    );
+
+    if (joinElement && joinElement.id) {
+      const fieldCount = getUsedJoinFields(joinName).size;
+      const message = fieldCount > 0
+        ? `Remove "${joinName}" and its ${fieldCount} field${fieldCount > 1 ? 's' : ''}?`
+        : `Remove "${joinName}"?`;
+
+      if (confirm(message)) {
+        // Remove from store
+        const index = store.currentPage["#children"].indexOf(joinElement);
+        if (index > -1) {
+          store.currentPage["#children"].splice(index, 1);
+          store.hasUnsavedChanges = true;
+        }
+
+        // Collapse the section
+        expandedJoins.delete(joinName);
+        expandedJoins = new Set(expandedJoins);
+      }
+    }
+  }
+
+  // Toggle join section expansion
+  function toggleJoinExpansion(joinName: string) {
+    if (expandedJoins.has(joinName)) {
+      expandedJoins.delete(joinName);
+    } else {
+      expandedJoins.add(joinName);
+    }
+    expandedJoins = new Set(expandedJoins);
+  }
+
+  // Add a field to a join entity
+  function handleAddJoinField(joinName: string, fieldName: string, field: any) {
+    if (!store.currentPage || !store.currentPage["#children"]) return;
+
+    const joinElement = store.currentPage["#children"].find(
+      (child: any) => child["af-join"] === joinName
+    );
+
+    if (!joinElement) return;
+
+    // Build default defn from field metadata
+    const defaultDefn: Record<string, any> = {
+      label: field.label || field.title || fieldName,
+      input_type: field.input_type || "Text",
+      required: field.required || false,
+      placeholder: "",
+      help_post: field.help_pre || field.help_post || "",
+    };
+
+    // Include options for Select, Radio, CheckBox fields
+    if (field.options && Array.isArray(field.options) && field.options.length > 0) {
+      defaultDefn.options = field.options;
+    }
+
+    const newField = {
+      "#tag": "af-field" as const,
+      name: fieldName,
+      defn: { ...defaultDefn },
+      originalDefn: { ...defaultDefn },
+      id: `element_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    };
+
+    // Add field directly to join element's children
+    if (!joinElement["#children"]) {
+      joinElement["#children"] = [];
+    }
+    joinElement["#children"].push(newField);
+    store.hasUnsavedChanges = true;
   }
 </script>
 
@@ -220,6 +392,78 @@
             </div>
           {/if}
         </div>
+
+        <!-- Add Related Entity Section -->
+        {#if availableJoinEntities().length > 0}
+          <div class="add-join-section">
+            <div class="add-join-header">
+              <h4>Add Related Entity</h4>
+            </div>
+            <div class="join-list">
+              {#each availableJoinEntities() as join}
+                <button
+                  type="button"
+                  class="join-item"
+                  onclick={() => handleAddJoin(join)}
+                >
+                  <i class="fa fa-plus-circle"></i>
+                  <span>{join.label}</span>
+                </button>
+              {/each}
+            </div>
+          </div>
+        {/if}
+
+        <!-- Added Join Sections -->
+        {#each addedJoins() as joinName}
+          {@const joinFields = getAvailableJoinFields(joinName)}
+          {@const usedCount = getUsedJoinFields(joinName).size}
+          {@const isExpanded = expandedJoins.has(joinName)}
+
+          <div class="join-section">
+            <div class="join-section-header">
+              <button
+                type="button"
+                class="join-toggle"
+                onclick={() => toggleJoinExpansion(joinName)}
+              >
+                <i class="fa {isExpanded ? 'fa-chevron-down' : 'fa-chevron-right'}"></i>
+                <span class="join-name">{joinName}</span>
+                <span class="join-field-count">{usedCount}</span>
+              </button>
+              <button
+                type="button"
+                class="join-remove"
+                onclick={() => handleRemoveJoin(joinName)}
+                title="Remove {joinName}"
+              >
+                <i class="fa fa-times"></i>
+              </button>
+            </div>
+
+            {#if isExpanded}
+              <div class="join-fields">
+                {#if joinFields.length === 0}
+                  <div class="no-join-fields">
+                    <i class="fa fa-check-circle"></i>
+                    <span>All fields added</span>
+                  </div>
+                {:else}
+                  {#each joinFields as item}
+                    <button
+                      type="button"
+                      class="field-item"
+                      onclick={() => handleAddJoinField(joinName, item.name, item.field)}
+                    >
+                      <i class="fa fa-plus-circle"></i>
+                      <span>{item.label}</span>
+                    </button>
+                  {/each}
+                {/if}
+              </div>
+            {/if}
+          </div>
+        {/each}
       {/if}
     {/if}
   </div>
@@ -471,5 +715,145 @@
     font-size: var(--crm-m3);
     color: var(--crm-c-text);
     font-weight: 500;
+  }
+
+  /* Add Related Entity Section */
+  .add-join-section {
+    background: var(--crm-c-layer0-bg);
+    border-top: 1px solid var(--crm-c-gray-200);
+  }
+
+  .add-join-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--crm-m2) var(--crm-r);
+    border-bottom: 1px solid var(--crm-c-gray-200);
+    background: var(--crm-c-layer1-bg);
+  }
+
+  .add-join-header h4 {
+    margin: 0;
+    font-size: var(--crm-small-font-size);
+    font-weight: 700;
+    color: var(--crm-c-gray-800);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .join-list {
+    padding: var(--crm-m);
+  }
+
+  .join-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--crm-m1);
+    padding: var(--crm-m1) var(--crm-m2);
+    background: var(--crm-c-layer0-bg);
+    border: 1px solid var(--crm-c-gray-200);
+    border-radius: var(--crm-roundness);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    margin-bottom: var(--crm-s);
+    text-align: left;
+  }
+
+  .join-item:hover {
+    background: color-mix(in srgb, var(--crm-c-success) 10%, transparent 90%);
+    border-color: var(--crm-c-success);
+    transform: translateX(2px);
+  }
+
+  .join-item i {
+    color: var(--crm-c-success);
+    font-size: var(--crm-m3);
+  }
+
+  .join-item span {
+    font-size: var(--crm-m3);
+    color: var(--crm-c-text);
+    font-weight: 500;
+  }
+
+  /* Added Join Sections */
+  .join-section {
+    background: var(--crm-c-layer0-bg);
+    border-top: 1px solid var(--crm-c-gray-200);
+  }
+
+  .join-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--crm-m1) var(--crm-m2);
+    background: color-mix(in srgb, var(--crm-c-success) 8%, var(--crm-c-layer1-bg) 92%);
+    border-bottom: 1px solid var(--crm-c-gray-200);
+  }
+
+  .join-toggle {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--crm-m1);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--crm-s) 0;
+    text-align: left;
+  }
+
+  .join-toggle i {
+    color: var(--crm-c-gray-500);
+    font-size: var(--crm-small-font-size);
+    width: 12px;
+  }
+
+  .join-name {
+    font-size: var(--crm-m3);
+    font-weight: 600;
+    color: var(--crm-c-text);
+  }
+
+  .join-field-count {
+    font-size: var(--crm-small-font-size);
+    font-weight: 700;
+    color: var(--crm-c-gray-600);
+    background: var(--crm-c-gray-200);
+    padding: 1px var(--crm-m);
+    border-radius: var(--crm-m1);
+    margin-left: var(--crm-m1);
+  }
+
+  .join-remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--crm-s);
+    color: var(--crm-c-gray-400);
+    transition: color 0.15s ease;
+  }
+
+  .join-remove:hover {
+    color: var(--crm-c-danger);
+  }
+
+  .join-fields {
+    padding: var(--crm-m);
+    background: var(--crm-c-layer0-bg);
+  }
+
+  .no-join-fields {
+    display: flex;
+    align-items: center;
+    gap: var(--crm-m1);
+    padding: var(--crm-m1);
+    color: var(--crm-c-gray-500);
+    font-size: var(--crm-small-font-size);
+  }
+
+  .no-join-fields i {
+    color: var(--crm-c-success);
   }
 </style>

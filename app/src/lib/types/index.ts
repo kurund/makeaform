@@ -66,6 +66,13 @@ export interface EntityConfig {
   security?: string;
 }
 
+// Join entity definition (Email, Phone, Address, etc.)
+export interface JoinEntity {
+  name: string;
+  label: string;
+  icon?: string | null;
+}
+
 // Entity definition from APIv4
 export interface EntityDefinition {
   name: string;
@@ -82,6 +89,7 @@ export interface EntityDefinition {
   order_by?: string;
   primary_key: string[];
   paths?: Record<string, string>;
+  joins?: JoinEntity[];  // Available join entities for this entity type
 }
 
 // Field definition from APIv4
