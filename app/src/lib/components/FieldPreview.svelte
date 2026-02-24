@@ -28,6 +28,17 @@
 
     if (!confirm(message)) return;
 
+    // Remove the matching entity config (af-entity definition)
+    const entityName = page["af-fieldset"];
+    if (entityName) {
+      const configIndex = store.entityConfigs.findIndex(
+        (ec) => ec.name === entityName,
+      );
+      if (configIndex !== -1) {
+        store.entityConfigs.splice(configIndex, 1);
+      }
+    }
+
     // Adjust current page index before deletion if needed
     if (store.currentPageIndex >= pageIndex && store.currentPageIndex > 0) {
       store.currentPageIndex = Math.max(0, store.currentPageIndex - 1);
