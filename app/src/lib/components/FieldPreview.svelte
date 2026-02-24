@@ -385,7 +385,7 @@
 
       <!-- Submit Button Preview -->
       {#each store.formElements.filter((el) => el["#tag"] === "button") as submitButton}
-        <div style="margin-top: var(--crm-r4); text-align: center;">
+        <div style="margin-top: var(--crm-l-reg-4); text-align: center;">
           <button
             type="button"
             class={submitButton.class || "af-button btn btn-primary"}
@@ -407,7 +407,7 @@
   .typeform-preview {
     position: relative;
     height: 100%;
-    background: var(--crm-c-container-bg);
+    background: var(--crm-container-bg-color);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -437,20 +437,20 @@
   .empty-content {
     text-align: center;
     max-width: 400px;
-    padding: var(--crm-xxl);
+    padding: var(--crm-l-large-2);
   }
 
   .empty-content i {
     opacity: 0.4;
-    margin-bottom: var(--crm-r4);
+    margin-bottom: var(--crm-l-reg-4);
     color: var(--makeaform-accent);
   }
 
   .empty-content h2 {
-    font-size: var(--crm-l);
+    font-size: var(--crm-l-large);
     font-weight: 700;
-    margin: 0 0 var(--crm-m2) 0;
-    color: var(--crm-c-text);
+    margin: 0 0 var(--crm-l-medium-2) 0;
+    color: var(--crm-text-color);
   }
 
   .empty-content p {
@@ -463,22 +463,22 @@
   .form-preview-container {
     flex: 1;
     overflow-y: auto;
-    padding: var(--crm-r4);
+    padding: var(--crm-l-reg-4);
   }
 
   .entities-wrapper {
-    background: var(--crm-c-layer1-bg);
+    background: var(--crm-layer1-bg-color);
     border: 1px solid var(--crm-c-gray-200);
-    border-radius: var(--crm-m2);
-    padding: var(--crm-r2);
+    border-radius: var(--crm-l-medium-2);
+    padding: var(--crm-l-reg-2);
   }
 
   .entity-container {
-    background: var(--crm-c-layer0-bg);
+    background: var(--crm-paper);
     border: 2px solid var(--crm-c-gray-200);
-    border-radius: var(--crm-m2);
-    padding: var(--crm-r2);
-    margin-bottom: var(--crm-r2);
+    border-radius: var(--crm-l-medium-2);
+    padding: var(--crm-l-reg-2);
+    margin-bottom: var(--crm-l-reg-2);
     transition: all 0.2s ease;
   }
 
@@ -495,8 +495,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--crm-r);
-    margin-bottom: var(--crm-m);
+    gap: var(--crm-l-reg);
+    margin-bottom: var(--crm-l-medium);
   }
 
   .page-header-content {
@@ -507,7 +507,7 @@
   .page-action-buttons {
     display: flex;
     align-items: center;
-    gap: var(--crm-m);
+    gap: var(--crm-l-medium);
     opacity: 0;
     transition: opacity 0.2s ease;
   }
@@ -519,17 +519,17 @@
   .page-reorder-buttons {
     display: flex;
     flex-direction: column;
-    gap: var(--crm-xs1);
+    gap: var(--crm-l-xsmall-1);
   }
 
   .btn-reorder {
-    background: var(--crm-c-layer1-bg);
+    background: var(--crm-layer1-bg-color);
     border: 1px solid var(--crm-c-gray-300);
     color: var(--crm-c-gray-700);
     cursor: pointer;
-    padding: var(--crm-xs1) var(--crm-m);
-    border-radius: var(--crm-roundness);
-    font-size: var(--crm-small-font-size);
+    padding: var(--crm-l-xsmall-1) var(--crm-l-medium);
+    border-radius: var(--crm-l-radius);
+    font-size: var(--crm-font-small-size);
     transition: all 0.15s ease;
     display: flex;
     align-items: center;
@@ -541,12 +541,12 @@
   .btn-reorder:hover {
     background: var(--makeaform-accent);
     border-color: var(--makeaform-accent);
-    color: var(--crm-c-text-light);
+    color: var(--crm-text-light-color);
     transform: scale(1.1);
   }
 
   .btn-reorder i {
-    font-size: var(--crm-small-font-size);
+    font-size: var(--crm-font-small-size);
   }
 
   .btn-delete-entity {
@@ -554,9 +554,9 @@
     border: 1px solid var(--crm-c-gray-300);
     color: var(--crm-c-gray-500);
     cursor: pointer;
-    padding: var(--crm-m);
-    border-radius: var(--crm-roundness);
-    font-size: var(--crm-m3);
+    padding: var(--crm-l-medium);
+    border-radius: var(--crm-l-radius);
+    font-size: var(--crm-l-medium-3);
     transition: all 0.15s ease;
     display: flex;
     align-items: center;
@@ -566,8 +566,8 @@
   }
 
   .btn-delete-entity:hover {
-    background: var(--crm-c-danger);
-    border-color: var(--crm-c-danger);
+    background: var(--crm-danger-color);
+    border-color: var(--crm-danger-color);
     color: white;
     transform: scale(1.1);
   }
@@ -575,24 +575,24 @@
   .container-label-input {
     background: transparent;
     border: 1px solid transparent;
-    font-size: var(--crm-r2);
+    font-size: var(--crm-l-reg-2);
     font-weight: 700;
-    color: var(--crm-c-text);
+    color: var(--crm-text-color);
     width: 100%;
-    padding: var(--crm-xs1) var(--crm-m);
-    margin: 0 0 var(--crm-m) 0;
-    border-radius: var(--crm-roundness);
+    padding: var(--crm-l-xsmall-1) var(--crm-l-medium);
+    margin: 0 0 var(--crm-l-medium) 0;
+    border-radius: var(--crm-l-radius);
     transition: all 0.15s ease;
   }
 
   .container-label-input:hover {
-    background: var(--crm-c-layer1-bg);
+    background: var(--crm-layer1-bg-color);
     border-color: var(--crm-c-gray-300);
   }
 
   .container-label-input:focus {
     outline: none;
-    background: var(--crm-c-layer1-bg);
+    background: var(--crm-layer1-bg-color);
     border-color: var(--makeaform-accent);
     box-shadow: 0 0 0 2px var(--makeaform-accent-bg);
   }
@@ -600,14 +600,14 @@
   .fields-list-preview {
     display: flex;
     flex-direction: column;
-    gap: var(--crm-r);
+    gap: var(--crm-l-reg);
   }
 
   .field-card {
-    background: var(--crm-c-layer0-bg);
+    background: var(--crm-paper);
     border: 2px solid var(--crm-c-gray-200);
-    border-radius: var(--crm-m2);
-    padding: var(--crm-r2);
+    border-radius: var(--crm-l-medium-2);
+    padding: var(--crm-l-reg-2);
     cursor: pointer;
     transition: all 0.2s ease;
   }
@@ -626,41 +626,41 @@
   .field-card-header {
     display: flex;
     align-items: center;
-    gap: var(--crm-m2);
-    margin-bottom: var(--crm-r);
+    gap: var(--crm-l-medium-2);
+    margin-bottom: var(--crm-l-reg);
   }
 
   .field-label {
     margin: 0;
-    font-size: var(--crm-r1);
+    font-size: var(--crm-l-reg-1);
     font-weight: 600;
-    color: var(--crm-c-text);
+    color: var(--crm-text-color);
     flex: 1;
   }
 
   .required-badge {
-    color: var(--crm-c-danger);
-    margin-left: var(--crm-xs1);
+    color: var(--crm-danger-color);
+    margin-left: var(--crm-l-xsmall-1);
   }
 
   .field-card-input {
-    margin-bottom: var(--crm-m2);
+    margin-bottom: var(--crm-l-medium-2);
   }
 
   .preview-input {
     width: 100%;
     border: 1px solid var(--crm-input-border-color);
     border-radius: var(--makeaform-radius);
-    padding: var(--crm-m1) var(--crm-m2);
-    font-size: var(--crm-m3);
+    padding: var(--crm-l-medium-1) var(--crm-l-medium-2);
+    font-size: var(--crm-l-medium-3);
     color: var(--crm-input-color);
-    background: var(--crm-c-layer1-bg);
+    background: var(--crm-layer1-bg-color);
   }
 
   .preview-input:focus {
     outline: none;
     border-color: var(--makeaform-accent);
-    background: var(--crm-input-bg);
+    background: var(--crm-input-bg-color);
   }
 
   textarea.preview-input {
@@ -671,17 +671,17 @@
   .option-preview {
     display: flex;
     flex-direction: column;
-    gap: var(--crm-m1);
+    gap: var(--crm-l-medium-1);
   }
 
   .option-item {
     display: flex;
     align-items: center;
-    gap: var(--crm-m1);
-    padding: var(--crm-m1);
-    background: var(--crm-c-layer1-bg);
+    gap: var(--crm-l-medium-1);
+    padding: var(--crm-l-medium-1);
+    background: var(--crm-layer1-bg-color);
     border: 1px solid var(--crm-c-gray-200);
-    border-radius: var(--crm-roundness);
+    border-radius: var(--crm-l-radius);
   }
 
   .option-item input {
@@ -689,65 +689,65 @@
   }
 
   .option-item span {
-    font-size: var(--crm-m3);
+    font-size: var(--crm-l-medium-3);
     color: var(--crm-c-gray-800);
   }
 
   .field-help {
     display: flex;
     align-items: center;
-    gap: var(--crm-s);
-    font-size: var(--crm-m3);
+    gap: var(--crm-l-small);
+    font-size: var(--crm-l-medium-3);
     color: var(--crm-c-gray-600);
     font-style: italic;
   }
 
   .field-help i {
     color: var(--makeaform-accent);
-    font-size: var(--crm-small-font-size);
+    font-size: var(--crm-font-small-size);
   }
 
   .option-more {
-    font-size: var(--crm-small-font-size);
+    font-size: var(--crm-font-small-size);
     color: var(--crm-c-gray-600);
     font-style: italic;
-    padding: var(--crm-s) var(--crm-m1);
+    padding: var(--crm-l-small) var(--crm-l-medium-1);
   }
 
   /* Join Entity Section Styles */
   .join-section-preview {
-    margin-top: var(--crm-r2);
+    margin-top: var(--crm-l-reg-2);
     border: 1px solid var(--crm-c-gray-200);
-    border-radius: var(--crm-m2);
+    border-radius: var(--crm-l-medium-2);
     overflow: hidden;
-    background: color-mix(in srgb, var(--crm-c-success) 3%, var(--crm-c-layer0-bg) 97%);
+    background: color-mix(in srgb, var(--crm-success-color) 3%, var(--crm-paper) 97%);
   }
 
   .join-section-header-preview {
     display: flex;
     align-items: center;
-    gap: var(--crm-m1);
-    padding: var(--crm-m2) var(--crm-r);
-    background: color-mix(in srgb, var(--crm-c-success) 10%, var(--crm-c-layer1-bg) 90%);
+    gap: var(--crm-l-medium-1);
+    padding: var(--crm-l-medium-2) var(--crm-l-reg);
+    background: color-mix(in srgb, var(--crm-success-color) 10%, var(--crm-layer1-bg-color) 90%);
     border-bottom: 1px solid var(--crm-c-gray-200);
   }
 
   .join-section-header-preview i {
-    color: var(--crm-c-success);
-    font-size: var(--crm-m3);
+    color: var(--crm-success-color);
+    font-size: var(--crm-l-medium-3);
   }
 
   .join-section-header-preview span {
-    font-size: var(--crm-m3);
+    font-size: var(--crm-l-medium-3);
     font-weight: 600;
-    color: var(--crm-c-text);
+    color: var(--crm-text-color);
   }
 
   .join-fields-preview {
-    padding: var(--crm-r);
+    padding: var(--crm-l-reg);
     display: flex;
     flex-direction: column;
-    gap: var(--crm-m2);
+    gap: var(--crm-l-medium-2);
   }
 
   .join-field-card {
@@ -757,10 +757,10 @@
   .join-empty {
     display: flex;
     align-items: center;
-    gap: var(--crm-m1);
-    padding: var(--crm-r);
+    gap: var(--crm-l-medium-1);
+    padding: var(--crm-l-reg);
     color: var(--crm-c-gray-500);
-    font-size: var(--crm-m3);
+    font-size: var(--crm-l-medium-3);
   }
 
   .join-empty i {

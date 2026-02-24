@@ -137,8 +137,8 @@
 
 <style>
   .entity-selector {
-    padding: var(--crm-r) var(--crm-r2);
-    background: var(--crm-c-layer0-bg);
+    padding: var(--crm-l-reg) var(--crm-l-reg-2);
+    background: var(--crm-paper);
     border-bottom: 1px solid var(--crm-c-gray-200);
   }
 
@@ -148,9 +148,9 @@
 
   .form-group label {
     display: block;
-    margin-bottom: var(--crm-m);
+    margin-bottom: var(--crm-l-medium);
     font-weight: 700;
-    font-size: var(--crm-small-font-size);
+    font-size: var(--crm-font-small-size);
     color: var(--crm-c-gray-600);
     text-transform: uppercase;
     letter-spacing: 0.8px;
@@ -158,15 +158,15 @@
 
   .form-group label i {
     color: var(--makeaform-accent);
-    margin-right: var(--crm-s);
+    margin-right: var(--crm-l-small);
   }
 
   .form-group select {
     border: 1px solid var(--crm-input-border-color);
     border-radius: var(--makeaform-radius);
-    padding: var(--crm-m) var(--crm-m2);
+    padding: var(--crm-l-medium) var(--crm-l-medium-2);
     transition: all 0.2s ease;
-    background: var(--crm-input-bg);
+    background: var(--crm-input-bg-color);
     color: var(--crm-input-color);
   }
 
@@ -178,9 +178,9 @@
 
   .help-block {
     display: block;
-    margin-top: var(--crm-m);
+    margin-top: var(--crm-l-medium);
     color: var(--crm-c-gray-600);
-    font-size: var(--crm-small-font-size);
+    font-size: var(--crm-font-small-size);
     font-weight: 500;
   }
 

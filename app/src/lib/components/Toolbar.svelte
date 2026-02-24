@@ -227,8 +227,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--crm-r) var(--crm-r4);
-    background: var(--crm-c-layer0-bg);
+    padding: var(--crm-l-reg) var(--crm-l-reg-4);
+    background: var(--crm-paper);
     border-bottom: 1px solid var(--crm-c-gray-200);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   }
@@ -239,7 +239,7 @@
 
   .form-name-group {
     display: flex;
-    gap: var(--crm-r2);
+    gap: var(--crm-l-reg-2);
     align-items: flex-end;
   }
 
@@ -249,22 +249,22 @@
 
   .form-group label {
     display: block;
-    font-size: var(--crm-small-font-size);
+    font-size: var(--crm-font-small-size);
     font-weight: 600;
     color: var(--crm-c-gray-600);
-    margin-bottom: var(--crm-s);
+    margin-bottom: var(--crm-l-small);
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
 
   .form-group input {
     border: 1px solid var(--crm-input-border-color);
-    border-radius: var(--crm-roundness);
-    padding: var(--crm-m) var(--crm-m2);
-    font-size: var(--crm-m3);
+    border-radius: var(--crm-l-radius);
+    padding: var(--crm-l-medium) var(--crm-l-medium-2);
+    font-size: var(--crm-l-medium-3);
     min-width: 200px;
     transition: all 0.2s ease;
-    background: var(--crm-input-bg);
+    background: var(--crm-input-bg-color);
     color: var(--crm-input-color);
   }
 
@@ -291,42 +291,42 @@
   .toolbar-right {
     display: flex;
     align-items: center;
-    gap: var(--crm-m2);
+    gap: var(--crm-l-medium-2);
   }
 
   .toolbar-right .label {
-    font-size: var(--crm-small-font-size);
-    padding: var(--crm-s) var(--crm-m2);
-    border-radius: var(--crm-m2);
+    font-size: var(--crm-font-small-size);
+    padding: var(--crm-l-small) var(--crm-l-medium-2);
+    border-radius: var(--crm-l-medium-2);
     font-weight: 600;
   }
 
   .toolbar-right .label-warning {
-    background: var(--crm-c-warning-light);
-    color: var(--crm-c-warning);
+    background: var(--crm-warning-light-color);
+    color: var(--crm-warning-color);
   }
 
   .toolbar-right .label-success {
-    background: var(--crm-c-success-light);
-    color: var(--crm-c-success);
+    background: var(--crm-success-light-color);
+    color: var(--crm-success-color);
   }
 
   .toolbar-right .btn-primary {
-    background: var(--crm-c-primary);
-    border-color: var(--crm-c-primary);
-    color: var(--crm-c-primary-text);
+    background: var(--crm-primary-color);
+    border-color: var(--crm-primary-color);
+    color: var(--crm-primary-text-color);
     padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
     border-radius: var(--makeaform-radius);
     font-weight: 600;
-    font-size: var(--crm-m3);
+    font-size: var(--crm-l-medium-3);
     transition: all 0.2s ease;
   }
 
   .toolbar-right .btn-primary:hover {
-    background: var(--crm-c-primary-hover);
-    border-color: var(--crm-c-primary-hover);
+    background: var(--crm-primary-hover-color);
+    border-color: var(--crm-primary-hover-color);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(from var(--crm-c-primary) r g b / 0.3);
+    box-shadow: 0 4px 12px rgba(from var(--crm-primary-color) r g b / 0.3);
   }
 
   .toolbar-right .btn-primary:disabled {
@@ -340,7 +340,7 @@
     background: transparent;
     border: 1px solid var(--crm-c-gray-300);
     color: var(--crm-c-gray-600);
-    padding: var(--crm-m) var(--crm-m2);
+    padding: var(--crm-l-medium) var(--crm-l-medium-2);
     border-radius: var(--makeaform-radius);
     cursor: pointer;
     transition: all 0.2s ease;
@@ -355,13 +355,13 @@
   }
 
   .toolbar-right .btn-secondary {
-    background: var(--crm-c-layer1-bg);
+    background: var(--crm-layer1-bg-color);
     border: 1px solid var(--crm-c-gray-300);
     color: var(--crm-c-gray-700);
     padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
     border-radius: var(--makeaform-radius);
     font-weight: 600;
-    font-size: var(--crm-m3);
+    font-size: var(--crm-l-medium-3);
     cursor: pointer;
     transition: all 0.2s ease;
   }
@@ -378,18 +378,18 @@
 
   .toolbar-right .btn-danger {
     background: transparent;
-    border: 1px solid var(--crm-c-danger);
-    color: var(--crm-c-danger);
+    border: 1px solid var(--crm-danger-color);
+    color: var(--crm-danger-color);
     padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
     border-radius: var(--makeaform-radius);
     font-weight: 600;
-    font-size: var(--crm-m3);
+    font-size: var(--crm-l-medium-3);
     cursor: pointer;
     transition: all 0.2s ease;
   }
 
   .toolbar-right .btn-danger:hover {
-    background: var(--crm-c-danger);
+    background: var(--crm-danger-color);
     color: white;
   }
 
@@ -400,9 +400,9 @@
 
   /* Settings Panel */
   .settings-panel {
-    background: var(--crm-c-layer0-bg);
+    background: var(--crm-paper);
     border-bottom: 1px solid var(--crm-c-gray-200);
-    padding: var(--crm-r2) var(--crm-r4);
+    padding: var(--crm-l-reg-2) var(--crm-l-reg-4);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
 
@@ -410,14 +410,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--crm-r2);
+    margin-bottom: var(--crm-l-reg-2);
   }
 
   .settings-panel-header h4 {
     margin: 0;
     font-size: var(--crm-font-size);
     font-weight: 700;
-    color: var(--crm-c-text);
+    color: var(--crm-text-color);
   }
 
   .btn-close {
@@ -425,7 +425,7 @@
     border: none;
     color: var(--crm-c-gray-500);
     cursor: pointer;
-    padding: var(--crm-s);
+    padding: var(--crm-l-small);
     font-size: var(--crm-font-size);
     transition: color 0.2s ease;
   }
@@ -436,7 +436,7 @@
 
   .settings-panel-body {
     display: flex;
-    gap: var(--crm-r4);
+    gap: var(--crm-l-reg-4);
     align-items: flex-start;
   }
 
@@ -448,12 +448,12 @@
   .settings-panel-body textarea {
     width: 100%;
     border: 1px solid var(--crm-input-border-color);
-    border-radius: var(--crm-roundness);
-    padding: var(--crm-m) var(--crm-m2);
-    font-size: var(--crm-m3);
+    border-radius: var(--crm-l-radius);
+    padding: var(--crm-l-medium) var(--crm-l-medium-2);
+    font-size: var(--crm-l-medium-3);
     font-family: inherit;
     resize: vertical;
-    background: var(--crm-input-bg);
+    background: var(--crm-input-bg-color);
     color: var(--crm-input-color);
   }
 

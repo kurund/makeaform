@@ -659,11 +659,11 @@
 
 <style>
   :root {
-    --makeaform-accent: var(--crm-c-link);
-    --makeaform-accent-hover: var(--crm-c-link-hover);
+    --makeaform-accent: var(--crm-link-color);
+    --makeaform-accent-hover: var(--crm-link-hover-color);
     --makeaform-accent-bg: color-mix(
       in srgb,
-      var(--crm-c-link) 10%,
+      var(--crm-link-color) 10%,
       transparent 90%
     );
     --makeaform-radius: 0.5rem; /* 8px - maintain modern rounded corners */
@@ -674,7 +674,7 @@
     flex-direction: column;
     height: 100vh;
     overflow: hidden;
-    background: var(--crm-c-container-bg);
+    background: var(--crm-container-bg-color);
     margin: 0;
     padding: 0;
     font-family: var(--crm-font);
@@ -688,24 +688,24 @@
     justify-content: center;
     height: 100vh;
     color: var(--crm-c-gray-800);
-    background: var(--crm-c-container-bg);
+    background: var(--crm-container-bg-color);
   }
 
   .loading-screen i,
   .error-screen i {
-    margin-bottom: var(--crm-r2);
+    margin-bottom: var(--crm-l-reg-2);
     color: var(--makeaform-accent);
   }
 
   .loading-screen p,
   .error-screen p {
-    font-size: var(--crm-r1);
+    font-size: var(--crm-l-reg-1);
     margin: 0;
     font-weight: 500;
   }
 
   .error-screen i {
-    color: var(--crm-c-danger);
+    color: var(--crm-danger-color);
   }
 
   .form-builder-content {
@@ -717,20 +717,20 @@
   .panel-left {
     width: 280px;
     flex-shrink: 0;
-    background: var(--crm-c-layer0-bg);
+    background: var(--crm-paper);
     border-right: 1px solid var(--crm-c-gray-200);
   }
 
   .panel-center {
     flex: 1;
     min-width: 0;
-    background: var(--crm-c-container-bg);
+    background: var(--crm-container-bg-color);
   }
 
   .panel-right {
     width: 320px;
     flex-shrink: 0;
-    background: var(--crm-c-layer0-bg);
+    background: var(--crm-paper);
     border-left: 1px solid var(--crm-c-gray-200);
   }
 

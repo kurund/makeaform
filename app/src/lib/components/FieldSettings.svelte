@@ -181,9 +181,9 @@
       <!-- Info Note -->
       <div class="field-info-box">
         <div class="info-row">
-          <i class="fa fa-info-circle" style="margin-right: var(--crm-m);"></i>
+          <i class="fa fa-info-circle" style="margin-right: var(--crm-l-medium);"></i>
           <span
-            style="font-size: var(--crm-small-font-size); color: var(--crm-c-gray-600);"
+            style="font-size: var(--crm-font-small-size); color: var(--crm-c-gray-600);"
           >
             The button will automatically submit the form when clicked.
           </span>
@@ -365,12 +365,12 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    background: var(--crm-c-layer0-bg);
+    background: var(--crm-paper);
   }
 
   .settings-header {
-    padding: var(--crm-r2);
-    background: var(--crm-c-layer0-bg);
+    padding: var(--crm-l-reg-2);
+    background: var(--crm-paper);
     border-bottom: 1px solid var(--crm-c-gray-200);
   }
 
@@ -378,7 +378,7 @@
     margin: 0;
     font-size: var(--crm-font-size);
     font-weight: 700;
-    color: var(--crm-c-text);
+    color: var(--crm-text-color);
     letter-spacing: 0.3px;
   }
 
@@ -388,58 +388,58 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: var(--crm-xl) var(--crm-r2);
+    padding: var(--crm-l-large-1) var(--crm-l-reg-2);
     color: var(--crm-c-gray-400);
     text-align: center;
   }
 
   .settings-empty i {
-    margin-bottom: var(--crm-r);
+    margin-bottom: var(--crm-l-reg);
     opacity: 0.4;
     color: var(--makeaform-accent);
   }
 
   .settings-empty p {
     margin: 0;
-    font-size: var(--crm-m3);
+    font-size: var(--crm-l-medium-3);
     color: var(--crm-c-gray-600);
   }
 
   .settings-content {
     flex: 1;
     overflow-y: auto;
-    padding: var(--crm-r2);
+    padding: var(--crm-l-reg-2);
   }
 
   .form-group {
-    margin-bottom: var(--crm-r4);
+    margin-bottom: var(--crm-l-reg-4);
   }
 
   .form-group label {
     display: flex;
     align-items: center;
-    gap: var(--crm-m);
-    font-size: var(--crm-small-font-size);
+    gap: var(--crm-l-medium);
+    font-size: var(--crm-font-small-size);
     font-weight: 700;
     color: var(--crm-c-gray-800);
-    margin-bottom: var(--crm-m);
+    margin-bottom: var(--crm-l-medium);
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
 
   .form-group label i {
     color: var(--makeaform-accent);
-    font-size: var(--crm-small-font-size);
+    font-size: var(--crm-font-small-size);
   }
 
   .form-control {
     width: 100%;
     border: 1px solid var(--crm-input-border-color);
     border-radius: var(--makeaform-radius);
-    padding: var(--crm-m1) var(--crm-m2);
-    font-size: var(--crm-m3);
+    padding: var(--crm-l-medium-1) var(--crm-l-medium-2);
+    font-size: var(--crm-l-medium-3);
     color: var(--crm-input-color);
-    background: var(--crm-input-bg);
+    background: var(--crm-input-bg-color);
     transition: all 0.2s ease;
   }
 
@@ -456,8 +456,8 @@
 
   .help-block {
     display: block;
-    margin-top: var(--crm-s);
-    font-size: var(--crm-small-font-size);
+    margin-top: var(--crm-l-small);
+    font-size: var(--crm-font-small-size);
     color: var(--crm-c-gray-600);
     font-style: italic;
   }
@@ -467,13 +467,13 @@
     overflow-y: auto;
     border: 1px solid var(--crm-c-gray-200);
     border-radius: var(--makeaform-radius);
-    background: var(--crm-c-layer1-bg);
+    background: var(--crm-layer1-bg-color);
   }
 
   .option-row {
-    padding: var(--crm-m) var(--crm-m2);
+    padding: var(--crm-l-medium) var(--crm-l-medium-2);
     border-bottom: 1px solid var(--crm-c-gray-200);
-    font-size: var(--crm-m3);
+    font-size: var(--crm-l-medium-3);
   }
 
   .option-row:last-child {
@@ -481,15 +481,15 @@
   }
 
   .option-label {
-    color: var(--crm-c-text);
+    color: var(--crm-text-color);
   }
 
   .checkbox-label {
     display: flex;
     align-items: center;
-    gap: var(--crm-m2);
-    padding: var(--crm-m2);
-    background: var(--crm-c-layer1-bg);
+    gap: var(--crm-l-medium-2);
+    padding: var(--crm-l-medium-2);
+    background: var(--crm-layer1-bg-color);
     border: 1px solid var(--crm-c-gray-200);
     border-radius: var(--makeaform-radius);
     cursor: pointer;
@@ -510,21 +510,21 @@
   .checkbox-label span {
     display: flex;
     align-items: center;
-    gap: var(--crm-m);
-    font-size: var(--crm-m3);
+    gap: var(--crm-l-medium);
+    font-size: var(--crm-l-medium-3);
     font-weight: 600;
-    color: var(--crm-c-text);
+    color: var(--crm-text-color);
   }
 
   .checkbox-label span i {
     color: var(--makeaform-accent);
-    font-size: var(--crm-small-font-size);
+    font-size: var(--crm-font-small-size);
   }
 
   .field-info-box {
-    margin-top: var(--crm-l);
-    padding: var(--crm-r);
-    background: var(--crm-c-layer1-bg);
+    margin-top: var(--crm-l-large);
+    padding: var(--crm-l-reg);
+    background: var(--crm-layer1-bg-color);
     border: 1px solid var(--crm-c-gray-200);
     border-radius: var(--makeaform-radius);
   }
@@ -533,7 +533,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--crm-m) 0;
+    padding: var(--crm-l-medium) 0;
   }
 
   .info-row:not(:last-child) {
@@ -541,7 +541,7 @@
   }
 
   .info-label {
-    font-size: var(--crm-small-font-size);
+    font-size: var(--crm-font-small-size);
     font-weight: 700;
     color: var(--crm-c-gray-600);
     text-transform: uppercase;
@@ -549,14 +549,14 @@
   }
 
   .info-value {
-    font-size: var(--crm-small-font-size);
+    font-size: var(--crm-font-small-size);
     color: var(--crm-c-gray-800);
     font-weight: 500;
   }
 
   .delete-section {
-    margin-top: var(--crm-r4);
-    padding-top: var(--crm-r4);
+    margin-top: var(--crm-l-reg-4);
+    padding-top: var(--crm-l-reg-4);
     border-top: 1px solid var(--crm-c-gray-200);
   }
 
@@ -565,20 +565,20 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--crm-m);
-    padding: var(--crm-m1) var(--crm-r);
+    gap: var(--crm-l-medium);
+    padding: var(--crm-l-medium-1) var(--crm-l-reg);
     background: transparent;
-    border: 1px solid var(--crm-c-danger);
+    border: 1px solid var(--crm-danger-color);
     border-radius: var(--makeaform-radius);
-    color: var(--crm-c-danger);
-    font-size: var(--crm-m3);
+    color: var(--crm-danger-color);
+    font-size: var(--crm-l-medium-3);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
   }
 
   .btn-delete-field:hover {
-    background: var(--crm-c-danger);
+    background: var(--crm-danger-color);
     color: white;
   }
 </style>
