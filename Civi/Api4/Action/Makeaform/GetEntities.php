@@ -73,6 +73,8 @@ class GetEntities extends \Civi\Api4\Generic\AbstractAction {
         'icon' => $entity['icon'] ?? NULL,
         'type' => $entityType,
         'sort_order' => $sortOrder[$name] ?? 100,
+        'defaults' => $entity['defaults'] ?? NULL,
+        'boilerplate' => $entity['boilerplate'] ?? NULL,
       ];
     }
 
@@ -94,27 +96,47 @@ class GetEntities extends \Civi\Api4\Generic\AbstractAction {
    * the parent entity (e.g., Email, Phone for Contact entities).
    */
   protected function getJoinEntities(): array {
-    // Use Afform's metadata to get join entities
     $afformMeta = AfformAdminMeta::getMetadata();
     $entities = $afformMeta['entities'] ?? [];
+
+    // Collect all primary entity names for matching
+    $primaryEntities = [];
+    foreach ($entities as $name => $entity) {
+      if ($name !== '*' && ($entity['type'] ?? 'primary') === 'primary') {
+        $primaryEntities[] = $entity['entity'] ?? $name;
+      }
+    }
 
     $joins = [];
 
     foreach ($entities as $name => $entity) {
-      // Skip non-join entities
       $entityType = $entity['type'] ?? 'primary';
       if ($entityType !== 'join') {
         continue;
       }
 
-      // Determine which parent entities this join applies to
-      // Join entities typically have a 'parent' property
+      // Dynamically discover parent entities via foreign key fields
       $parentEntities = [];
-
-      // Common join entities and their parents
-      if (in_array($name, ['Email', 'Phone', 'Address', 'Website', 'IM'])) {
-        $parentEntities = ['Contact'];
+      try {
+        $fields = civicrm_api4($name, 'getFields', [
+          'checkPermissions' => FALSE,
+          'action' => 'create',
+          'select' => ['name', 'fk_entity'],
+          'where' => [['fk_entity', 'IS NOT NULL']],
+        ]);
+        foreach ($fields as $field) {
+          $fkEntity = $field['fk_entity'];
+          if (in_array($fkEntity, $primaryEntities) || $fkEntity === 'Contact') {
+            $parentEntities[] = $fkEntity;
+          }
+        }
       }
+      catch (\Exception $e) {
+        // If getFields fails, skip this join entity
+        continue;
+      }
+
+      $parentEntities = array_unique($parentEntities);
 
       foreach ($parentEntities as $parent) {
         if (!isset($joins[$parent])) {
