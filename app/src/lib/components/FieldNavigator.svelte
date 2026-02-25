@@ -312,8 +312,8 @@
     {:else if store.pages.length === 0}
       <div class="navigator-empty">
         <i class="fa fa-inbox fa-2x"></i>
-        <p><strong>No pages yet</strong></p>
-        <p>Add questions to create pages</p>
+        <p><strong>No fields yet</strong></p>
+        <p>Select an entity and add fields to build your form</p>
       </div>
     {:else}
       <div class="pages-list">
