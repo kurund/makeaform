@@ -298,6 +298,33 @@
 
           // Load form elements
           store.formElements = formElements;
+
+          // Load fields for all join entities found in the form
+          const joinNames = new Set<string>();
+          for (const element of formElements) {
+            if (element["#tag"] === "fieldset" && element["#children"]) {
+              for (const child of element["#children"]) {
+                if (child["af-join"]) {
+                  joinNames.add(child["af-join"]);
+                }
+              }
+            }
+          }
+          for (const joinName of joinNames) {
+            try {
+              const joinFields = await window.CRM.api4(joinName, "getFields", {
+                loadOptions: ["id", "label"],
+                where: [["type", "!=", "Extra"]],
+              });
+              const fieldsMap: Record<string, any> = {};
+              joinFields.forEach((field: any) => {
+                fieldsMap[field.name] = field;
+              });
+              store.joinEntityFields[joinName] = fieldsMap;
+            } catch (err) {
+              console.error(`Failed to load fields for join entity ${joinName}:`, err);
+            }
+          }
         }
 
         // Set metadata - preserve all existing form properties
