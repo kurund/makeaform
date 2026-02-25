@@ -55,8 +55,10 @@ class GetEntities extends \Civi\Api4\Generic\AbstractAction {
 
     $entityMap = [];
     foreach ($entities as $name => $entity) {
-      // Skip the special '*' content block entry
-      if ($name === '*') {
+      // Skip the special '*' content block entry and Contact
+      // (Contact is excluded because forms should use specific subtypes:
+      // Individual, Household, Organization)
+      if ($name === '*' || $name === 'Contact') {
         continue;
       }
 
