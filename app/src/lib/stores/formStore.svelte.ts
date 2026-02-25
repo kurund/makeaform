@@ -47,7 +47,7 @@ class FormStore {
   isSaving = $state(false);
   hasUnsavedChanges = $state(false);
 
-  // Typeform-style navigation
+  // Form builder navigation
   currentPageIndex = $state(0); // Index of current fieldset/page
   currentFieldIndex = $state(0); // Index of current field within page
 

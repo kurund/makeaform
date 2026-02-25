@@ -13,18 +13,12 @@
     store.adminData?.entities
       ? Object.entries(store.adminData.entities)
           .map(([name, entity]) => ({ name, ...entity }))
-          .sort((a, b) => (a.title || a.name).localeCompare(b.title || b.name))
+          .sort((a, b) => (a.sort_order ?? 100) - (b.sort_order ?? 100))
       : [],
   );
 
-  async function handleEntityChange(e: Event) {
-    const entityName = (e.target as HTMLSelectElement).value;
-
-    if (!entityName) {
-      setSelectedEntity(null);
-      setEntityFields({});
-      return;
-    }
+  async function handleEntitySelect(entityName: string) {
+    if (loading) return;
 
     setSelectedEntity(entityName);
 
@@ -50,11 +44,10 @@
     });
 
     // Add a new fieldset for this entity
-    // af-fieldset references the entity instance name (e.g., "Individual1")
     store.formElements.push({
       "#tag": "fieldset",
       "af-fieldset": entityInstanceName,
-      entityType: entityName, // Track the entity type for counting
+      entityType: entityName,
       label: `${entityName} ${existingCount + 1}`,
       class: "af-container",
       id: `fieldset_${Date.now()}`,
@@ -86,12 +79,10 @@
     loading = true;
 
     try {
-      // Check if we already have fields from loadAdminData
       const existingFields = store.adminData?.fields?.[entityName];
       if (existingFields) {
         setEntityFields(existingFields);
       } else {
-        // Fallback to fetching fields if not in adminData
         const fields = await getEntityFields(entityName);
         setEntityFields(fields);
       }
@@ -105,87 +96,68 @@
 </script>
 
 <div class="entity-selector">
-  <div class="form-group">
-    <label for="entity-select">
-      <i class="fa fa-database"></i> Select Entity
-    </label>
-    <select
-      id="entity-select"
-      class="form-control"
-      value={store.selectedEntity || ""}
-      onchange={handleEntityChange}
-      disabled={loading}
-    >
-      <option value="">-- Choose an entity --</option>
-      {#each entities as entity}
-        <option value={entity.name}>
-          {entity.title || entity.name}
-        </option>
-      {/each}
-    </select>
-    {#if loading}
-      <small class="help-block">
-        <i class="fa fa-spinner fa-spin"></i> Loading fields...
-      </small>
-    {:else if store.selectedEntity}
-      <small class="help-block">
-        {Object.keys(store.entityFields).length} fields available
-      </small>
-    {/if}
+  <div class="entity-list">
+    {#each entities as entity}
+      <button
+        type="button"
+        class="entity-item"
+        disabled={loading}
+        onclick={() => handleEntitySelect(entity.name)}
+      >
+        <i class="fa {entity.icon || 'fa-puzzle-piece'} entity-icon"></i>
+        <span>{entity.title || entity.name}</span>
+      </button>
+    {/each}
   </div>
 </div>
 
 <style>
   .entity-selector {
-    padding: var(--crm-l-medium-2) var(--crm-l-reg);
     background: var(--crm-paper);
     border-bottom: 1px solid var(--crm-c-gray-200);
   }
 
-  .form-group {
-    margin: 0;
+  .entity-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--crm-l-small);
+    padding: var(--crm-l-medium-2) var(--crm-l-reg);
   }
 
-  .form-group label {
-    display: block;
-    margin-bottom: var(--crm-l-small);
-    font-weight: 600;
-    font-size: var(--crm-font-small-size);
-    color: var(--crm-c-gray-500);
-    text-transform: none;
-    letter-spacing: 0;
-  }
-
-  .form-group label i {
-    color: var(--crm-c-gray-400);
-    margin-right: var(--crm-l-small);
-  }
-
-  .form-group select {
-    border: 1px solid var(--crm-input-border-color);
-    border-radius: var(--makeaform-radius-sm);
+  .entity-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--crm-l-small);
     padding: var(--crm-l-small) var(--crm-l-medium-2);
+    background: var(--crm-layer1-bg-color);
+    border: 1px solid var(--crm-c-gray-200);
+    border-radius: var(--crm-l-reg);
+    cursor: pointer;
     font-size: var(--crm-font-small-size);
-    transition: all 0.2s ease;
-    background: var(--crm-input-bg-color);
-    color: var(--crm-input-color);
+    color: var(--crm-text-color);
+    transition: all 0.15s ease;
+    white-space: nowrap;
   }
 
-  .form-group select:focus {
+  .entity-item:hover:not(:disabled) {
+    background: var(--makeaform-accent-bg);
     border-color: var(--makeaform-accent);
-    outline: none;
-    box-shadow: var(--makeaform-shadow-focus);
-  }
-
-  .help-block {
-    display: block;
-    margin-top: var(--crm-l-medium);
-    color: var(--crm-c-gray-600);
-    font-size: var(--crm-font-small-size);
-    font-weight: 500;
-  }
-
-  .help-block i {
     color: var(--makeaform-accent);
+  }
+
+  .entity-item:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .entity-icon {
+    font-size: var(--crm-font-small-size);
+    color: var(--makeaform-accent);
+    width: 14px;
+    text-align: center;
+  }
+
+  .entity-item span {
+    font-weight: 500;
   }
 </style>

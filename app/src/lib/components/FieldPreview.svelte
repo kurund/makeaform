@@ -48,24 +48,6 @@
     deleteElement(page.id);
   }
 
-  // Calculate progress
-  const progress = $derived(() => {
-    if (store.totalFields === 0) return 0;
-
-    let currentFieldNumber = 0;
-    for (let i = 0; i < store.currentPageIndex; i++) {
-      const page = store.pages[i];
-      if (page["#children"]) {
-        currentFieldNumber += page["#children"].filter(
-          (c) => c["#tag"] === "af-field",
-        ).length;
-      }
-    }
-    currentFieldNumber += store.currentFieldIndex + 1;
-
-    return Math.round((currentFieldNumber / store.totalFields) * 100);
-  });
-
   function handleNext() {
     if (canGoNext()) {
       nextField();
@@ -104,12 +86,7 @@
   }
 </script>
 
-<div class="typeform-preview">
-  <!-- Progress Bar -->
-  <div class="progress-bar">
-    <div class="progress-fill" style="width: {progress()}%"></div>
-  </div>
-
+<div class="formbuilder-preview">
   {#if !store.selectedEntity}
     <div class="preview-empty">
       <div class="empty-content">
@@ -336,7 +313,13 @@
                     {#each joinFields as field}
                       {@const inputType = getInputType(field.defn?.input_type || "Text")}
 
-                      <div class="field-card join-field-card">
+                      <div
+                        class="field-card join-field-card"
+                        class:selected={store.selectedElementId === field.id}
+                        onclick={() => selectElement(field.id)}
+                        role="button"
+                        tabindex="0"
+                      >
                         <div class="field-card-header">
                           <h3 class="field-label">
                             {field.defn?.label || field.name || "Untitled Field"}
@@ -415,27 +398,13 @@
 </div>
 
 <style>
-  .typeform-preview {
+  .formbuilder-preview {
     position: relative;
     height: 100%;
     background: var(--crm-container-bg-color);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-  }
-
-  .progress-bar {
-    height: 6px;
-    background: var(--crm-c-gray-200);
-    position: relative;
-    z-index: 10;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: var(--makeaform-accent);
-    border-radius: 0 3px 3px 0;
-    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .preview-empty {

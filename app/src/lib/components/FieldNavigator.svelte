@@ -76,6 +76,12 @@
       .map((child: any) => child["af-join"]);
   });
 
+  // Look up join entity icon by name
+  function getJoinIcon(joinName: string): string {
+    const join = availableJoins().find((j: JoinEntity) => j.name === joinName);
+    return join?.icon || "fa-link";
+  }
+
   // Get available (not yet added) join entities
   const availableJoinEntities = $derived(() => {
     const added = new Set(addedJoins());
@@ -406,7 +412,7 @@
                   class="join-item"
                   onclick={() => handleAddJoin(join)}
                 >
-                  <i class="fa fa-plus-circle"></i>
+                  <i class="fa {join.icon || 'fa-link'}"></i>
                   <span>{join.label}</span>
                 </button>
               {/each}
@@ -428,6 +434,7 @@
                 onclick={() => toggleJoinExpansion(joinName)}
               >
                 <i class="fa {isExpanded ? 'fa-chevron-down' : 'fa-chevron-right'}"></i>
+                <i class="fa {getJoinIcon(joinName)} join-icon"></i>
                 <span class="join-name">{joinName}</span>
                 <span class="join-field-count">{usedCount}</span>
               </button>
@@ -812,6 +819,11 @@
     color: var(--crm-c-gray-500);
     font-size: var(--crm-font-small-size);
     width: 12px;
+  }
+
+  .join-icon {
+    color: var(--crm-success-color);
+    font-size: var(--crm-font-small-size);
   }
 
   .join-name {

@@ -32,17 +32,25 @@
     { value: "TextArea", label: "Long Text", icon: "fa-align-left" },
   ];
 
+  // The active field for settings - either a regular page field or a selected join field
+  const activeField = $derived(() => {
+    const sel = store.selectedElement;
+    if (sel && sel["#tag"] === "af-field") return sel;
+    return store.currentField;
+  });
+
   // Get available field types based on current field
   const availableFieldTypes = $derived(() => {
-    if (!store.currentField) return allFieldTypes;
+    const field = activeField();
+    if (!field) return allFieldTypes;
 
     // If field has options, only show option-based input types
-    if (store.currentField.defn?.options?.length > 0) {
+    if (field.defn?.options?.length > 0) {
       return optionFieldTypes;
     }
 
     // For fields without options, show text-based types
-    const currentType = store.currentField.defn?.input_type;
+    const currentType = field.defn?.input_type;
     if (["Text", "TextArea", "Email", "Number"].includes(currentType)) {
       return textFieldTypes;
     }
@@ -52,28 +60,30 @@
   });
 
   function handleFieldChange(field: string, value: any) {
-    if (!store.currentField) return;
+    const current = activeField();
+    if (!current) return;
 
     if (field.startsWith("defn.")) {
       const defnField = field.replace("defn.", "");
-      updateElement(store.currentField.id, {
+      updateElement(current.id, {
         defn: {
-          ...store.currentField.defn,
+          ...current.defn,
           [defnField]: value,
         },
       });
     } else {
-      updateElement(store.currentField.id, {
+      updateElement(current.id, {
         [field]: value,
       });
     }
   }
 
   function handleDeleteField() {
-    if (!store.currentField) return;
+    const current = activeField();
+    if (!current) return;
 
     if (confirm("Delete this field?")) {
-      const fieldId = store.currentField.id;
+      const fieldId = current.id;
       const currentIndex = store.currentFieldIndex;
       const pageIndex = store.currentPageIndex;
 
@@ -190,7 +200,7 @@
         </div>
       </div>
     </div>
-  {:else if store.currentField}
+  {:else if activeField()}
     <div class="settings-content">
       <!-- Field Label -->
       <div class="form-group">
@@ -202,7 +212,7 @@
           id="field-label"
           type="text"
           class="form-control"
-          value={store.currentField.defn?.label || ""}
+          value={activeField().defn?.label || ""}
           oninput={(e) =>
             handleFieldChange(
               "defn.label",
@@ -221,7 +231,7 @@
         <select
           id="field-type"
           class="form-control"
-          value={store.currentField.defn?.input_type || "Text"}
+          value={activeField().defn?.input_type || "Text"}
           onchange={(e) =>
             handleFieldChange(
               "defn.input_type",
@@ -246,7 +256,7 @@
           id="placeholder"
           type="text"
           class="form-control"
-          value={store.currentField.defn?.placeholder || ""}
+          value={activeField().defn?.placeholder || ""}
           oninput={(e) =>
             handleFieldChange(
               "defn.placeholder",
@@ -266,7 +276,7 @@
           id="help-text"
           class="form-control"
           rows="2"
-          value={store.currentField.defn?.help_post || ""}
+          value={activeField().defn?.help_post || ""}
           oninput={(e) =>
             handleFieldChange(
               "defn.help_post",
@@ -283,7 +293,7 @@
           onclick={() =>
             handleFieldChange(
               "defn.required",
-              !store.currentField.defn?.required,
+              !activeField().defn?.required,
             )}
           role="button"
           tabindex="0"
@@ -294,9 +304,9 @@
           </span>
           <span
             class="toggle-switch"
-            class:active={store.currentField.defn?.required || false}
+            class:active={activeField().defn?.required || false}
             role="switch"
-            aria-checked={store.currentField.defn?.required || false}
+            aria-checked={activeField().defn?.required || false}
             title="Toggle required"
           >
             <span class="toggle-knob"></span>
@@ -305,7 +315,7 @@
       </div>
 
       <!-- Validation (if applicable) -->
-      {#if ["Email", "Number"].includes(store.currentField.defn?.input_type || "")}
+      {#if ["Email", "Number"].includes(activeField().defn?.input_type || "")}
         <div class="form-group">
           <label for="validation">
             <i class="fa fa-check-circle"></i>
@@ -315,7 +325,7 @@
             id="validation"
             type="text"
             class="form-control"
-            value={store.currentField.defn?.validation || ""}
+            value={activeField().defn?.validation || ""}
             oninput={(e) =>
               handleFieldChange(
                 "defn.validation",
@@ -327,14 +337,14 @@
       {/if}
 
       <!-- Options (for Select, Radio, CheckBox) -->
-      {#if ["Select", "Radio", "CheckBox"].includes(store.currentField.defn?.input_type || "") && store.currentField.defn?.options?.length}
+      {#if ["Select", "Radio", "CheckBox"].includes(activeField().defn?.input_type || "") && activeField().defn?.options?.length}
         <div class="form-group">
           <label>
             <i class="fa fa-list-ul"></i>
-            Options ({store.currentField.defn.options.length})
+            Options ({activeField().defn.options.length})
           </label>
           <div class="options-list">
-            {#each store.currentField.defn.options as option}
+            {#each activeField().defn.options as option}
               <div class="option-row">
                 <span class="option-label">{option.label || option.id}</span>
               </div>
