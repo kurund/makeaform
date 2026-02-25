@@ -278,21 +278,30 @@
 
       <!-- Required Toggle -->
       <div class="form-group">
-        <label class="checkbox-label">
-          <input
-            type="checkbox"
-            checked={store.currentField.defn?.required || false}
-            onchange={(e) =>
-              handleFieldChange(
-                "defn.required",
-                (e.target as HTMLInputElement).checked,
-              )}
-          />
-          <span>
+        <div
+          class="toggle-label"
+          onclick={() =>
+            handleFieldChange(
+              "defn.required",
+              !store.currentField.defn?.required,
+            )}
+          role="button"
+          tabindex="0"
+        >
+          <span class="toggle-text">
             <i class="fa fa-asterisk"></i>
             Required Field
           </span>
-        </label>
+          <span
+            class="toggle-switch"
+            class:active={store.currentField.defn?.required || false}
+            role="switch"
+            aria-checked={store.currentField.defn?.required || false}
+            title="Toggle required"
+          >
+            <span class="toggle-knob"></span>
+          </span>
+        </div>
       </div>
 
       <!-- Validation (if applicable) -->
@@ -369,7 +378,7 @@
   }
 
   .settings-header {
-    padding: var(--crm-l-reg-2);
+    padding: var(--crm-l-medium-2) var(--crm-l-reg);
     background: var(--crm-paper);
     border-bottom: 1px solid var(--crm-c-gray-200);
   }
@@ -379,7 +388,7 @@
     font-size: var(--crm-font-size);
     font-weight: 700;
     color: var(--crm-text-color);
-    letter-spacing: 0.3px;
+    letter-spacing: 0;
   }
 
   .settings-empty {
@@ -408,11 +417,11 @@
   .settings-content {
     flex: 1;
     overflow-y: auto;
-    padding: var(--crm-l-reg-2);
+    padding: var(--crm-l-reg);
   }
 
   .form-group {
-    margin-bottom: var(--crm-l-reg-4);
+    margin-bottom: var(--crm-l-reg-2);
   }
 
   .form-group label {
@@ -420,15 +429,15 @@
     align-items: center;
     gap: var(--crm-l-medium);
     font-size: var(--crm-font-small-size);
-    font-weight: 700;
-    color: var(--crm-c-gray-800);
+    font-weight: 600;
+    color: var(--crm-c-gray-500);
     margin-bottom: var(--crm-l-medium);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    text-transform: none;
+    letter-spacing: 0;
   }
 
   .form-group label i {
-    color: var(--makeaform-accent);
+    color: var(--crm-c-gray-400);
     font-size: var(--crm-font-small-size);
   }
 
@@ -446,7 +455,7 @@
   .form-control:focus {
     outline: none;
     border-color: var(--makeaform-accent);
-    box-shadow: 0 0 0 3px var(--makeaform-accent-bg);
+    box-shadow: var(--makeaform-shadow-focus);
   }
 
   textarea.form-control {
@@ -484,30 +493,22 @@
     color: var(--crm-text-color);
   }
 
-  .checkbox-label {
+  .toggle-label {
     display: flex;
     align-items: center;
-    gap: var(--crm-l-medium-2);
+    justify-content: space-between;
     padding: var(--crm-l-medium-2);
     background: var(--crm-layer1-bg-color);
     border: 1px solid var(--crm-c-gray-200);
     border-radius: var(--makeaform-radius);
     cursor: pointer;
-    transition: all 0.2s ease;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 500;
+    color: var(--crm-text-color);
   }
 
-  .checkbox-label:hover {
-    background: var(--makeaform-accent-bg);
-    border-color: var(--makeaform-accent);
-  }
-
-  .checkbox-label input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-  }
-
-  .checkbox-label span {
+  .toggle-text {
     display: flex;
     align-items: center;
     gap: var(--crm-l-medium);
@@ -516,16 +517,50 @@
     color: var(--crm-text-color);
   }
 
-  .checkbox-label span i {
-    color: var(--makeaform-accent);
+  .toggle-text i {
+    color: var(--crm-c-gray-400);
     font-size: var(--crm-font-small-size);
   }
 
+  .toggle-switch {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    background: var(--crm-c-gray-300);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    padding: 0;
+    flex-shrink: 0;
+  }
+
+  .toggle-switch.active {
+    background: var(--makeaform-accent);
+  }
+
+  .toggle-knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  }
+
+  .toggle-switch.active .toggle-knob {
+    transform: translateX(16px);
+  }
+
   .field-info-box {
-    margin-top: var(--crm-l-large);
-    padding: var(--crm-l-reg);
+    margin-top: var(--crm-l-reg);
+    padding: var(--crm-l-medium-2) var(--crm-l-reg);
     background: var(--crm-layer1-bg-color);
     border: 1px solid var(--crm-c-gray-200);
+    border-left: 3px solid var(--makeaform-accent);
     border-radius: var(--makeaform-radius);
   }
 
@@ -542,10 +577,10 @@
 
   .info-label {
     font-size: var(--crm-font-small-size);
-    font-weight: 700;
-    color: var(--crm-c-gray-600);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-weight: 600;
+    color: var(--crm-c-gray-500);
+    text-transform: none;
+    letter-spacing: 0;
   }
 
   .info-value {
@@ -555,8 +590,8 @@
   }
 
   .delete-section {
-    margin-top: var(--crm-l-reg-4);
-    padding-top: var(--crm-l-reg-4);
+    margin-top: var(--crm-l-reg-2);
+    padding-top: var(--crm-l-reg-2);
     border-top: 1px solid var(--crm-c-gray-200);
   }
 
@@ -568,9 +603,9 @@
     gap: var(--crm-l-medium);
     padding: var(--crm-l-medium-1) var(--crm-l-reg);
     background: transparent;
-    border: 1px solid var(--crm-danger-color);
+    border: 1px solid var(--crm-c-gray-300);
     border-radius: var(--makeaform-radius);
-    color: var(--crm-danger-color);
+    color: var(--crm-c-gray-500);
     font-size: var(--crm-l-medium-3);
     font-weight: 600;
     cursor: pointer;
@@ -579,6 +614,7 @@
 
   .btn-delete-field:hover {
     background: var(--crm-danger-color);
+    border-color: var(--crm-danger-color);
     color: white;
   }
 </style>

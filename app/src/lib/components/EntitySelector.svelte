@@ -137,7 +137,7 @@
 
 <style>
   .entity-selector {
-    padding: var(--crm-l-reg) var(--crm-l-reg-2);
+    padding: var(--crm-l-medium-2) var(--crm-l-reg);
     background: var(--crm-paper);
     border-bottom: 1px solid var(--crm-c-gray-200);
   }
@@ -148,23 +148,24 @@
 
   .form-group label {
     display: block;
-    margin-bottom: var(--crm-l-medium);
-    font-weight: 700;
+    margin-bottom: var(--crm-l-small);
+    font-weight: 600;
     font-size: var(--crm-font-small-size);
-    color: var(--crm-c-gray-600);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
+    color: var(--crm-c-gray-500);
+    text-transform: none;
+    letter-spacing: 0;
   }
 
   .form-group label i {
-    color: var(--makeaform-accent);
+    color: var(--crm-c-gray-400);
     margin-right: var(--crm-l-small);
   }
 
   .form-group select {
     border: 1px solid var(--crm-input-border-color);
-    border-radius: var(--makeaform-radius);
-    padding: var(--crm-l-medium) var(--crm-l-medium-2);
+    border-radius: var(--makeaform-radius-sm);
+    padding: var(--crm-l-small) var(--crm-l-medium-2);
+    font-size: var(--crm-font-small-size);
     transition: all 0.2s ease;
     background: var(--crm-input-bg-color);
     color: var(--crm-input-color);
@@ -173,7 +174,7 @@
   .form-group select:focus {
     border-color: var(--makeaform-accent);
     outline: none;
-    box-shadow: 0 0 0 3px var(--makeaform-accent-bg);
+    box-shadow: var(--makeaform-shadow-focus);
   }
 
   .help-block {

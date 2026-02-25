@@ -663,10 +663,14 @@
     --makeaform-accent-hover: var(--crm-link-hover-color);
     --makeaform-accent-bg: color-mix(
       in srgb,
-      var(--crm-link-color) 10%,
-      transparent 90%
+      var(--crm-link-color) 8%,
+      transparent 92%
     );
-    --makeaform-radius: 0.5rem; /* 8px - maintain modern rounded corners */
+    --makeaform-radius: 6px;
+    --makeaform-radius-sm: 4px;
+    --makeaform-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --makeaform-shadow-md: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --makeaform-shadow-focus: 0 0 0 3px var(--makeaform-accent-bg);
   }
 
   .form-builder-app {

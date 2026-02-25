@@ -227,10 +227,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--crm-l-reg) var(--crm-l-reg-4);
+    padding: var(--crm-l-medium-2) var(--crm-l-reg-2);
     background: var(--crm-paper);
     border-bottom: 1px solid var(--crm-c-gray-200);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--makeaform-shadow-sm);
   }
 
   .toolbar-left {
@@ -251,17 +251,17 @@
     display: block;
     font-size: var(--crm-font-small-size);
     font-weight: 600;
-    color: var(--crm-c-gray-600);
+    color: var(--crm-c-gray-500);
     margin-bottom: var(--crm-l-small);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    text-transform: none;
+    letter-spacing: 0;
   }
 
   .form-group input {
     border: 1px solid var(--crm-input-border-color);
-    border-radius: var(--crm-l-radius);
-    padding: var(--crm-l-medium) var(--crm-l-medium-2);
-    font-size: var(--crm-l-medium-3);
+    border-radius: var(--makeaform-radius-sm);
+    padding: var(--crm-l-small) var(--crm-l-medium-2);
+    font-size: var(--crm-font-small-size);
     min-width: 200px;
     transition: all 0.2s ease;
     background: var(--crm-input-bg-color);
@@ -275,7 +275,7 @@
   .form-group input:focus {
     border-color: var(--makeaform-accent);
     outline: none;
-    box-shadow: 0 0 0 3px var(--makeaform-accent-bg);
+    box-shadow: var(--makeaform-shadow-focus);
   }
 
   #form-title {
@@ -296,8 +296,8 @@
 
   .toolbar-right .label {
     font-size: var(--crm-font-small-size);
-    padding: var(--crm-l-small) var(--crm-l-medium-2);
-    border-radius: var(--crm-l-medium-2);
+    padding: 2px var(--crm-l-medium-2);
+    border-radius: 999px;
     font-weight: 600;
   }
 
@@ -325,15 +325,11 @@
   .toolbar-right .btn-primary:hover {
     background: var(--crm-primary-hover-color);
     border-color: var(--crm-primary-hover-color);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(from var(--crm-primary-color) r g b / 0.3);
   }
 
   .toolbar-right .btn-primary:disabled {
     background: var(--crm-c-gray-400);
     border-color: var(--crm-c-gray-400);
-    transform: none;
-    box-shadow: none;
   }
 
   .btn-settings {
@@ -403,7 +399,7 @@
     background: var(--crm-paper);
     border-bottom: 1px solid var(--crm-c-gray-200);
     padding: var(--crm-l-reg-2) var(--crm-l-reg-4);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--makeaform-shadow-md);
   }
 
   .settings-panel-header {
@@ -460,6 +456,6 @@
   .settings-panel-body textarea:focus {
     border-color: var(--makeaform-accent);
     outline: none;
-    box-shadow: 0 0 0 3px var(--makeaform-accent-bg);
+    box-shadow: var(--makeaform-shadow-focus);
   }
 </style>

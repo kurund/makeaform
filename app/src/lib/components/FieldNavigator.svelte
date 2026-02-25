@@ -478,7 +478,7 @@
   }
 
   .navigator-header {
-    padding: var(--crm-l-reg-2);
+    padding: var(--crm-l-medium-2) var(--crm-l-reg);
     background: var(--crm-paper);
     border-bottom: 1px solid var(--crm-c-gray-200);
   }
@@ -529,14 +529,14 @@
   }
 
   .page-item {
-    margin-bottom: var(--crm-l-reg);
+    margin-bottom: var(--crm-l-medium-2);
   }
 
   .page-header {
     display: flex;
     align-items: center;
     gap: var(--crm-l-medium-1);
-    padding: var(--crm-l-medium-2) var(--crm-l-medium-3);
+    padding: var(--crm-l-medium-1) var(--crm-l-medium-2);
     background: var(--crm-paper);
     border: 1px solid var(--crm-c-gray-200);
     border-radius: var(--makeaform-radius);
@@ -552,7 +552,7 @@
   .page-header.active {
     background: var(--makeaform-accent-bg);
     border-color: var(--makeaform-accent);
-    box-shadow: 0 2px 8px rgba(from var(--makeaform-accent) r g b / 0.15);
+    border-left: 3px solid var(--makeaform-accent);
   }
 
   .page-header i {
@@ -602,8 +602,8 @@
     font-size: var(--crm-font-small-size);
     font-weight: 700;
     color: var(--crm-c-gray-800);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    text-transform: none;
+    letter-spacing: 0;
   }
 
   .field-count {
@@ -703,12 +703,17 @@
   .field-item:hover {
     background: var(--makeaform-accent-bg);
     border-color: var(--makeaform-accent);
-    transform: translateX(2px);
   }
 
   .field-item i {
     color: var(--makeaform-accent);
     font-size: var(--crm-l-medium-3);
+    opacity: 0.6;
+    transition: opacity 0.15s ease;
+  }
+
+  .field-item:hover i {
+    opacity: 1;
   }
 
   .field-item span {
@@ -737,8 +742,8 @@
     font-size: var(--crm-font-small-size);
     font-weight: 700;
     color: var(--crm-c-gray-800);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    text-transform: none;
+    letter-spacing: 0;
   }
 
   .join-list {
@@ -763,7 +768,6 @@
   .join-item:hover {
     background: color-mix(in srgb, var(--crm-success-color) 10%, transparent 90%);
     border-color: var(--crm-success-color);
-    transform: translateX(2px);
   }
 
   .join-item i {
