@@ -8,6 +8,14 @@
   import { getEntityFields } from "../api/civicrm";
 
   let loading = $state(false);
+  let expanded = $state(true);
+
+  // Auto-collapse when an entity is selected
+  $effect(() => {
+    if (store.selectedEntity) {
+      expanded = false;
+    }
+  });
 
   const entities = $derived(
     store.adminData?.entities
@@ -116,24 +124,36 @@
 </script>
 
 <div class="entity-selector">
-  {#each groupedEntities() as group}
-    <div class="entity-group">
-      <div class="group-header">{group.name}</div>
-      <div class="entity-list">
-        {#each group.entities as entity}
-          <button
-            type="button"
-            class="entity-item"
-            disabled={loading}
-            onclick={() => handleEntitySelect(entity.name)}
-          >
-            <i class="crm-i {entity.icon || 'fa-puzzle-piece'} entity-icon"></i>
-            <span>{entity.title || entity.name}</span>
-          </button>
-        {/each}
-      </div>
+  {#if !expanded && store.selectedEntity}
+    <div class="collapsed-bar">
+      <button
+        type="button"
+        class="collapsed-btn"
+        onclick={() => (expanded = true)}
+      >
+        <i class="crm-i fa-plus"></i> Add another entity
+      </button>
     </div>
-  {/each}
+  {:else}
+    {#each groupedEntities() as group}
+      <div class="entity-group">
+        <div class="group-header">{group.name}</div>
+        <div class="entity-list">
+          {#each group.entities as entity}
+            <button
+              type="button"
+              class="entity-item"
+              disabled={loading}
+              onclick={() => handleEntitySelect(entity.name)}
+            >
+              <i class="crm-i {entity.icon || 'fa-puzzle-piece'} entity-icon"></i>
+              <span>{entity.title || entity.name}</span>
+            </button>
+          {/each}
+        </div>
+      </div>
+    {/each}
+  {/if}
 </div>
 
 <style>
@@ -204,5 +224,30 @@
 
   .entity-item span {
     font-weight: 500;
+  }
+
+  .collapsed-bar {
+    padding: var(--crm-l-small) var(--crm-l-reg);
+    background: var(--crm-paper);
+  }
+
+  .collapsed-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    background: none;
+    border: 1px solid var(--crm-c-gray-200);
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+    color: var(--crm-c-gray-600);
+    transition: all 0.15s ease;
+  }
+
+  .collapsed-btn:hover {
+    background: var(--makeaform-accent-bg);
+    color: var(--makeaform-accent);
+    border-color: var(--makeaform-accent);
   }
 </style>
