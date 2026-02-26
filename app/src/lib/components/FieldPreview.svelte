@@ -76,6 +76,33 @@
     return typeMap[fieldType] || "text";
   }
 
+  // Delete a join entity and all its fields from a page
+  function deleteJoin(pageIndex: number, joinName: string) {
+    const page = store.pages[pageIndex];
+    if (!page || !page["#children"]) return;
+
+    const joinElement = page["#children"].find(
+      (child: any) => child["af-join"] === joinName,
+    );
+    if (!joinElement) return;
+
+    const fieldCount =
+      joinElement["#children"]?.filter((c: any) => c["#tag"] === "af-field")
+        .length || 0;
+    const message =
+      fieldCount > 0
+        ? `Remove "${joinName}" and its ${fieldCount} field${fieldCount > 1 ? "s" : ""}?`
+        : `Remove "${joinName}"?`;
+
+    if (!confirm(message)) return;
+
+    const index = page["#children"].indexOf(joinElement);
+    if (index > -1) {
+      page["#children"].splice(index, 1);
+      store.hasUnsavedChanges = true;
+    }
+  }
+
   // Update page/container label
   function updatePageLabel(pageIndex: number, newLabel: string) {
     const page = store.pages[pageIndex];
@@ -304,8 +331,21 @@
 
               <div class="join-section-preview">
                 <div class="join-section-header-preview">
-                  <i class="crm-i fa-link"></i>
-                  <span>{joinName}</span>
+                  <div class="join-header-label">
+                    <i class="crm-i fa-link"></i>
+                    <span>{joinName}</span>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn-delete-join"
+                    onclick={(e) => {
+                      e.stopPropagation();
+                      deleteJoin(pageIndex, joinName);
+                    }}
+                    title="Remove join entity and its fields"
+                  >
+                    <i class="crm-i fa-trash"></i>
+                  </button>
                 </div>
 
                 {#if joinFields.length > 0}
@@ -708,21 +748,54 @@
   .join-section-header-preview {
     display: flex;
     align-items: center;
-    gap: var(--crm-l-medium-1);
+    justify-content: space-between;
     padding: var(--crm-l-medium-2) var(--crm-l-reg);
     background: color-mix(in srgb, var(--crm-success-color) 10%, var(--crm-layer1-bg-color) 90%);
     border-bottom: 1px solid var(--crm-c-gray-200);
   }
 
-  .join-section-header-preview :global(i) {
+  .join-header-label {
+    display: flex;
+    align-items: center;
+    gap: var(--crm-l-medium-1);
+  }
+
+  .join-header-label :global(i) {
     color: var(--crm-success-color);
     font-size: var(--crm-l-medium-3);
   }
 
-  .join-section-header-preview span {
+  .join-header-label span {
     font-size: var(--crm-l-medium-3);
     font-weight: 600;
     color: var(--crm-text-color);
+  }
+
+  .btn-delete-join {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--crm-c-gray-400);
+    cursor: pointer;
+    padding: var(--crm-l-xsmall-1);
+    border-radius: var(--crm-l-radius);
+    font-size: var(--crm-l-medium-3);
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    opacity: 0;
+  }
+
+  .join-section-preview:hover .btn-delete-join {
+    opacity: 1;
+  }
+
+  .btn-delete-join:hover {
+    background: var(--crm-danger-color);
+    border-color: var(--crm-danger-color);
+    color: white;
   }
 
   .join-fields-preview {
