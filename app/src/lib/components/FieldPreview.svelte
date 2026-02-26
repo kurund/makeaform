@@ -8,7 +8,7 @@
     selectElement,
     movePageUp,
     movePageDown,
-    gotoField,
+    switchToPage,
     deleteElement,
   } from "../stores/formStore.svelte";
 
@@ -155,7 +155,7 @@
             >
               <div
                 class="page-header-content"
-                onclick={() => gotoField(pageIndex, 0)}
+                onclick={() => switchToPage(pageIndex, 0)}
               >
                 <input
                   type="text"
@@ -228,7 +228,7 @@
                   <div
                     class="field-card"
                     class:selected={isSelected}
-                    onclick={() => gotoField(pageIndex, fieldIndex)}
+                    onclick={() => switchToPage(pageIndex, fieldIndex)}
                     role="button"
                     tabindex="0"
                   >

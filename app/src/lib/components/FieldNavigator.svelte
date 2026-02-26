@@ -4,10 +4,9 @@
     store,
     gotoField,
     addElement,
-    setSelectedEntity,
-    setEntityFields,
     setJoinEntityFields,
     getJoinEntityFields,
+    switchToPage,
   } from "../stores/formStore.svelte";
   import { getEntityFields } from "../api/civicrm";
   import type { JoinEntity } from "../types";
@@ -128,32 +127,8 @@
       }));
   }
 
-  async function handlePageClick(pageIndex: number) {
-    gotoField(pageIndex, 0);
-
-    // Load entity fields for the clicked page
-    const page = store.pages[pageIndex];
-    if (page) {
-      // Use entityType (the entity type like "Individual") for loading fields
-      const entityType = page.entityType || page["af-fieldset"];
-      if (entityType && entityType !== store.selectedEntity) {
-        setSelectedEntity(entityType);
-
-        // Check if we already have fields from loadAdminData
-        const existingFields = store.adminData?.fields?.[entityType];
-        if (existingFields) {
-          setEntityFields(existingFields);
-        } else {
-          // Fallback to fetching fields if not in adminData
-          try {
-            const fields = await getEntityFields(entityType);
-            setEntityFields(fields);
-          } catch (error) {
-            console.error("Failed to load entity fields:", error);
-          }
-        }
-      }
-    }
+  function handlePageClick(pageIndex: number) {
+    switchToPage(pageIndex);
   }
 
   function handleAddField(fieldName: string, field: any) {

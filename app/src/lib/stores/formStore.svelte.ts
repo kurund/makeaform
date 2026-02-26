@@ -5,6 +5,7 @@ import type {
   EntityConfig,
   JoinEntity,
 } from "../types";
+import { getEntityFields } from "../api/civicrm";
 
 // Create a reactive state object
 class FormStore {
@@ -387,6 +388,33 @@ export function movePageUp(pageIndex: number) {
 /**
  * Move a page/entity down in the order
  */
+/**
+ * Navigation: Switch to a page and load its entity fields
+ */
+export async function switchToPage(pageIndex: number, fieldIndex: number = 0) {
+  gotoField(pageIndex, fieldIndex);
+
+  const page = store.pages[pageIndex];
+  if (page) {
+    const entityType = page.entityType || page["af-fieldset"];
+    if (entityType && entityType !== store.selectedEntity) {
+      store.selectedEntity = entityType;
+
+      const existingFields = store.adminData?.fields?.[entityType];
+      if (existingFields) {
+        store.entityFields = existingFields;
+      } else {
+        try {
+          const fields = await getEntityFields(entityType);
+          store.entityFields = fields;
+        } catch (error) {
+          console.error("Failed to load entity fields:", error);
+        }
+      }
+    }
+  }
+}
+
 export function movePageDown(pageIndex: number) {
   if (pageIndex < 0 || pageIndex >= store.pages.length - 1) return;
 
