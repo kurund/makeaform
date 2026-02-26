@@ -199,7 +199,7 @@
     addJoinCollapsed = true;
 
     // Expand this join section
-    expandedJoins = new Set([...expandedJoins, join.name]);
+    expandedJoins = new Set([join.name]);
   }
 
   // Remove a join entity from the current page
