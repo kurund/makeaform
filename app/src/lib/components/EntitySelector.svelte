@@ -36,7 +36,8 @@
       groups[group].push(entity);
     }
     // Return ordered: Contact Types first, then Components, then Other
-    const orderedGroups: Array<{ name: string; entities: typeof entities }> = [];
+    const orderedGroups: Array<{ name: string; entities: typeof entities }> =
+      [];
     for (const groupName of ["Contact Types", "Components", "Other"]) {
       if (groups[groupName]) {
         orderedGroups.push({ name: groupName, entities: groups[groupName] });
@@ -146,7 +147,8 @@
               disabled={loading}
               onclick={() => handleEntitySelect(entity.name)}
             >
-              <i class="crm-i {entity.icon || 'fa-puzzle-piece'} entity-icon"></i>
+              <i class="crm-i {entity.icon || 'fa-puzzle-piece'} entity-icon"
+              ></i>
               <span>{entity.title || entity.name}</span>
             </button>
           {/each}

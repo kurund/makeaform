@@ -235,14 +235,14 @@
                               c.class?.includes("af-container"),
                           );
                           if (joinContainer && joinContainer["#children"]) {
-                            joinEl["#children"] = joinContainer["#children"].map(
-                              (field: any) => ({
-                                ...field,
-                                id:
-                                  field.id ||
-                                  `element_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-                              }),
-                            );
+                            joinEl["#children"] = joinContainer[
+                              "#children"
+                            ].map((field: any) => ({
+                              ...field,
+                              id:
+                                field.id ||
+                                `element_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                            }));
                           } else {
                             // No inner container, just add IDs to existing children
                             joinEl["#children"] = joinEl["#children"].map(
@@ -322,7 +322,10 @@
               });
               store.joinEntityFields[joinName] = fieldsMap;
             } catch (err) {
-              console.error(`Failed to load fields for join entity ${joinName}:`, err);
+              console.error(
+                `Failed to load fields for join entity ${joinName}:`,
+                err,
+              );
             }
           }
         }

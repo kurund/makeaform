@@ -44,7 +44,7 @@ class FormStore {
   adminData = $state<AdminData | null>(null);
   selectedEntity = $state<string | null>(null);
   entityFields = $state<Record<string, any>>({});
-  joinEntityFields = $state<Record<string, Record<string, any>>>({});  // Keyed by join entity name (Email, Phone, etc.)
+  joinEntityFields = $state<Record<string, Record<string, any>>>({}); // Keyed by join entity name (Email, Phone, etc.)
   isSaving = $state(false);
   hasUnsavedChanges = $state(false);
 
@@ -84,9 +84,7 @@ class FormStore {
     if (!this.currentPage || !this.currentPage["#children"]) {
       return [];
     }
-    return this.currentPage["#children"].filter(
-      (child) => child["af-join"],
-    );
+    return this.currentPage["#children"].filter((child) => child["af-join"]);
   }
 
   // Derived state - get current field
@@ -258,7 +256,10 @@ export function setEntityFields(fields: Record<string, any>) {
 /**
  * Set join entity fields
  */
-export function setJoinEntityFields(joinEntity: string, fields: Record<string, any>) {
+export function setJoinEntityFields(
+  joinEntity: string,
+  fields: Record<string, any>,
+) {
   store.joinEntityFields[joinEntity] = fields;
 }
 

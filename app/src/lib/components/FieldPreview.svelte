@@ -140,9 +140,7 @@
               (child) => child["#tag"] === "af-field",
             ) || []}
           {@const pageJoins =
-            page["#children"]?.filter(
-              (child) => child["af-join"],
-            ) || []}
+            page["#children"]?.filter((child) => child["af-join"]) || []}
           {@const isActivePage = store.currentPageIndex === pageIndex}
 
           <div class="entity-container" class:active={isActivePage}>
@@ -327,7 +325,10 @@
             <!-- Join Entity Sections -->
             {#each pageJoins as joinElement}
               {@const joinName = joinElement["af-join"]}
-              {@const joinFields = joinElement["#children"]?.filter((c: any) => c["#tag"] === "af-field") || []}
+              {@const joinFields =
+                joinElement["#children"]?.filter(
+                  (c: any) => c["#tag"] === "af-field",
+                ) || []}
 
               <div class="join-section-preview">
                 <div class="join-section-header-preview">
@@ -351,7 +352,9 @@
                 {#if joinFields.length > 0}
                   <div class="join-fields-preview">
                     {#each joinFields as field}
-                      {@const inputType = getInputType(field.defn?.input_type || "Text")}
+                      {@const inputType = getInputType(
+                        field.defn?.input_type || "Text",
+                      )}
 
                       <div
                         class="field-card join-field-card"
@@ -362,7 +365,9 @@
                       >
                         <div class="field-card-header">
                           <h3 class="field-label">
-                            {field.defn?.label || field.name || "Untitled Field"}
+                            {field.defn?.label ||
+                              field.name ||
+                              "Untitled Field"}
                             {#if field.defn?.required}
                               <span class="required-badge">*</span>
                             {/if}
@@ -379,10 +384,15 @@
                             ></textarea>
                           {:else if inputType === "select"}
                             <select class="preview-input" disabled>
-                              <option value="">{field.defn?.placeholder || "Select an option..."}</option>
+                              <option value=""
+                                >{field.defn?.placeholder ||
+                                  "Select an option..."}</option
+                              >
                               {#if field.defn?.options?.length}
                                 {#each field.defn.options as option}
-                                  <option value={option.id}>{option.label || option.id}</option>
+                                  <option value={option.id}
+                                    >{option.label || option.id}</option
+                                  >
                                 {/each}
                               {/if}
                             </select>
@@ -742,7 +752,11 @@
     border: 1px solid var(--crm-c-gray-200);
     border-radius: var(--crm-l-medium-2);
     overflow: hidden;
-    background: color-mix(in srgb, var(--crm-success-color) 3%, var(--crm-paper) 97%);
+    background: color-mix(
+      in srgb,
+      var(--crm-success-color) 3%,
+      var(--crm-paper) 97%
+    );
   }
 
   .join-section-header-preview {
@@ -750,7 +764,11 @@
     align-items: center;
     justify-content: space-between;
     padding: var(--crm-l-medium-2) var(--crm-l-reg);
-    background: color-mix(in srgb, var(--crm-success-color) 10%, var(--crm-layer1-bg-color) 90%);
+    background: color-mix(
+      in srgb,
+      var(--crm-success-color) 10%,
+      var(--crm-layer1-bg-color) 90%
+    );
     border-bottom: 1px solid var(--crm-c-gray-200);
   }
 

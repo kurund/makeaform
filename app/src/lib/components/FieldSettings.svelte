@@ -191,7 +191,10 @@
       <!-- Info Note -->
       <div class="field-info-box">
         <div class="info-row">
-          <i class="crm-i fa-info-circle" style="margin-right: var(--crm-l-medium);"></i>
+          <i
+            class="crm-i fa-info-circle"
+            style="margin-right: var(--crm-l-medium);"
+          ></i>
           <span
             style="font-size: var(--crm-font-small-size); color: var(--crm-c-gray-600);"
           >
@@ -291,10 +294,7 @@
         <div
           class="toggle-label"
           onclick={() =>
-            handleFieldChange(
-              "defn.required",
-              !activeField().defn?.required,
-            )}
+            handleFieldChange("defn.required", !activeField().defn?.required)}
           role="button"
           tabindex="0"
         >

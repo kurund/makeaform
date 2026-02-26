@@ -66,8 +66,11 @@ export async function saveForm(params: AfformSaveParams): Promise<any> {
     });
     return result;
   } catch (error: any) {
-    const errorMsg = error?.error_message || error?.message || error?.statusText ||
-                     (typeof error === 'string' ? error : 'Unknown server error');
+    const errorMsg =
+      error?.error_message ||
+      error?.message ||
+      error?.statusText ||
+      (typeof error === "string" ? error : "Unknown server error");
     throw new Error(errorMsg);
   }
 }

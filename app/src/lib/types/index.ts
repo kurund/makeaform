@@ -89,7 +89,7 @@ export interface EntityDefinition {
   order_by?: string;
   primary_key: string[];
   paths?: Record<string, string>;
-  joins?: JoinEntity[];  // Available join entities for this entity type
+  joins?: JoinEntity[]; // Available join entities for this entity type
 }
 
 // Field definition from APIv4

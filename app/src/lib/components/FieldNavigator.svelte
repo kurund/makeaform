@@ -12,7 +12,7 @@
   import type { JoinEntity } from "../types";
 
   let searchQuery = $state("");
-  let expandedJoins = $state<Set<string>>(new Set());  // Track which join sections are expanded
+  let expandedJoins = $state<Set<string>>(new Set()); // Track which join sections are expanded
   let availableFieldsCollapsed = $state(false);
   let addJoinCollapsed = $state(false);
 
@@ -95,7 +95,7 @@
     if (!store.currentPage || !store.currentPage["#children"]) return fields;
 
     const joinElement = store.currentPage["#children"].find(
-      (child: any) => child["af-join"] === joinName
+      (child: any) => child["af-join"] === joinName,
     );
 
     if (joinElement && joinElement["#children"]) {
@@ -207,14 +207,15 @@
     if (!store.currentPage || !store.currentPage["#children"]) return;
 
     const joinElement = store.currentPage["#children"].find(
-      (child: any) => child["af-join"] === joinName
+      (child: any) => child["af-join"] === joinName,
     );
 
     if (joinElement && joinElement.id) {
       const fieldCount = getUsedJoinFields(joinName).size;
-      const message = fieldCount > 0
-        ? `Remove "${joinName}" and its ${fieldCount} field${fieldCount > 1 ? 's' : ''}?`
-        : `Remove "${joinName}"?`;
+      const message =
+        fieldCount > 0
+          ? `Remove "${joinName}" and its ${fieldCount} field${fieldCount > 1 ? "s" : ""}?`
+          : `Remove "${joinName}"?`;
 
       if (confirm(message)) {
         // Remove from store
@@ -246,7 +247,7 @@
     if (!store.currentPage || !store.currentPage["#children"]) return;
 
     const joinElement = store.currentPage["#children"].find(
-      (child: any) => child["af-join"] === joinName
+      (child: any) => child["af-join"] === joinName,
     );
 
     if (!joinElement) return;
@@ -261,7 +262,11 @@
     };
 
     // Include options for Select, Radio, CheckBox fields
-    if (field.options && Array.isArray(field.options) && field.options.length > 0) {
+    if (
+      field.options &&
+      Array.isArray(field.options) &&
+      field.options.length > 0
+    ) {
       defaultDefn.options = field.options;
     }
 
@@ -283,10 +288,6 @@
 </script>
 
 <div class="question-navigator">
-  <div class="navigator-header">
-    <h3>Form Builder</h3>
-  </div>
-
   <EntitySelector />
 
   <div class="navigator-content">
@@ -331,9 +332,14 @@
           <button
             type="button"
             class="available-fields-header"
-            onclick={() => (availableFieldsCollapsed = !availableFieldsCollapsed)}
+            onclick={() =>
+              (availableFieldsCollapsed = !availableFieldsCollapsed)}
           >
-            <i class="crm-i {availableFieldsCollapsed ? 'fa-chevron-right' : 'fa-chevron-down'} section-chevron"></i>
+            <i
+              class="crm-i {availableFieldsCollapsed
+                ? 'fa-chevron-right'
+                : 'fa-chevron-down'} section-chevron"
+            ></i>
             <h4>Available Fields</h4>
             <span class="field-count">{availableFields().length}</span>
           </button>
@@ -395,7 +401,11 @@
               class="add-join-header"
               onclick={() => (addJoinCollapsed = !addJoinCollapsed)}
             >
-              <i class="crm-i {addJoinCollapsed ? 'fa-chevron-right' : 'fa-chevron-down'} section-chevron"></i>
+              <i
+                class="crm-i {addJoinCollapsed
+                  ? 'fa-chevron-right'
+                  : 'fa-chevron-down'} section-chevron"
+              ></i>
               <h4>Add Related Entity</h4>
             </button>
             {#if !addJoinCollapsed}
@@ -428,7 +438,11 @@
                 class="join-toggle"
                 onclick={() => toggleJoinExpansion(joinName)}
               >
-                <i class="crm-i {isExpanded ? 'fa-chevron-down' : 'fa-chevron-right'}"></i>
+                <i
+                  class="crm-i {isExpanded
+                    ? 'fa-chevron-down'
+                    : 'fa-chevron-right'}"
+                ></i>
                 <i class="crm-i {getJoinIcon(joinName)} join-icon"></i>
                 <span class="join-name">{joinName}</span>
                 <span class="join-field-count">{usedCount}</span>
@@ -455,7 +469,8 @@
                     <button
                       type="button"
                       class="field-item"
-                      onclick={() => handleAddJoinField(joinName, item.name, item.field)}
+                      onclick={() =>
+                        handleAddJoinField(joinName, item.name, item.field)}
                     >
                       <i class="crm-i fa-plus-circle"></i>
                       <span>{item.label}</span>
@@ -791,7 +806,11 @@
   }
 
   .join-item:hover {
-    background: color-mix(in srgb, var(--crm-success-color) 10%, transparent 90%);
+    background: color-mix(
+      in srgb,
+      var(--crm-success-color) 10%,
+      transparent 90%
+    );
     border-color: var(--crm-success-color);
   }
 
@@ -817,7 +836,11 @@
     align-items: center;
     justify-content: space-between;
     padding: var(--crm-l-medium-1) var(--crm-l-medium-2);
-    background: color-mix(in srgb, var(--crm-success-color) 8%, var(--crm-layer1-bg-color) 92%);
+    background: color-mix(
+      in srgb,
+      var(--crm-success-color) 8%,
+      var(--crm-layer1-bg-color) 92%
+    );
     border-bottom: 1px solid var(--crm-c-gray-200);
   }
 
