@@ -329,8 +329,7 @@
 
       {#if store.currentPage}
         <div class="available-fields">
-          <button
-            type="button"
+          <section
             class="available-fields-header"
             onclick={() =>
               (availableFieldsCollapsed = !availableFieldsCollapsed)}
@@ -342,7 +341,7 @@
             ></i>
             <h4>Available Fields</h4>
             <span class="field-count">{availableFields().length}</span>
-          </button>
+          </section>
 
           {#if !availableFieldsCollapsed}
             {#if availableFields().length > 0}
@@ -396,8 +395,7 @@
         <!-- Add Related Entity Section -->
         {#if availableJoinEntities().length > 0}
           <div class="add-join-section">
-            <button
-              type="button"
+            <section
               class="add-join-header"
               onclick={() => (addJoinCollapsed = !addJoinCollapsed)}
             >
@@ -407,7 +405,7 @@
                   : 'fa-chevron-down'} section-chevron"
               ></i>
               <h4>Add Related Entity</h4>
-            </button>
+            </section>
             {#if !addJoinCollapsed}
               <div class="join-list">
                 {#each availableJoinEntities() as join}

@@ -126,15 +126,10 @@
 
 <div class="entity-selector">
   {#if !expanded && store.selectedEntity}
-    <div class="collapsed-bar">
-      <button
-        type="button"
-        class="collapsed-btn"
-        onclick={() => (expanded = true)}
-      >
-        <i class="crm-i fa-plus"></i> Add another entity
-      </button>
-    </div>
+    <section class="entity-collapased-header" onclick={() => (expanded = true)}>
+      <i class="crm-i fa-chevron-right section-chevron"></i>
+      <h4>Add another entity</h4>
+    </section>
   {:else}
     {#each groupedEntities() as group}
       <div class="entity-group">
@@ -233,23 +228,36 @@
     background: var(--crm-paper);
   }
 
-  .collapsed-btn {
+  .entity-collapased-header {
+    width: 100%;
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 2px 8px;
-    background: none;
-    border: 1px solid var(--crm-c-gray-200);
-    border-radius: 3px;
+    gap: var(--crm-l-medium-1);
+    padding: var(--crm-l-medium-2) var(--crm-l-reg);
+    border: none;
+    border-bottom: 1px solid var(--crm-c-gray-200);
+    background: var(--crm-layer1-bg-color);
     cursor: pointer;
-    font-size: 11px;
-    color: var(--crm-c-gray-600);
-    transition: all 0.15s ease;
+    text-align: left;
   }
 
-  .collapsed-btn:hover {
-    background: var(--makeaform-accent-bg);
-    color: var(--makeaform-accent);
-    border-color: var(--makeaform-accent);
+  .entity-collapased-header:hover {
+    background: var(--crm-c-gray-100);
+  }
+
+  .entity-collapased-header h4 {
+    flex: 1;
+    margin: 0;
+    font-size: var(--crm-font-small-size);
+    font-weight: 700;
+    color: var(--crm-c-gray-800);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .section-chevron {
+    color: var(--crm-c-gray-500);
+    font-size: var(--crm-font-small-size);
+    width: 12px;
   }
 </style>
