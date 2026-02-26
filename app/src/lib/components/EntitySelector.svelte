@@ -104,7 +104,7 @@
         disabled={loading}
         onclick={() => handleEntitySelect(entity.name)}
       >
-        <i class="fa {entity.icon || 'fa-puzzle-piece'} entity-icon"></i>
+        <i class="crm-i {entity.icon || 'fa-puzzle-piece'} entity-icon"></i>
         <span>{entity.title || entity.name}</span>
       </button>
     {/each}

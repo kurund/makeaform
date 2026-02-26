@@ -657,12 +657,12 @@
 <div class="form-builder-app">
   {#if loading}
     <div class="loading-screen">
-      <i class="fa fa-spinner fa-spin fa-3x"></i>
+      <i class="crm-i fa-spinner fa-spin fa-3x"></i>
       <p>Loading Form Builder...</p>
     </div>
   {:else if error}
     <div class="error-screen">
-      <i class="fa fa-exclamation-triangle fa-3x"></i>
+      <i class="crm-i fa-exclamation-triangle fa-3x"></i>
       <p>{error}</p>
     </div>
   {:else}

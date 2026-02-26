@@ -110,7 +110,7 @@
 
   {#if !store.selectedElement}
     <div class="settings-empty">
-      <i class="fa fa-cog fa-2x"></i>
+      <i class="crm-i fa-cog fa-2x"></i>
       <p>Select a field or button to edit its settings</p>
     </div>
   {:else if store.selectedElement?.["#tag"] === "button"}
@@ -118,7 +118,7 @@
       <!-- Button Label -->
       <div class="form-group">
         <label for="button-label">
-          <i class="fa fa-pencil"></i>
+          <i class="crm-i fa-pencil"></i>
           Button Text
         </label>
         <input
@@ -137,7 +137,7 @@
       <!-- Button Icon -->
       <div class="form-group">
         <label for="button-icon">
-          <i class="fa fa-picture-o"></i>
+          <i class="crm-i fa-picture-o"></i>
           Icon
         </label>
         <input
@@ -159,7 +159,7 @@
       <!-- Button Style -->
       <div class="form-group">
         <label for="button-class">
-          <i class="fa fa-paint-brush"></i>
+          <i class="crm-i fa-paint-brush"></i>
           Button Style
         </label>
         <select
@@ -191,7 +191,7 @@
       <!-- Info Note -->
       <div class="field-info-box">
         <div class="info-row">
-          <i class="fa fa-info-circle" style="margin-right: var(--crm-l-medium);"></i>
+          <i class="crm-i fa-info-circle" style="margin-right: var(--crm-l-medium);"></i>
           <span
             style="font-size: var(--crm-font-small-size); color: var(--crm-c-gray-600);"
           >
@@ -205,7 +205,7 @@
       <!-- Field Label -->
       <div class="form-group">
         <label for="field-label">
-          <i class="fa fa-pencil"></i>
+          <i class="crm-i fa-pencil"></i>
           Field Label
         </label>
         <input
@@ -225,7 +225,7 @@
       <!-- Field Type -->
       <div class="form-group">
         <label for="field-type">
-          <i class="fa fa-list"></i>
+          <i class="crm-i fa-list"></i>
           Input Type
         </label>
         <select
@@ -249,7 +249,7 @@
       <!-- Placeholder -->
       <div class="form-group">
         <label for="placeholder">
-          <i class="fa fa-text-width"></i>
+          <i class="crm-i fa-text-width"></i>
           Placeholder
         </label>
         <input
@@ -269,7 +269,7 @@
       <!-- Help Text -->
       <div class="form-group">
         <label for="help-text">
-          <i class="fa fa-info-circle"></i>
+          <i class="crm-i fa-info-circle"></i>
           Help Text
         </label>
         <textarea
@@ -299,7 +299,7 @@
           tabindex="0"
         >
           <span class="toggle-text">
-            <i class="fa fa-asterisk"></i>
+            <i class="crm-i fa-asterisk"></i>
             Required Field
           </span>
           <span
@@ -318,7 +318,7 @@
       {#if ["Email", "Number"].includes(activeField().defn?.input_type || "")}
         <div class="form-group">
           <label for="validation">
-            <i class="fa fa-check-circle"></i>
+            <i class="crm-i fa-check-circle"></i>
             Validation
           </label>
           <input
@@ -340,7 +340,7 @@
       {#if ["Select", "Radio", "CheckBox"].includes(activeField().defn?.input_type || "") && activeField().defn?.options?.length}
         <div class="form-group">
           <label>
-            <i class="fa fa-list-ul"></i>
+            <i class="crm-i fa-list-ul"></i>
             Options ({activeField().defn.options.length})
           </label>
           <div class="options-list">
@@ -371,7 +371,7 @@
           class="btn-delete-field"
           onclick={handleDeleteField}
         >
-          <i class="fa fa-trash"></i>
+          <i class="crm-i fa-trash"></i>
           Delete Field
         </button>
       </div>

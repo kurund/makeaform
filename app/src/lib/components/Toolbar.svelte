@@ -136,7 +136,7 @@
         onclick={toggleSettings}
         title="Form Settings"
       >
-        <i class="fa fa-cog"></i>
+        <i class="crm-i fa-cog"></i>
       </button>
     </div>
   </div>
@@ -158,7 +158,7 @@
           ? "Save first to preview"
           : "Preview form"}
       >
-        <i class="fa fa-eye"></i> Preview
+        <i class="crm-i fa-eye"></i> Preview
       </button>
     {/if}
 
@@ -169,9 +169,9 @@
       disabled={store.isSaving}
     >
       {#if store.isSaving}
-        <i class="fa fa-spinner fa-spin"></i> Saving...
+        <i class="crm-i fa-spinner fa-spin"></i> Saving...
       {:else}
-        <i class="fa fa-save"></i> Save
+        <i class="crm-i fa-save"></i> Save
       {/if}
     </button>
 
@@ -184,9 +184,9 @@
         title="Delete this form"
       >
         {#if isDeleting}
-          <i class="fa fa-spinner fa-spin"></i>
+          <i class="crm-i fa-spinner fa-spin"></i>
         {:else}
-          <i class="fa fa-trash"></i>
+          <i class="crm-i fa-trash"></i>
         {/if}
       </button>
     {/if}
@@ -204,7 +204,7 @@
         onclick={toggleSettings}
         title="Close settings"
       >
-        <i class="fa fa-times"></i>
+        <i class="crm-i fa-times"></i>
       </button>
     </div>
     <div class="settings-panel-body">

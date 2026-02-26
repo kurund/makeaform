@@ -90,7 +90,7 @@
   {#if !store.selectedEntity}
     <div class="preview-empty">
       <div class="empty-content">
-        <i class="fa fa-arrow-left fa-3x"></i>
+        <i class="crm-i fa-arrow-left fa-3x"></i>
         <h2>Get started</h2>
         <p>Select an entity from the left panel to begin building your form</p>
       </div>
@@ -98,7 +98,7 @@
   {:else if store.pages.length === 0}
     <div class="preview-empty">
       <div class="empty-content">
-        <i class="fa fa-plus-circle fa-3x"></i>
+        <i class="crm-i fa-plus-circle fa-3x"></i>
         <h2>Add your first field</h2>
         <p>Click "Add Field" in the left panel to get started</p>
       </div>
@@ -156,7 +156,7 @@
                         }}
                         title="Move up"
                       >
-                        <i class="fa fa-arrow-up"></i>
+                        <i class="crm-i fa-arrow-up"></i>
                       </button>
                     {/if}
                     {#if pageIndex < store.pages.length - 1}
@@ -169,7 +169,7 @@
                         }}
                         title="Move down"
                       >
-                        <i class="fa fa-arrow-down"></i>
+                        <i class="crm-i fa-arrow-down"></i>
                       </button>
                     {/if}
                   </div>
@@ -183,7 +183,7 @@
                   }}
                   title="Delete entity and all its fields"
                 >
-                  <i class="fa fa-trash"></i>
+                  <i class="crm-i fa-trash"></i>
                 </button>
               </div>
             </div>
@@ -288,7 +288,7 @@
 
                     {#if field.defn?.help_post}
                       <div class="field-help">
-                        <i class="fa fa-info-circle"></i>
+                        <i class="crm-i fa-info-circle"></i>
                         {field.defn.help_post}
                       </div>
                     {/if}
@@ -304,7 +304,7 @@
 
               <div class="join-section-preview">
                 <div class="join-section-header-preview">
-                  <i class="fa fa-link"></i>
+                  <i class="crm-i fa-link"></i>
                   <span>{joinName}</span>
                 </div>
 
@@ -358,7 +358,7 @@
 
                         {#if field.defn?.help_post}
                           <div class="field-help">
-                            <i class="fa fa-info-circle"></i>
+                            <i class="crm-i fa-info-circle"></i>
                             {field.defn.help_post}
                           </div>
                         {/if}
@@ -367,7 +367,7 @@
                   </div>
                 {:else}
                   <div class="join-empty">
-                    <i class="fa fa-info-circle"></i>
+                    <i class="crm-i fa-info-circle"></i>
                     <span>No fields added yet</span>
                   </div>
                 {/if}
@@ -387,7 +387,7 @@
             style="pointer-events: all; cursor: pointer;"
           >
             {#if submitButton["crm-icon"]}
-              <i class="fa {submitButton['crm-icon']}"></i>
+              <i class="crm-i {submitButton['crm-icon']}"></i>
             {/if}
             {submitButton["#children"]?.[0] || "Submit"}
           </button>

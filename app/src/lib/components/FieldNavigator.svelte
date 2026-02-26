@@ -311,13 +311,13 @@
   <div class="navigator-content">
     {#if !store.selectedEntity}
       <div class="navigator-empty">
-        <i class="fa fa-arrow-up fa-2x"></i>
+        <i class="crm-i fa-arrow-up fa-2x"></i>
         <p><strong>Select an entity</strong></p>
         <p>to start building your form</p>
       </div>
     {:else if store.pages.length === 0}
       <div class="navigator-empty">
-        <i class="fa fa-inbox fa-2x"></i>
+        <i class="crm-i fa-inbox fa-2x"></i>
         <p><strong>No fields yet</strong></p>
         <p>Select an entity and add fields to build your form</p>
       </div>
@@ -337,7 +337,7 @@
               role="button"
               tabindex="0"
             >
-              <i class="fa fa-file-text-o"></i>
+              <i class="crm-i fa-file-text-o"></i>
               <span class="page-name">{pageName}</span>
               <span class="question-count">{questions.length}</span>
             </div>
@@ -354,7 +354,7 @@
 
           {#if availableFields().length > 0}
             <div class="field-search">
-              <i class="fa fa-search"></i>
+              <i class="crm-i fa-search"></i>
               <input
                 type="text"
                 placeholder=" Search fields..."
@@ -367,7 +367,7 @@
                   onclick={() => (searchQuery = "")}
                   title="Clear search"
                 >
-                  <i class="fa fa-times"></i>
+                  <i class="crm-i fa-times"></i>
                 </button>
               {/if}
             </div>
@@ -375,12 +375,12 @@
 
           {#if availableFields().length === 0}
             <div class="no-fields">
-              <i class="fa fa-check-circle"></i>
+              <i class="crm-i fa-check-circle"></i>
               <p>All fields added!</p>
             </div>
           {:else if filteredFields().length === 0}
             <div class="no-fields">
-              <i class="fa fa-search"></i>
+              <i class="crm-i fa-search"></i>
               <p>No matching fields</p>
             </div>
           {:else}
@@ -391,7 +391,7 @@
                   class="field-item"
                   onclick={() => handleAddField(item.name, item.field)}
                 >
-                  <i class="fa fa-plus-circle"></i>
+                  <i class="crm-i fa-plus-circle"></i>
                   <span>{item.label}</span>
                 </button>
               {/each}
@@ -412,7 +412,7 @@
                   class="join-item"
                   onclick={() => handleAddJoin(join)}
                 >
-                  <i class="fa {join.icon || 'fa-link'}"></i>
+                  <i class="crm-i {join.icon || 'fa-link'}"></i>
                   <span>{join.label}</span>
                 </button>
               {/each}
@@ -433,8 +433,8 @@
                 class="join-toggle"
                 onclick={() => toggleJoinExpansion(joinName)}
               >
-                <i class="fa {isExpanded ? 'fa-chevron-down' : 'fa-chevron-right'}"></i>
-                <i class="fa {getJoinIcon(joinName)} join-icon"></i>
+                <i class="crm-i {isExpanded ? 'fa-chevron-down' : 'fa-chevron-right'}"></i>
+                <i class="crm-i {getJoinIcon(joinName)} join-icon"></i>
                 <span class="join-name">{joinName}</span>
                 <span class="join-field-count">{usedCount}</span>
               </button>
@@ -444,7 +444,7 @@
                 onclick={() => handleRemoveJoin(joinName)}
                 title="Remove {joinName}"
               >
-                <i class="fa fa-times"></i>
+                <i class="crm-i fa-times"></i>
               </button>
             </div>
 
@@ -452,7 +452,7 @@
               <div class="join-fields">
                 {#if joinFields.length === 0}
                   <div class="no-join-fields">
-                    <i class="fa fa-check-circle"></i>
+                    <i class="crm-i fa-check-circle"></i>
                     <span>All fields added</span>
                   </div>
                 {:else}
@@ -462,7 +462,7 @@
                       class="field-item"
                       onclick={() => handleAddJoinField(joinName, item.name, item.field)}
                     >
-                      <i class="fa fa-plus-circle"></i>
+                      <i class="crm-i fa-plus-circle"></i>
                       <span>{item.label}</span>
                     </button>
                   {/each}
