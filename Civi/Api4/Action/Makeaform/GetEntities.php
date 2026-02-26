@@ -53,6 +53,10 @@ class GetEntities extends \Civi\Api4\Generic\AbstractAction {
       'Relationship' => 10,
     ];
 
+    // Define entity groups for UI organization
+    $contactTypes = ['Individual', 'Organization', 'Household'];
+    $components = ['Event', 'Membership', 'Participant', 'Contribution', 'Case'];
+
     $entityMap = [];
     foreach ($entities as $name => $entity) {
       // Skip the special '*' content block entry and Contact
@@ -69,11 +73,23 @@ class GetEntities extends \Civi\Api4\Generic\AbstractAction {
         continue;
       }
 
+      // Determine group
+      if (in_array($name, $contactTypes)) {
+        $group = 'Contact Types';
+      }
+      elseif (in_array($name, $components)) {
+        $group = 'Components';
+      }
+      else {
+        $group = 'Other';
+      }
+
       $entityMap[$name] = [
         'name' => $entity['entity'] ?? $name,
         'title' => $entity['label'] ?? $name,
         'icon' => $entity['icon'] ?? NULL,
         'type' => $entityType,
+        'group' => $group,
         'sort_order' => $sortOrder[$name] ?? 100,
         'defaults' => $entity['defaults'] ?? NULL,
         'boilerplate' => $entity['boilerplate'] ?? NULL,

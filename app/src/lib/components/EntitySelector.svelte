@@ -17,6 +17,26 @@
       : [],
   );
 
+  // Group entities by their group field
+  const groupedEntities = $derived(() => {
+    const groups: Record<string, typeof entities> = {};
+    for (const entity of entities) {
+      const group = entity.group || "Other";
+      if (!groups[group]) {
+        groups[group] = [];
+      }
+      groups[group].push(entity);
+    }
+    // Return ordered: Contact Types first, then Components, then Other
+    const orderedGroups: Array<{ name: string; entities: typeof entities }> = [];
+    for (const groupName of ["Contact Types", "Components", "Other"]) {
+      if (groups[groupName]) {
+        orderedGroups.push({ name: groupName, entities: groups[groupName] });
+      }
+    }
+    return orderedGroups;
+  });
+
   async function handleEntitySelect(entityName: string) {
     if (loading) return;
 
@@ -96,19 +116,24 @@
 </script>
 
 <div class="entity-selector">
-  <div class="entity-list">
-    {#each entities as entity}
-      <button
-        type="button"
-        class="entity-item"
-        disabled={loading}
-        onclick={() => handleEntitySelect(entity.name)}
-      >
-        <i class="crm-i {entity.icon || 'fa-puzzle-piece'} entity-icon"></i>
-        <span>{entity.title || entity.name}</span>
-      </button>
-    {/each}
-  </div>
+  {#each groupedEntities() as group}
+    <div class="entity-group">
+      <div class="group-header">{group.name}</div>
+      <div class="entity-list">
+        {#each group.entities as entity}
+          <button
+            type="button"
+            class="entity-item"
+            disabled={loading}
+            onclick={() => handleEntitySelect(entity.name)}
+          >
+            <i class="crm-i {entity.icon || 'fa-puzzle-piece'} entity-icon"></i>
+            <span>{entity.title || entity.name}</span>
+          </button>
+        {/each}
+      </div>
+    </div>
+  {/each}
 </div>
 
 <style>
@@ -117,31 +142,51 @@
     border-bottom: 1px solid var(--crm-c-gray-200);
   }
 
+  .entity-group {
+    border-bottom: 1px solid var(--crm-c-gray-100);
+  }
+
+  .entity-group:last-child {
+    border-bottom: none;
+  }
+
+  .group-header {
+    padding: var(--crm-l-small) var(--crm-l-reg);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--crm-c-gray-500);
+    background: var(--crm-layer1-bg-color);
+  }
+
   .entity-list {
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--crm-l-small);
-    padding: var(--crm-l-medium-2) var(--crm-l-reg);
+    flex-direction: column;
   }
 
   .entity-item {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: var(--crm-l-small);
-    padding: var(--crm-l-small) var(--crm-l-medium-2);
-    background: var(--crm-layer1-bg-color);
-    border: 1px solid var(--crm-c-gray-200);
-    border-radius: var(--crm-l-reg);
+    gap: var(--crm-l-medium-1);
+    padding: var(--crm-l-medium-1) var(--crm-l-reg);
+    background: var(--crm-paper);
+    border: none;
+    border-bottom: 1px solid var(--crm-c-gray-100);
     cursor: pointer;
     font-size: var(--crm-font-small-size);
     color: var(--crm-text-color);
     transition: all 0.15s ease;
-    white-space: nowrap;
+    text-align: left;
+    width: 100%;
+  }
+
+  .entity-item:last-child {
+    border-bottom: none;
   }
 
   .entity-item:hover:not(:disabled) {
     background: var(--makeaform-accent-bg);
-    border-color: var(--makeaform-accent);
     color: var(--makeaform-accent);
   }
 
@@ -153,7 +198,7 @@
   .entity-icon {
     font-size: var(--crm-font-small-size);
     color: var(--makeaform-accent);
-    width: 14px;
+    width: 16px;
     text-align: center;
   }
 

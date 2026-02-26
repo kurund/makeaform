@@ -311,8 +311,8 @@
   <div class="navigator-content">
     {#if !store.selectedEntity}
       <div class="navigator-empty">
-        <i class="crm-i fa-arrow-up fa-2x"></i>
-        <p><strong>Select an entity</strong></p>
+        <i class="crm-i fa-hand-pointer-o fa-2x"></i>
+        <p><strong>Pick an entity above</strong></p>
         <p>to start building your form</p>
       </div>
     {:else if store.pages.length === 0}
