@@ -325,9 +325,11 @@ export function gotoField(pageIndex: number, fieldIndex: number = 0) {
       Math.max(0, fields.length - 1),
     );
 
-    // Update selected element
-    if (store.currentField) {
+    // Update selected element (clear if page has no fields)
+    if (fields.length > 0 && store.currentField) {
       store.selectedElementId = store.currentField.id || null;
+    } else {
+      store.selectedElementId = null;
     }
   }
 }

@@ -677,9 +677,11 @@
         <FieldPreview />
       </div>
 
-      <div class="panel-right">
-        <FieldSettings />
-      </div>
+      {#if store.selectedElement}
+        <div class="panel-right">
+          <FieldSettings />
+        </div>
+      {/if}
     </div>
   {/if}
 </div>
