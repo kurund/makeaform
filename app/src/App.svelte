@@ -722,8 +722,8 @@
     background: var(--crm-container-bg-color);
   }
 
-  .loading-screen i,
-  .error-screen i {
+  .loading-screen :global(i),
+  .error-screen :global(i) {
     margin-bottom: var(--crm-l-reg-2);
     color: var(--makeaform-accent);
   }
@@ -735,7 +735,7 @@
     font-weight: 500;
   }
 
-  .error-screen i {
+  .error-screen :global(i) {
     color: var(--crm-danger-color);
   }
 

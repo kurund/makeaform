@@ -412,7 +412,7 @@
     text-align: center;
   }
 
-  .settings-empty i {
+  .settings-empty :global(i) {
     margin-bottom: var(--crm-l-reg);
     opacity: 0.4;
     color: var(--makeaform-accent);
@@ -446,7 +446,7 @@
     letter-spacing: 0;
   }
 
-  .form-group label i {
+  .form-group label :global(i) {
     color: var(--crm-c-gray-400);
     font-size: var(--crm-font-small-size);
   }
@@ -527,7 +527,7 @@
     color: var(--crm-text-color);
   }
 
-  .toggle-text i {
+  .toggle-text :global(i) {
     color: var(--crm-c-gray-400);
     font-size: var(--crm-font-small-size);
   }

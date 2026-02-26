@@ -391,7 +391,7 @@
                   class="field-item"
                   onclick={() => handleAddField(item.name, item.field)}
                 >
-                  <i class="crm-i fa-plus-circle"></i>
+                  <i class="crm-i fa-plus-circle field-icon"></i>
                   <span>{item.label}</span>
                 </button>
               {/each}
@@ -514,7 +514,7 @@
     text-align: center;
   }
 
-  .navigator-empty i {
+  .navigator-empty :global(i) {
     margin-bottom: var(--crm-l-reg);
     opacity: 0.4;
     color: var(--makeaform-accent);
@@ -562,7 +562,7 @@
     border-left: 3px solid var(--makeaform-accent);
   }
 
-  .page-header i {
+  .page-header :global(i) {
     color: var(--makeaform-accent);
     font-size: var(--crm-font-size);
   }
@@ -631,7 +631,7 @@
     border-bottom: 1px solid var(--crm-c-gray-200);
   }
 
-  .field-search i {
+  .field-search :global(i) {
     color: var(--crm-c-gray-400);
     font-size: var(--crm-l-medium-3);
   }
@@ -675,7 +675,7 @@
     text-align: center;
   }
 
-  .no-fields i {
+  .no-fields :global(i) {
     font-size: var(--crm-l-large);
     color: var(--makeaform-accent);
     margin-bottom: var(--crm-l-medium-2);
@@ -712,14 +712,14 @@
     border-color: var(--makeaform-accent);
   }
 
-  .field-item i {
-    color: var(--makeaform-accent);
+  .field-item :global(i) {
+    color: var(--makeaform-accent) !important;
     font-size: var(--crm-l-medium-3);
     opacity: 0.6;
     transition: opacity 0.15s ease;
   }
 
-  .field-item:hover i {
+  .field-item:hover :global(i) {
     opacity: 1;
   }
 
@@ -777,7 +777,7 @@
     border-color: var(--crm-success-color);
   }
 
-  .join-item i {
+  .join-item :global(i) {
     color: var(--crm-success-color);
     font-size: var(--crm-l-medium-3);
   }
@@ -815,7 +815,7 @@
     text-align: left;
   }
 
-  .join-toggle i {
+  .join-toggle :global(i) {
     color: var(--crm-c-gray-500);
     font-size: var(--crm-font-small-size);
     width: 12px;
@@ -869,7 +869,7 @@
     font-size: var(--crm-font-small-size);
   }
 
-  .no-join-fields i {
+  .no-join-fields :global(i) {
     color: var(--crm-success-color);
   }
 </style>
