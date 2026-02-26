@@ -13,6 +13,8 @@
 
   let searchQuery = $state("");
   let expandedJoins = $state<Set<string>>(new Set());  // Track which join sections are expanded
+  let availableFieldsCollapsed = $state(false);
+  let addJoinCollapsed = $state(false);
 
   // Track which fields are already in the form
   const usedFields = $derived(() => {
@@ -192,6 +194,10 @@
       console.error(`Failed to load fields for ${join.name}:`, error);
     }
 
+    // Collapse other sections so the new join is immediately visible
+    availableFieldsCollapsed = true;
+    addJoinCollapsed = true;
+
     // Expand this join section
     expandedJoins = new Set([...expandedJoins, join.name]);
   }
@@ -322,76 +328,90 @@
 
       {#if store.currentPage}
         <div class="available-fields">
-          <div class="available-fields-header">
+          <button
+            type="button"
+            class="available-fields-header"
+            onclick={() => (availableFieldsCollapsed = !availableFieldsCollapsed)}
+          >
+            <i class="crm-i {availableFieldsCollapsed ? 'fa-chevron-right' : 'fa-chevron-down'} section-chevron"></i>
             <h4>Available Fields</h4>
             <span class="field-count">{availableFields().length}</span>
-          </div>
+          </button>
 
-          {#if availableFields().length > 0}
-            <div class="field-search">
-              <i class="crm-i fa-search"></i>
-              <input
-                type="text"
-                placeholder=" Search fields..."
-                bind:value={searchQuery}
-              />
-              {#if searchQuery}
-                <button
-                  type="button"
-                  class="clear-search"
-                  onclick={() => (searchQuery = "")}
-                  title="Clear search"
-                >
-                  <i class="crm-i fa-times"></i>
-                </button>
-              {/if}
-            </div>
-          {/if}
+          {#if !availableFieldsCollapsed}
+            {#if availableFields().length > 0}
+              <div class="field-search">
+                <i class="crm-i fa-search"></i>
+                <input
+                  type="text"
+                  placeholder=" Search fields..."
+                  bind:value={searchQuery}
+                />
+                {#if searchQuery}
+                  <button
+                    type="button"
+                    class="clear-search"
+                    onclick={() => (searchQuery = "")}
+                    title="Clear search"
+                  >
+                    <i class="crm-i fa-times"></i>
+                  </button>
+                {/if}
+              </div>
+            {/if}
 
-          {#if availableFields().length === 0}
-            <div class="no-fields">
-              <i class="crm-i fa-check-circle"></i>
-              <p>All fields added!</p>
-            </div>
-          {:else if filteredFields().length === 0}
-            <div class="no-fields">
-              <i class="crm-i fa-search"></i>
-              <p>No matching fields</p>
-            </div>
-          {:else}
-            <div class="fields-list">
-              {#each filteredFields() as item}
-                <button
-                  type="button"
-                  class="field-item"
-                  onclick={() => handleAddField(item.name, item.field)}
-                >
-                  <i class="crm-i fa-plus-circle field-icon"></i>
-                  <span>{item.label}</span>
-                </button>
-              {/each}
-            </div>
+            {#if availableFields().length === 0}
+              <div class="no-fields">
+                <i class="crm-i fa-check-circle"></i>
+                <p>All fields added!</p>
+              </div>
+            {:else if filteredFields().length === 0}
+              <div class="no-fields">
+                <i class="crm-i fa-search"></i>
+                <p>No matching fields</p>
+              </div>
+            {:else}
+              <div class="fields-list">
+                {#each filteredFields() as item}
+                  <button
+                    type="button"
+                    class="field-item"
+                    onclick={() => handleAddField(item.name, item.field)}
+                  >
+                    <i class="crm-i fa-plus-circle field-icon"></i>
+                    <span>{item.label}</span>
+                  </button>
+                {/each}
+              </div>
+            {/if}
           {/if}
         </div>
 
         <!-- Add Related Entity Section -->
         {#if availableJoinEntities().length > 0}
           <div class="add-join-section">
-            <div class="add-join-header">
+            <button
+              type="button"
+              class="add-join-header"
+              onclick={() => (addJoinCollapsed = !addJoinCollapsed)}
+            >
+              <i class="crm-i {addJoinCollapsed ? 'fa-chevron-right' : 'fa-chevron-down'} section-chevron"></i>
               <h4>Add Related Entity</h4>
-            </div>
-            <div class="join-list">
-              {#each availableJoinEntities() as join}
-                <button
-                  type="button"
-                  class="join-item"
-                  onclick={() => handleAddJoin(join)}
-                >
-                  <i class="crm-i {join.icon || 'fa-link'}"></i>
-                  <span>{join.label}</span>
-                </button>
-              {/each}
-            </div>
+            </button>
+            {#if !addJoinCollapsed}
+              <div class="join-list">
+                {#each availableJoinEntities() as join}
+                  <button
+                    type="button"
+                    class="join-item"
+                    onclick={() => handleAddJoin(join)}
+                  >
+                    <i class="crm-i {join.icon || 'fa-link'}"></i>
+                    <span>{join.label}</span>
+                  </button>
+                {/each}
+              </div>
+            {/if}
           </div>
         {/if}
 
@@ -571,15 +591,30 @@
   }
 
   .available-fields-header {
+    width: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: var(--crm-l-medium-1);
     padding: var(--crm-l-medium-2) var(--crm-l-reg);
+    border: none;
     border-bottom: 1px solid var(--crm-c-gray-200);
     background: var(--crm-layer1-bg-color);
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .available-fields-header:hover {
+    background: var(--crm-c-gray-100);
+  }
+
+  .section-chevron {
+    color: var(--crm-c-gray-500);
+    font-size: var(--crm-font-small-size);
+    width: 12px;
   }
 
   .available-fields-header h4 {
+    flex: 1;
     margin: 0;
     font-size: var(--crm-font-small-size);
     font-weight: 700;
@@ -711,12 +746,20 @@
   }
 
   .add-join-header {
+    width: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: var(--crm-l-medium-1);
     padding: var(--crm-l-medium-2) var(--crm-l-reg);
+    border: none;
     border-bottom: 1px solid var(--crm-c-gray-200);
     background: var(--crm-layer1-bg-color);
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .add-join-header:hover {
+    background: var(--crm-c-gray-100);
   }
 
   .add-join-header h4 {
